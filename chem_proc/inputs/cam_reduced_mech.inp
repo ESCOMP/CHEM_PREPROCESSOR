@@ -22,7 +22,7 @@ End Comments
         OLE -> C2, C2H4, CH3COCHO, ISOP -> C5H8, ROOH -> CH3COCH2OOH
         ONIT -> CH3COCH2ONO2, XO2 -> H, XO2N -> H, RXPAR -> H
         CB1 -> C, CB2 -> C, SO2, SO4, DMS -> CH3SCH3, NH3, NH4, H2SO4, NH4NO3
-        OC1 -> C, OC2 -> C, SA1 -> NaCl, SA2 -> NaCl, SA3 -> NaCl, SA4 -> NaCl
+        OC1 -> C, OC2 -> C, SSLT01 -> NaCl, SSLT02 -> NaCl, SSLT03 -> NaCl, SSLT04 -> NaCl
       End Solution
 
       Fixed
@@ -48,7 +48,7 @@ End Comments
        OLE, C2H4, CH3COCHO, ISOP, ROOH
        ONIT, XO2, XO2N, RXPAR
        SO2, SO4, DMS, NH3, NH4, H2SO4, NH4NO3
-       CB1, CB2, OC1, OC2, SA1, SA2, SA3, SA4
+       CB1, CB2, OC1, OC2, SSLT01, SSLT02, SSLT03, SSLT04
       End Implicit
    End Solution Classes
 

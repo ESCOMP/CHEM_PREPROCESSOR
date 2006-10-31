@@ -40,9 +40,9 @@ End Comments
  ISOPNO3 -> CH2CHCCH3OOCH2ONO2, ONITR -> CH2CCH3CHONO2CH2OH
  CB1 -> C, CB2 -> C, OC1 -> C, OC2 -> C, SOA -> C12
  SO2, SO4, DMS -> CH3SCH3, NH3, NH4NO3
- SA1 -> NaCl, SA2 -> NaCl, SA3 -> NaCl, SA4 -> NaCl
+ SSLT01 -> NaCl, SSLT02 -> NaCl, SSLT03 -> NaCl, SSLT04 -> NaCl
  Rn, Pb
- DST1 -> AlSiO5, DST2 -> AlSiO5, DST3 -> AlSiO5, DST4 -> AlSiO5
+ DST01 -> AlSiO5, DST02 -> AlSiO5, DST03 -> AlSiO5, DST04 -> AlSiO5
       End Solution
 
       Fixed
@@ -73,8 +73,8 @@ End Comments
        TOLUENE, CRESOL, TOLO2, TOLOOH, XOH, BIGALD, GLYOXAL
        PAN, ONIT, MPAN, ISOPNO3, ONITR
        CB1, CB2, SO2, SO4, DMS, NH3, NH4NO3
-       OC1, OC2, SA1, SA2, SA3, SA4, SOA
-       DST1, DST2, DST3, DST4
+       OC1, OC2, SSLT01, SSLT02, SSLT03, SSLT04, SOA
+       DST01, DST02, DST03, DST04
       End Implicit
    End Solution Classes
 
