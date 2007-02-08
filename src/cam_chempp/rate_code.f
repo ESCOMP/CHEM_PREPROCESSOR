@@ -56,6 +56,7 @@ contains
     logical  ::  t_dependent(rxpcnt)
 
 
+
     inquire( file = trim( temp_path ) // 'mo_setrxt.F', exist = lexist )
     if( lexist ) then
        call system( 'rm ' // trim( temp_path ) // 'mo_setrxt.F' )
@@ -226,6 +227,7 @@ contains
           cnt = count( t_dependent(:rxpcnt) )
        end if
 
+
        !-----------------------------------------------------------------------
        !        ... check for temp dependent rates
        !-----------------------------------------------------------------------
@@ -306,7 +308,7 @@ contains
        !-----------------------------------------------------------------------
        !        ... first do all temperature independent rates
        !-----------------------------------------------------------------------
-       const_rxts : if( cnt > 0 .and. cnt /= rxpcnt ) then
+       const_rxts : if( rxpcnt > 0 .and. cnt /= rxpcnt ) then
           line = ' '
           do i = 1,rxpcnt
              if( sym_rates(2,i) == ' ' ) then
