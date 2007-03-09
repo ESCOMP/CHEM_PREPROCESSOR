@@ -427,9 +427,6 @@ End Comments
           NH3 + OH -> H2O                                ; 1.7e-12, -710.
           OC1 -> OC2                                     ; 7.1e-6
  [usr26]  HO2 -> 0.5*H2O2
- [usr27]  CH2O ->
- [usr28]  O3 ->
- [usr28a] O3A ->
    End Reactions
 
    Heterogeneous
@@ -438,11 +435,11 @@ End Comments
       CH3OH, C2H5OH, GLYALD, HYAC, HYDRALD, CH3CHO, ISOPNO3
       ALKOOH, MEKOOH, TOLOOH, TERPOOH, CH3COOH
       XHNO3, XHO2NO2, XONIT, XONITR, XISOPNO3
-      SO2, SO4, CB2, NH3, NH4NO3, NH4, OC2, SOA, H2SO4
+      SO2, NH3, NH4,  H2SO4
    End Heterogeneous
 
    Ext Forcing
-      NO, CO, SYNOZ, XNO
+      NO, CO, XNO
    End Ext Forcing
 
    END CHEMISTRY
