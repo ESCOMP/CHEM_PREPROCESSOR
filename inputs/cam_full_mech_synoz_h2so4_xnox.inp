@@ -144,17 +144,18 @@ End Comments
          OA + O3 -> O3                  	       ; 8e-12, -2060
          O + O3A  -> O                                  ; 8e-12, -2060
  [o1d_n2] O1D + N2 -> O + N2                                             ; 2.1e-11, 115
+         O1DA + N2 -> OA + N2                 ; 2.1e-11, 115
  [o1d_o2] O1D + O2 -> O + O2                                             ; 3.2e-11, 70
+         O1DA + O2 -> OA + O2                 ; 3.2e-11 , 70
  [ox_l1]  O1D + H2O -> 2*OH                                              ; 2.2e-10
-          O1DA + N2 -> OA + N2                 ; 2.1e-11, 115
-          O1DA + O2 -> OA + O2                 ; 3.2e-11 , 70
-          O1DA + H2O -> H2O                    ; 2.2e-10
+         O1DA + H2O -> H2O                    ; 2.2e-10
           H2 + O1D -> HO2 + OH                                           ; 1.1e-10
-         H2 + O1D -> HO2 + OH                 ; 1.1e-10
 	 H2 + O1DA -> H2	              ; 1.1e-10
           H2 + OH -> H2O + HO2                                           ; 5.5e-12, -2000
           O + OH -> HO2 + O2                                             ; 2.2e-11, 120
+         OA + OH -> OH                                             ; 2.2e-11, 120
           HO2 + O -> OH + O2                                             ; 3e-11, 200
+         HO2 + OA -> HO2                                             ; 3e-11, 200
  [ox_l2]  OH + O3 -> HO2 + O2                                            ; 1.7e-12, -940
          OH + O3A -> OH                                ; 1.7e-12, -940
  [ox_l3]  HO2 + O3 -> OH + 2*O2                                          ; 1.e-14, -490
@@ -165,40 +166,39 @@ End Comments
           OH + OH -> H2O + O                                             ; 4.2e-12, -240
           OH + OH + M -> H2O2 + M                                        ; 6.9e-31,1., 2.6e-11,0., .6
           N2O + O1D -> 2*NO                                              ; 6.7e-11
+         N2O + O1DA -> N2O                             ; 6.7e-11
           N2O + O1D -> N2 + O2                                           ; 4.9e-11
-          N2O + O1DA -> N2O                             ; 6.7e-11
-          N2O + O1DA -> N2O                             ; 4.9e-11
+         N2O + O1DA -> N2O                             ; 4.9e-11
  [ox_p1]  NO + HO2 -> NO2 + OH                                           ; 3.5e-12, 250
-          NO + O3 -> NO2 + O2                                            ; 3e-12, -1500
-          NO2 + O -> NO + O2                                             ; 5.6e-12, 180
-          NO2 + O3 -> NO3 + O2                                           ; 1.2e-13, -2450
-          NO3 + HO2 -> OH + NO2                                          ; 2.3e-12, 170.
          XNO + HO2 -> XNO2 + HO2                 ; 3.5e-12, 250
+          NO + O3 -> NO2 + O2                                            ; 3e-12, -1500
          XNO + O3 -> XNO2 + O3                   ; 3e-12, -1500
          NO +  O3A -> NO                         ; 3e-12, -1500
+          NO2 + O -> NO + O2                                             ; 5.6e-12, 180
          NO2 + OA -> NO2                               ; 5.6e-12, 180
          XNO2 + O -> XNO + O                           ; 5.6e-12, 180
-         NO2 + O3 -> NO3 + O2                   ; 1.2e-13, -2450
+          NO2 + O3 -> NO3 + O2                                           ; 1.2e-13, -2450
          XNO2 + O3 -> XNO3 + O3                 ; 1.2e-13, -2450
          NO2 + O3A -> NO2                       ; 1.2e-13, -2450
+          NO3 + HO2 -> OH + NO2                                          ; 2.3e-12, 170.
          XNO3 + HO2 -> HO2 + XNO2                      ; 2.3e-12, 170.
  [usr2]   NO2 + NO3 + M -> N2O5 + M                                      ; 2.e-30,4.4, 1.4e-12,.7, .6
- [usr2a]  XNO2 + NO3 + M -> XNO2NO3 + NO3 + M     ; 2.e-30,4.4, 1.4e-12,.7, .6
- [usr2b]  NO2 + XNO3 + M -> NO2XNO3 + NO2 + M     ; 2.e-30,4.4, 1.4e-12,.7, .6
+ [usr2a] XNO2 + NO3 + M -> XNO2NO3 + NO3 + M     ; 2.e-30,4.4, 1.4e-12,.7, .6
+ [usr2b] NO2 + XNO3 + M -> NO2XNO3 + NO2 + M     ; 2.e-30,4.4, 1.4e-12,.7, .6
  [usr3]   N2O5 + M -> NO2 + NO3 + M
- [usr3a]  XNO2NO3 + M -> XNO2 + M
- [usr3b]  NO2XNO3 + M -> XNO3 + M
+ [usr3a] XNO2NO3 + M -> XNO2 + M
+ [usr3b] NO2XNO3 + M -> XNO3 + M
  [usr4]   NO2 + OH + M -> HNO3 + M                                       ; 2.0e-30,3.0, 2.5e-11,0., .6
  [usr4a] XNO2 + OH + M -> XHNO3 + OH + M         ; 2.0e-30,3.0, 2.5e-11,0., .6
  [usr5]   HNO3 + OH -> NO3 + H2O
  [usr5a] XHNO3 + OH -> XNO3 + OH 
           NO3 + NO -> 2*NO2                                              ; 1.5e-11, 170
-        XNO3 + NO -> XNO2 + NO                         ; 1.5e-11, 170
-        NO3 + XNO -> XNO2 + NO3                        ; 1.5e-11, 170
+         XNO3 + NO -> XNO2 + NO                         ; 1.5e-11, 170
+         NO3 + XNO -> XNO2 + NO3                        ; 1.5e-11, 170
  [usr6]   NO2 + HO2 + M -> HO2NO2 + M                                    ; 1.8e-31,3.2, 4.7e-12,1.4, .6
  [usr6a] XNO2 + HO2 + M -> XHO2NO2 + HO2 + M           ; 1.8e-31,3.2, 4.7e-12,1.4, .6
           HO2NO2 + OH -> H2O + NO2 + O2                                  ; 1.3e-12, 380
-        XHO2NO2 + OH -> XNO2 + OH                      ; 1.3e-12, 380
+         XHO2NO2 + OH -> XNO2 + OH                      ; 1.3e-12, 380
  [usr7]   HO2NO2 + M -> HO2 + NO2 + M
  [usr7a] XHO2NO2 + M -> XNO2 + M
  [usr16]  N2O5 -> 2 * HNO3
@@ -210,7 +210,7 @@ End Comments
  [usr17ab] XNO2  -> 0.5*XNO + 0.5*XHNO3
           CH4 + OH -> CH3O2 + H2O                                        ; 2.45e-12, -1775
           CH4 + O1D -> .75*CH3O2 + .75*OH + .25*CH2O + .4*HO2 + .05*H2   ; 1.5e-10
-        CH4 + O1DA -> CH4                                                       ; 1.5e-10
+         CH4 + O1DA -> CH4                                                       ; 1.5e-10
  [ox_p2]  CH3O2 + NO -> CH2O + NO2 + HO2                                 ; 2.8e-12, 300
          CH3O2 + XNO -> CH3O2 + XNO2                   ; 2.8e-12, 300
           CH3O2 + CH3O2 -> 2 * CH2O + 2 * HO2                            ; 5.e-13,-424
@@ -224,7 +224,7 @@ End Comments
  [usr13]  C2H4 + OH + M -> .75*EO2 + .5*CH2O + .25*HO2 + M               ; 1.e-28,.8, 8.8e-12,0., .6
  [ox_l6]  C2H4 + O3 -> CH2O + .12 * HO2 + .5 * CO                        ; 1.2e-14, -2630
                       + .12 * OH + .25 * CH3COOH
-         O3A + C2H4 -> C2H4                                             ; 1.2e-14, -2630
+         C2H4 + O3A -> C2H4                                             ; 1.2e-14, -2630
           EO2 + NO -> EO + NO2                                           ; 4.2e-12,180
          EO2 + XNO -> EO2 + XNO2                                        ; 4.2e-12,180
 	  EO  + O2 -> GLYALD + HO2                                       ; 1.e-14
@@ -269,7 +269,7 @@ End Comments
           C3H7OOH + OH -> H2O + C3H7O2                                   ; 3.8e-12, 200
  [usr22]  CH3COCH3 + OH -> RO2 + H2O
  [ox_p10] RO2 + NO -> CH3CO3 + CH2O + NO2                                ; 2.9e-12, 300
-          RO2 + XNO -> RO2 + XNO2                                  ; 2.9e-12, 300
+         RO2 + XNO -> RO2 + XNO2                                  ; 2.9e-12, 300
           RO2 + HO2 -> ROOH + O2                                         ; 8.6e-13, 700
           RO2 + CH3O2 -> .3*CH3CO3 + .8*CH2O + .3*HO2 + .2*HYAC          ; 2.0e-12, 500
                       + .5*CH3COCHO + .5*CH3OH
@@ -284,7 +284,7 @@ End Comments
  	  ALKO2 + HO2 -> ALKOOH                                          ; 7.5e-13, 700
  	  ALKOOH + OH -> ALKO2                                           ; 3.8e-12, 200
           ONIT + OH -> NO2 + CH3COCHO                                    ; 6.8e-13
-          XONIT + OH -> XNO2 + OH                                  ; 6.8e-13
+         XONIT + OH -> XNO2 + OH                                  ; 6.8e-13
  	  MEK + OH -> MEKO2                                              ; 2.3e-12, -170
  	  MEKO2 + NO  -> CH3CO3 + CH3CHO + NO2                           ; 4.2e-12, 180
  	 MEKO2 + XNO  ->  MEKO2 + XNO2                                  ; 4.2e-12, 180
@@ -302,9 +302,9 @@ End Comments
  	  GLYOXAL + OH -> HO2 + CO + CO2                                 ; 1.1e-11
           ISOP + OH -> ISOPO2                                            ; 2.54e-11, 410
  [ox_l5]  ISOP + O3 -> .4 * MACR + .2 * MVK + .07 * C3H6 + .27 * OH      ; 1.05e-14, -2000
-         ISOP + O3A -> ISOP + .1 * O3A                                ; 1.05e-14, -2000 
                       + .06 * HO2 + .6 * CH2O + .3 * CO + .1 * O3
 		      + .2 * MCO3 + .2 * CH3COOH
+         ISOP + O3A -> ISOP + .1 * O3A                                ; 1.05e-14, -2000 
  [ox_p6]  ISOPO2 + NO -> .08 * ONITR + .92 * NO2 + HO2 + .55 * CH2O      ; 2.2e-12, 180
                         + .23 * MACR + .32 * MVK + .37 * HYDRALD
          ISOPO2 + XNO -> ISOPO2 + .92 * XNO2 +.08 * XONITR              ; 2.2e-12, 180
@@ -356,40 +356,40 @@ End Comments
  [soa1]   C10H16 + O3 -> .7*OH + MVK + MACR + HO2                         ; 1.e-15, -732
          C10H16 + O3A ->  C10H16                             		 ; 1.e-15, -732
  [soa3]   C10H16 + NO3 -> TERPO2 + NO2                                    ; 1.2e-12, 490
-          C10H16 + XNO3 -> C10H16 + XNO2                       		 ; 1.2e-12, 490
+         C10H16 + XNO3 -> C10H16 + XNO2                       		 ; 1.2e-12, 490
  	  TERPO2 + NO  -> .1*CH3COCH3 + HO2 + MVK + MACR + NO2            ; 4.2e-12, 180
- 	  TERPO2 + XNO -> TERPO2 + XNO2               		        ; 4.2e-12, 180
+ 	 TERPO2 + XNO -> TERPO2 + XNO2               		        ; 4.2e-12, 180
  	  TERPO2 + HO2 -> TERPOOH                                         ; 7.5e-13, 700
  	  TERPOOH + OH -> TERPO2                                          ; 3.8e-12, 200
           CH3COOH + OH -> CH3O2 + CO2 + H2O                               ; 7.e-13
           ISOP + NO3 -> ISOPNO3                                                    ; 3.03e-12,-446
- [new5]   ISOP + XNO3 -> XISOPNO3  + ISOP                          ; 3.03e-12,-446
+ [new5]  ISOP + XNO3 -> XISOPNO3  + ISOP                          ; 3.03e-12,-446
           ISOPNO3 + NO -> 1.206 * NO2 + .794 * HO2 + .072 * CH2O + .167 * MACR     ; 2.7e-12, 360
                           + .039 * MVK + .794 * ONITR
-          XISOPNO3 + NO -> .794 * XONITR + .206 * XNO2 +  NO                       ; 2.7e-12, 360
-          ISOPNO3 + XNO ->  1.00 * XNO2 +  ISOPNO3                     ; 2.7e-12, 360
+         XISOPNO3 + NO -> .794 * XONITR + .206 * XNO2 +  NO                       ; 2.7e-12, 360
+         ISOPNO3 + XNO ->  1.00 * XNO2 +  ISOPNO3                     ; 2.7e-12, 360
           ISOPNO3 + NO3 -> 1.206 * NO2 + .072 * CH2O + .167 * MACR + .039 * MVK    ; 2.4e-12
                            + .794 * ONITR + .794 * HO2
-          XISOPNO3 + NO3 -> .794 * XONITR + .206 * XNO2 + NO3                      ; 2.4e-12
+         XISOPNO3 + NO3 -> .794 * XONITR + .206 * XNO2 + NO3                      ; 2.4e-12
           ISOPNO3 + XNO3 ->  1.00 * XNO2 +  ISOPNO3                                ; 2.4e-12
           ISOPNO3 + HO2 -> .206 * NO2 + .794 * HO2 + .008 * CH2O            ; 8.e-13, 700
                            + .167 * MACR + .039 * MVK + .794 * ONITR
-          XISOPNO3 + HO2 -> .206 * XNO2 + .794 * XONITR + HO2               ; 8.e-13, 700
+         XISOPNO3 + HO2 -> .206 * XNO2 + .794 * XONITR + HO2               ; 8.e-13, 700
           CH3COCHO + OH -> CH3CO3 + CO + H2O                               ; 8.4e-13,830
           CH3COCHO + NO3 -> HNO3 + CO + CH3CO3                             ; 1.4e-12, -1860
           ONITR + OH -> HYDRALD + .4*NO2 + HO2                             ; 4.5e-11
-          XONITR + OH -> OH  + .4 *XNO2                                    ; 4.5e-11
+         XONITR + OH -> OH  + .4 *XNO2                                    ; 4.5e-11
           ONITR + NO3 -> HYDRALD + NO2 + HO2                               ; 1.4e-12, -1860
-          XONITR + NO3 -> .5 * XNO2 + NO3                                  ; 1.4e-12, -1860
+         XONITR + NO3 -> .5 * XNO2 + NO3                                  ; 1.4e-12, -1860
           ONITR + XNO3 -> .5 * XNO2 + ONITR                                ; 1.4e-12, -1860
-          CH3COCHO + XNO3 -> XHNO3 + CH3COCHO                              ; 1.4e-12, -1860
+         CH3COCHO + XNO3 -> XHNO3 + CH3COCHO                              ; 1.4e-12, -1860
 	  HYDRALD + OH -> XO2                                              ; 1.86e-11,175
  [ox_p11] XO2 + NO -> NO2 + 1.5*HO2 + CO                                   ; 2.7e-12, 360
                       + .25*HYAC + .25*CH3COCHO + .25*GLYALD
-          XO2 + XNO -> XNO2 + XO2                                          ; 2.7e-12, 360
+         XO2 + XNO -> XNO2 + XO2                                          ; 2.7e-12, 360
           XO2 + NO3 -> NO2 + 1.5*HO2 + CO + .25*HYAC                       ; 2.4e-12
 	               + .25*CH3COCHO + .25*GLYALD
-          XO2 + XNO3 -> XNO2 + XO2                                         ; 2.4e-12
+         XO2 + XNO3 -> XNO2 + XO2                                         ; 2.4e-12
           XO2 + HO2 -> XOOH                                                ; 8.e-13, 700
           XO2 + CH3O2 -> .3 * CH3OH + HO2 + .7 * CH2O                      ; 5.e-13,400
 	                 + .4 * CO + .1 * HYAC
@@ -401,9 +401,9 @@ End Comments
           CH3OH + OH -> HO2 + CH2O                                         ; 7.3e-12,-620
           C2H5OH + OH -> HO2 + CH3CHO                                      ; 6.9e-12,-230
           MPAN + OH   -> .5*HYAC + .5*NO3 + .5*CH2O + .5*HO2 + .5*CO2      ; 8.e-27,3.5,3.e-11,0.,.5
-          OH + XMPAN   -> .5 * XNO3 + OH                               ; 8.e-27,3.5,3.e-11,0.,.5
+         OH + XMPAN   -> .5 * XNO3 + OH                               ; 8.e-27,3.5,3.e-11,0.,.5
           PAN + OH  -> CH2O + NO3 + CO2                                    ; 4.e-14
-          OH + XPAN  -> XNO3 + OH                                       ; 4.e-14
+         OH + XPAN  -> XNO3 + OH                                       ; 4.e-14
           HYAC + OH -> CH3COCHO + HO2                                      ; 3.e-12
           GLYALD + OH -> HO2 + .2*GLYOXAL + .8*CH2O + .8*CO2               ; 1.e-11
           Rn -> Pb                                                         ; 2.1e-6
@@ -412,7 +412,7 @@ End Comments
           DMS + OH -> SO2                                                  ; 9.6e-12,-234.
  [usr24]  DMS + OH -> .5 * SO2 + .5 * HO2
           DMS + NO3 -> SO2 + HNO3                                          ; 1.9e-13, 520.
-          DMS + XNO3 -> DMS + XHNO3                        ; 1.9e-13, 520.
+         DMS + XNO3 -> DMS + XHNO3                        ; 1.9e-13, 520.
           NH3 + OH -> H2O                                                  ; 1.7e-12, -710.
           OC1 -> OC2                                                       ; 9.64506e-06
  [usr26]  HO2 -> 0.5*H2O2
