@@ -106,6 +106,39 @@
       if( m > 0 ) then
          eps(m) = high_rel_err
       end if
+      m = get_spc_ndx( 'O3A' )
+      if( m > 0 ) then
+         eps(m) = high_rel_err
+      end if
+      m = get_spc_ndx( 'XNO' )
+      if( m > 0 ) then
+         eps(m) = high_rel_err
+      end if
+      m = get_spc_ndx( 'XNO2' )
+      if( m > 0 ) then
+         eps(m) = high_rel_err
+      end if
+      m = get_spc_ndx( 'XNO3' )
+      if( m > 0 ) then
+         eps(m) = high_rel_err
+      end if
+      m = get_spc_ndx( 'XHNO3' )
+      if( m > 0 ) then
+         eps(m) = high_rel_err
+      end if
+      m = get_spc_ndx( 'XHO2NO2' )
+      if( m > 0 ) then
+         eps(m) = high_rel_err
+      end if
+      m = get_spc_ndx( 'XNO2NO3' )
+      if( m > 0 ) then
+         eps(m) = high_rel_err
+      end if
+      m = get_spc_ndx( 'NO2XNO3' )
+      if( m > 0 ) then
+         eps(m) = high_rel_err
+      end if
+
       !do m = 1,max(1,clscnt4)
       do m = 1,clscnt4
          epsilon(m) = eps(clsmap(m,4))
