@@ -107,6 +107,8 @@
       logical ::  tavgprnt = .false.            ! time averaged printout
       logical ::  longnames = .false.           ! do not use long names
 
+      integer :: rxt_alias_cnt
+
       type(SPARSITY) :: sparse(2)
 
 !----------------------------------------------------------------------------------
@@ -1586,10 +1588,12 @@ sparse_matrix_loop : &
       end if
       close( 20)
 
+     rxt_alias_cnt = count( rxt_has_alias )
+
 !-----------------------------------------------------------------------
 !        ... Write the chemistry header file
 !-----------------------------------------------------------------------
-      call chm_hdr( hetcnt, usrcnt, cls_rxt_cnt, radj_flag, phtcnt, &
+      call chm_hdr( rxt_alias_cnt, hetcnt, usrcnt, cls_rxt_cnt, radj_flag, phtcnt, &
                     rxpcnt, rxparm, rxntot, ncol, nfs, &
                     indexm, indexh2o, new_nq, relcnt, grp_mem_cnt, &
                     clscnt, iter_counts, nzcnt, vec_ftns, machine, options(1) )
