@@ -462,8 +462,8 @@
          end do 
          line = ' '
          write(30,100) trim(line)
-         write(line,'("      rxt_alias_cnt = ",i4)') l
-         write(30,100) trim(line)
+!!$         write(line,'("      rxt_alias_cnt = ",i4)') l
+!!$         write(30,100) trim(line)
          line = ' '
          line(7:) = 'if( allocated( rxt_alias_lst ) ) then'
          write(30,100) trim(line)

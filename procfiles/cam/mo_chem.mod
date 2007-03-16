@@ -28,7 +28,8 @@
                             clscnt5   = CLSCNT5, &   ! number of species in rodas class
                             indexm    = INDEXM, &    ! index of total atm density in invariant array
                             indexh2o  = INDEXH2O, &  ! index of water vapor density
-                            clsze     = CLSZE        ! loop length for implicit chemistry
+                            clsze      = CLSZE, &       ! loop length for implicit chemistry
+                            rxt_alias_cnt = ALIASCNT
 
       integer   :: clscnt(5)
       integer   :: cls_rxt_cnt(4,5)
@@ -49,8 +50,7 @@
       character(len=8)               :: inv_lst(max(1,nfs))
       character(len=8)               :: extfrc_lst(max(1,extcnt))
       logical                        :: frc_from_dataset(max(1,extcnt))
-      integer, allocatable :: rxt_alias_map(:)
+      integer,           allocatable :: rxt_alias_map(:)
       character(len=16), allocatable :: rxt_alias_lst(:)
-      integer ::            rxt_alias_cnt = 0
 
       end module chem_mods
