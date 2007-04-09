@@ -52,8 +52,8 @@ End Comments
       End Photolysis
 
       Reactions
-          CB1 -> CB2                                                       ; 9.64506e-06
-          OC1 -> OC2                                                       ; 9.64506e-06
+          CB1 -> CB2                                                       ; 1.006e-05 
+          OC1 -> OC2                                                       ; 1.006e-05
       End Reactions
 
       Heterogeneous
