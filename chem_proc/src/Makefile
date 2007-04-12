@@ -115,6 +115,34 @@ OBJ/%.o : %.f
 endif
 
 #------------------------------------------------------------------------
+# Linux - lightning
+#------------------------------------------------------------------------
+ifeq ($(UNAMES),Linux)
+
+obj_flag  = -o $@ 
+
+ifeq ($(COMPILER),Lahey)
+FC        := lf95
+ifneq ($(DEBUG),ON)
+FFLAGS    := --nfix --nap --nchk --ng --npca --nsav --ntrace --tp4 -c --mod ./OBJ -O
+else
+FFLAGS    := --nfix --nap --nchk --g --npca --nsav --trace --trap --tp4 -c --mod ./OBJ -O
+endif
+else
+FC          := pgf90
+FFLAGS      := -O2 -c -Mfree -module ./OBJ
+endif
+
+
+.SUFFIXES:
+.SUFFIXES: .f .F .c .o
+
+OBJ/%.o : %.f
+	$(FC) $(FFLAGS) -o $@ $<
+
+endif
+
+#------------------------------------------------------------------------
 # SGI ?
 #------------------------------------------------------------------------
 ifeq ($(UNAMES),IRIX64)
