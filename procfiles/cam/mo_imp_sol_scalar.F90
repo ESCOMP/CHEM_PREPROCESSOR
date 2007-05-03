@@ -1,25 +1,19 @@
 
+
 module mo_imp_sol
- 
   use shr_kind_mod, only : r8 => shr_kind_r8
   use chem_mods, only : clscnt4, gas_pcnst, clsmap
-
   implicit none
-
   private
   public :: imp_slv_inti, imp_sol
-
   save
-
   real(r8), parameter :: rel_err = 1.e-3_r8
   real(r8), parameter :: high_rel_err = 1.e-4_r8
-
   !-----------------------------------------------------------------------
   ! Newton-Raphson iteration limits
   !-----------------------------------------------------------------------
   integer, parameter :: itermax = 11
   integer, parameter :: cut_limit = 5
-
   real(r8) :: small
   real(r8) :: epsilon(clscnt4)
   logical :: factor(itermax)
@@ -35,14 +29,14 @@ module mo_imp_sol
   integer :: ox_l1_ndx, ox_l2_ndx, ox_l3_ndx, ox_l4_ndx, ox_l5_ndx
   integer :: ox_l6_ndx, ox_l7_ndx, ox_l8_ndx, ox_l9_ndx, usr4_ndx
   integer :: usr16_ndx, usr17_ndx, r63_ndx,c2o3_ndx,ole_ndx
+  integer :: tolo2_ndx, terpo2_ndx, alko2_ndx, eneo2_ndx, eo2_ndx, meko2_ndx
+  integer :: ox_p17_ndx,ox_p12_ndx,ox_p13_ndx,ox_p14_ndx,ox_p15_ndx,ox_p16_ndx
   integer :: lt_cnt
   logical :: full_ozone_chem = .false.
   logical :: reduced_ozone_chem = .false.
-
   ! for xnox ozone chemistry diagnostics
   integer :: o3a_ndx, xno2_ndx, no2xno3_ndx, xno2no3_ndx, xno3_ndx, o1da_ndx, xno_ndx
   integer :: usr4a_ndx, usr16a_ndx, usr16b_ndx, usr17b_ndx
-
 contains
   subroutine imp_slv_inti
     !-----------------------------------------------------------------------
@@ -59,7 +53,7 @@ contains
     !-----------------------------------------------------------------------
     integer :: m
     real(r8) :: eps(gas_pcnst)
-    integer :: wrk(21)
+    integer :: wrk(27)
     integer :: i,j
     ! small = 1.e6_r8 * tiny( small )
     small = 1.e-40_r8
@@ -106,7 +100,6 @@ contains
     if( m > 0 ) then
        eps(m) = high_rel_err
     end if
-
     o3a_ndx = get_spc_ndx( 'O3A' )
     if( o3a_ndx > 0 ) then
        eps(m) = high_rel_err
@@ -155,8 +148,15 @@ contains
        ox_p9_ndx = get_rxt_ndx( 'ox_p9' )
        ox_p10_ndx = get_rxt_ndx( 'ox_p10' )
        ox_p11_ndx = get_rxt_ndx( 'ox_p11' )
-       wrk(1:11) = (/ ox_p1_ndx, ox_p2_ndx, ox_p3_ndx, ox_p4_ndx, ox_p5_ndx, &
-            ox_p6_ndx, ox_p7_ndx, ox_p8_ndx, ox_p9_ndx, ox_p10_ndx, ox_p11_ndx /)
+       ox_p12_ndx = get_rxt_ndx( 'ox_p12' )
+       ox_p13_ndx = get_rxt_ndx( 'ox_p13' )
+       ox_p14_ndx = get_rxt_ndx( 'ox_p14' )
+       ox_p15_ndx = get_rxt_ndx( 'ox_p15' )
+       ox_p16_ndx = get_rxt_ndx( 'ox_p16' )
+       ox_p17_ndx = get_rxt_ndx( 'ox_p17' )
+       wrk(1:17) = (/ ox_p1_ndx, ox_p2_ndx, ox_p3_ndx, ox_p4_ndx, ox_p5_ndx, &
+            ox_p6_ndx, ox_p7_ndx, ox_p8_ndx, ox_p9_ndx, ox_p10_ndx, ox_p11_ndx, &
+            ox_p12_ndx, ox_p13_ndx, ox_p14_ndx, ox_p15_ndx, ox_p16_ndx, ox_p17_ndx /)
        if( all( wrk(1:11) > 0 ) ) then
           full_ozone_chem = .true.
        end if
@@ -231,12 +231,19 @@ contains
           isopo2_ndx = get_spc_ndx( 'ISOPO2' )
           mvk_ndx = get_spc_ndx( 'MVK' )
           c10h16_ndx = get_spc_ndx( 'C10H16' )
+          tolo2_ndx = get_spc_ndx('TOLO2')
+          terpo2_ndx =get_spc_ndx('TERPO2')
+          alko2_ndx = get_spc_ndx('ALKO2')
+          eneo2_ndx = get_spc_ndx('ENEO2')
+          eo2_ndx = get_spc_ndx('EO2')
+          meko2_ndx = get_spc_ndx('MEKO2')
           if ( full_ozone_chem ) then
-             wrk(1:21) = (/ oh_ndx, ho2_ndx, ch3o2_ndx, po2_ndx, ch3co3_ndx, &
+             wrk(1:27) = (/ oh_ndx, ho2_ndx, ch3o2_ndx, po2_ndx, ch3co3_ndx, &
                   c2h5o2_ndx, macro2_ndx, mco3_ndx, c3h7o2_ndx, ro2_ndx, &
                   xo2_ndx, no_ndx, no2_ndx, no3_ndx, n2o5_ndx, &
-                  c2h4_ndx, c3h6_ndx, isop_ndx, isopo2_ndx, mvk_ndx, c10h16_ndx /)
-             if( any( wrk(1:21) < 1 ) ) then
+                  c2h4_ndx, c3h6_ndx, isop_ndx, isopo2_ndx, mvk_ndx, c10h16_ndx, &
+                  tolo2_ndx, terpo2_ndx, alko2_ndx, eneo2_ndx, eo2_ndx, meko2_ndx /)
+             if( any( wrk(1:27) < 1 ) ) then
                 full_ozone_chem = .false.
              end if
           endif
@@ -266,7 +273,6 @@ contains
        call addfld( trim(solsym(j))//'_CHML', '/cm3/s ', pver, 'I', 'chemical loss rate',       phys_decomp )
     enddo
   end subroutine imp_slv_inti
-
   subroutine imp_sol( base_sol, reaction_rates, het_rates, extfrc, delt, &
        xhnm, ncol, lchnk )
     !-----------------------------------------------------------------------
@@ -328,11 +334,6 @@ contains
     logical :: frc_mask, iter_conv
     logical :: converged(max(1,clscnt4))
     real(r8), dimension(ncol,pver,max(1,clscnt4)) :: prod_out, loss_out
-
-print*,'FVDBG... imp_sol... ncol,pver,clscnt4 = ',ncol,pver,clscnt4
-print*,'FVDBG... imp_sol... size(loss_out) = ',size(loss_out)
-print*,'FVDBG... imp_sol... shape(loss_out) = ',shape(loss_out)
-
     prod_out(:,:,:) = 0._r8
     loss_out(:,:,:) = 0._r8
     solution(:) = 0._r8
@@ -348,7 +349,7 @@ print*,'FVDBG... imp_sol... shape(loss_out) = ',shape(loss_out)
        end do
     end if
     level_loop : do lev = 1,pver
-       column_loop :  do i = 1,ncol
+       column_loop : do i = 1,ncol
           !-----------------------------------------------------------------------
           ! ... transfer from base to local work arrays
           !-----------------------------------------------------------------------
@@ -556,12 +557,18 @@ print*,'FVDBG... imp_sol... shape(loss_out) = ',shape(loss_out)
                         + reaction_rates(i,lev,ox_p3_ndx) * base_sol(i,lev,po2_ndx) &
                         + reaction_rates(i,lev,ox_p4_ndx) * base_sol(i,lev,ch3co3_ndx) &
                         + reaction_rates(i,lev,ox_p5_ndx) * base_sol(i,lev,c2h5o2_ndx) &
-                        + .88_r8* reaction_rates(i,lev,ox_p6_ndx) * base_sol(i,lev,isopo2_ndx) &
-                        + .985_r8*reaction_rates(i,lev,ox_p7_ndx) * base_sol(i,lev,macro2_ndx) &
+                        + .92_r8* reaction_rates(i,lev,ox_p6_ndx) * base_sol(i,lev,isopo2_ndx) &
+                        + reaction_rates(i,lev,ox_p7_ndx) * base_sol(i,lev,macro2_ndx) &
                         + reaction_rates(i,lev,ox_p8_ndx) * base_sol(i,lev,mco3_ndx) &
                         + reaction_rates(i,lev,ox_p9_ndx) * base_sol(i,lev,c3h7o2_ndx) &
                         + reaction_rates(i,lev,ox_p10_ndx)* base_sol(i,lev,ro2_ndx) &
-                        + reaction_rates(i,lev,ox_p11_ndx)* base_sol(i,lev,xo2_ndx)
+                        + reaction_rates(i,lev,ox_p11_ndx)* base_sol(i,lev,xo2_ndx) &
+                        + .9_r8*reaction_rates(i,lev,ox_p12_ndx)*base_sol(i,lev,tolo2_ndx) &
+                        + reaction_rates(i,lev,ox_p13_ndx)*base_sol(i,lev,terpo2_ndx)&
+                        + .9_r8*reaction_rates(i,lev,ox_p14_ndx)*base_sol(i,lev,alko2_ndx) &
+                        + reaction_rates(i,lev,ox_p15_ndx)*base_sol(i,lev,eneo2_ndx) &
+                        + reaction_rates(i,lev,ox_p16_ndx)*base_sol(i,lev,eo2_ndx) &
+                        + reaction_rates(i,lev,ox_p17_ndx)*base_sol(i,lev,meko2_ndx)
                    loss_out(i,lev,k) = loss_out(i,lev,k) &
                         + reaction_rates(i,lev,ox_l2_ndx) * base_sol(i,lev,oh_ndx) &
                         + reaction_rates(i,lev,ox_l3_ndx) * base_sol(i,lev,ho2_ndx) &
@@ -570,7 +577,7 @@ print*,'FVDBG... imp_sol... shape(loss_out) = ',shape(loss_out)
                         + .9_r8* reaction_rates(i,lev,ox_l5_ndx) * base_sol(i,lev,isop_ndx) &
                         + .8_r8*( reaction_rates(i,lev,ox_l7_ndx) * base_sol(i,lev,mvk_ndx) &
                         + reaction_rates(i,lev,ox_l8_ndx) * base_sol(i,lev,macro2_ndx)) &
-                        + .235_r8*reaction_rates(i,lev,ox_l9_ndx) * base_sol(i,lev,c10h16_ndx) 
+                        + .235_r8*reaction_rates(i,lev,ox_l9_ndx) * base_sol(i,lev,c10h16_ndx)
                 else if ( reduced_ozone_chem ) then
                    prod_out(i,lev,k) = reaction_rates(i,lev,ox_p1_ndx ) * base_sol(i,lev,ho2_ndx) &
                         + reaction_rates(i,lev,ox_p2_ndx ) * base_sol(i,lev,ch3o2_ndx) &
@@ -581,7 +588,7 @@ print*,'FVDBG... imp_sol... shape(loss_out) = ',shape(loss_out)
                         + reaction_rates(i,lev,ox_l3_ndx) * base_sol(i,lev,ho2_ndx) &
                         + .9_r8* reaction_rates(i,lev,ox_l5_ndx) * base_sol(i,lev,isop_ndx) &
                         + reaction_rates(i,lev,ox_l6_ndx) * base_sol(i,lev,c2h4_ndx) &
-                        + reaction_rates(i,lev,ox_l7_ndx) * base_sol(i,lev,ole_ndx) 
+                        + reaction_rates(i,lev,ox_l7_ndx) * base_sol(i,lev,ole_ndx)
                 endif
                 if (j == ox_ndx) then
                    loss_out(i,lev,k) = loss_out(i,lev,k) &
@@ -601,14 +608,13 @@ print*,'FVDBG... imp_sol... shape(loss_out) = ',shape(loss_out)
                    loss_out(i,lev,k) = loss_out(i,lev,k) * base_sol(i,lev,o3a_ndx)
                    prod_out(i,lev,k) = prod_out(i,lev,k) * base_sol(i,lev,xno_ndx)
                 endif
-             else 
+             else
                 prod_out(i,lev,k) = prod(m) + ind_prd(i,lev,m)
                 loss_out(i,lev,k) = loss(m)
              endif has_o3_chem
           end do cls_loop
        end do column_loop
     end do level_loop
-
     do i = 1,clscnt4
        j = clsmap(i,4)
        prod_out(:,:,i) = prod_out(:,:,i)*xhnm
@@ -617,5 +623,4 @@ print*,'FVDBG... imp_sol... shape(loss_out) = ',shape(loss_out)
        call outfld( trim(solsym(j))//'_CHML', loss_out(:,:,i), ncol, lchnk )
     enddo
   end subroutine imp_sol
-
 end module mo_imp_sol
