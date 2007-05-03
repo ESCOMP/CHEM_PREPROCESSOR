@@ -43,7 +43,8 @@ End Comments
  ISOPNO3 -> CH2CHCCH3OOCH2ONO2, ONITR -> CH2CCH3CHONO2CH2OH
  CB1 -> C, CB2 -> C, OC1 -> C, OC2 -> C, SOA -> C12
  SO2, SO4, DMS -> CH3SCH3, NH3, NH4, NH4NO3
- SA1 -> NaCl, SA2 -> NaCl, SA3 -> NaCl, SA4 -> NaCl
+ SSLT01 -> NaCl, SSLT02 -> NaCl, SSLT03 -> NaCl, SSLT04 -> NaCl
+ DST01 -> AlSiO5, DST02 -> AlSiO5, DST03 -> AlSiO5, DST04 -> AlSiO5
  Rn, Pb, O3S -> O3, O3INERT -> O3, SYNOZ -> O3, O3RAD -> O3
  XNO -> NO, XNO2 -> NO2, XNO3 -> NO3, XHNO3 -> HNO3
  XHO2NO2 -> HO2NO2, XNO2NO3 -> N2O5, NO2XNO3 -> N2O5
@@ -80,7 +81,9 @@ End Comments
        TOLUENE, CRESOL, TOLO2, TOLOOH, XOH, BIGALD, GLYOXAL
        PAN, ONIT, MPAN, ISOPNO3, ONITR
        CB1, CB2, SO2, SO4, DMS, NH3, NH4, NH4NO3
-       OC1, OC2, SA1, SA2, SA3, SA4, SOA
+       OC1, OC2
+       SSLT01, SSLT02, SSLT03, SSLT04, SOA
+       DST01, DST02, DST03, DST04
        XNO, XNO2, XNO3, XHNO3, XHO2NO2, XNO2NO3, NO2XNO3
        XPAN, XONIT, XMPAN, XISOPNO3, XONITR, XNH4NO3, O3A, O1DA, OA
       End Implicit
@@ -226,7 +229,7 @@ End Comments
  [ox_l6]  C2H4 + O3 -> CH2O + .12 * HO2 + .5 * CO                        ; 1.2e-14, -2630
                       + .12 * OH + .25 * CH3COOH
           O3A + C2H4 -> C2H4                                             ; 1.2e-14, -2630
-          EO2 + NO -> EO + NO2                                           ; 4.2e-12,180
+ [ox_p16] EO2 + NO -> EO + NO2                                           ; 4.2e-12,180
           EO2 + XNO -> EO2 + XNO2                                        ; 4.2e-12,180
 	  EO  + O2 -> GLYALD + HO2                                       ; 1.e-14
 	  EO       -> 2 * CH2O + HO2                                     ; 1.6e11,-4150
@@ -276,10 +279,10 @@ End Comments
                       + .5*CH3COCHO + .5*CH3OH
           ROOH + OH -> RO2 + H2O                                         ; 3.8e-12, 200
           BIGENE + OH -> ENEO2                                           ; 5.4e-11
-          ENEO2 + NO -> CH3CHO + .5*CH2O + .5*CH3COCH3 + HO2 + NO2       ; 4.2e-12, 180
+ [ox_p15] ENEO2 + NO -> CH3CHO + .5*CH2O + .5*CH3COCH3 + HO2 + NO2       ; 4.2e-12, 180
           ENEO2 + XNO ->  ENEO2 + XNO2                                   ; 4.2e-12, 180
  [soa5]   BIGALK + OH -> ALKO2                                           ; 3.5e-12
- 	  ALKO2 + NO -> .4*CH3CHO + .1*CH2O + .25*CH3COCH3 + .9*HO2      ; 4.2e-12, 180
+ [ox_p14] ALKO2 + NO -> .4*CH3CHO + .1*CH2O + .25*CH3COCH3 + .9*HO2      ; 4.2e-12, 180
  		                 + .75*MEK + .9*NO2 + .1*ONIT
           ALKO2 + XNO -> ALKO2 + .9*XNO2 + .1*XONIT                      ; 4.2e-12, 180
  	  ALKO2 + HO2 -> ALKOOH                                          ; 7.5e-13, 700
@@ -287,7 +290,7 @@ End Comments
           ONIT + OH -> NO2 + CH3COCHO                                    ; 6.8e-13
           XONIT + OH -> XNO2 + OH                                        ; 6.8e-13
  	  MEK + OH -> MEKO2                                              ; 2.3e-12, -170
- 	  MEKO2 + NO  -> CH3CO3 + CH3CHO + NO2                           ; 4.2e-12, 180
+ [ox_p17] MEKO2 + NO  -> CH3CO3 + CH3CHO + NO2                           ; 4.2e-12, 180
     	  MEKO2 + XNO  ->  MEKO2 + XNO2                                  ; 4.2e-12, 180
  	  MEKO2 + HO2 -> MEKOOH                                          ; 7.5e-13, 700
  	  MEKOOH + OH -> MEKO2                                           ; 3.8e-12, 200
@@ -295,7 +298,7 @@ End Comments
  	  CRESOL + OH  -> XOH                                            ; 3.e-12
  	  XOH + NO2    -> .7*NO2 + .7*BIGALD + .7*HO2                    ; 1.e-11
  [new1]   XOH + XNO2   ->  XOH + .7*XNO2		             	 ; 1.e-11
-          TOLO2 + NO   -> .45*GLYOXAL + .45*CH3COCHO +.9*BIGALD          ; 4.2e-12, 180
+ [ox_p12] TOLO2 + NO   -> .45*GLYOXAL + .45*CH3COCHO +.9*BIGALD          ; 4.2e-12, 180
 				     + .9*NO2 + .9*HO2
           TOLO2 + XNO   -> TOLO2 + .9*XNO2                  	       	 ; 4.2e-12, 180
  	  TOLO2 + HO2  -> TOLOOH                                         ; 7.5e-13, 700
@@ -358,7 +361,7 @@ End Comments
           C10H16 + O3A ->  C10H16                             		  ; 1.e-15, -732
  [soa3]   C10H16 + NO3 -> TERPO2 + NO2                                    ; 1.2e-12, 490
           C10H16 + XNO3 -> C10H16 + XNO2                       		 ; 1.2e-12, 490
- 	  TERPO2 + NO  -> .1*CH3COCH3 + HO2 + MVK + MACR + NO2            ; 4.2e-12, 180
+ [ox_p13] TERPO2 + NO  -> .1*CH3COCH3 + HO2 + MVK + MACR + NO2            ; 4.2e-12, 180
  	  TERPO2 + XNO -> TERPO2 + XNO2               		          ; 4.2e-12, 180
  	  TERPO2 + HO2 -> TERPOOH                                         ; 7.5e-13, 700
  	  TERPOOH + OH -> TERPO2                                          ; 3.8e-12, 200
@@ -424,7 +427,7 @@ End Comments
       C2H5OOH, C3H7OOH, ROOH, CH3COCHO, Pb, MACROOH, XOOH, ONITR, ISOPOOH
       CH3OH, C2H5OH, GLYALD, HYAC, HYDRALD, CH3CHO, ISOPNO3
       ALKOOH, MEKOOH, TOLOOH, TERPOOH, CH3COOH
-      XHNO3, XHO2NO2, XONIT, XONITR, XISOPNO3, XNH4NO3
+      XHNO3, XHO2NO2, XONIT, XONITR, XISOPNO3
       SO2, NH3, NH4
    End Heterogeneous
 
