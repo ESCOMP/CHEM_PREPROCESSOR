@@ -542,6 +542,13 @@ contains
              j = clsmap(k,4)
              m = permute(k,4)
              base_sol(i,lev,j) = solution(m)
+          end do cls_loop
+          !-----------------------------------------------------------------------
+          ! ... Prod/Loss history buffers...
+          !-----------------------------------------------------------------------
+          cls_loop2: do k = 1,clscnt4
+             j = clsmap(k,4)
+             m = permute(k,4)
              has_o3_chem: if( ( full_ozone_chem .or. reduced_ozone_chem ) .and. (j == ox_ndx .or. j == o3a_ndx )) then
                 if( o1d_ndx < 1 ) then
                    loss_out(i,lev,k) = reaction_rates(i,lev,ox_l1_ndx)
@@ -612,7 +619,7 @@ contains
                 prod_out(i,lev,k) = prod(m) + ind_prd(i,lev,m)
                 loss_out(i,lev,k) = loss(m)
              endif has_o3_chem
-          end do cls_loop
+          end do cls_loop2
        end do column_loop
     end do level_loop
     do i = 1,clscnt4
