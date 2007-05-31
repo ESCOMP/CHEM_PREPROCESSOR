@@ -446,9 +446,11 @@ Species_loop : &
 	    end do Species_loop
 	 end if
       end do Class_loop
-
-      line = '      end if'
-      write(30,100) line
+      
+      if ( .not. first_class ) then
+         line = '      end if'
+         write(30,100) line
+      endif
 
       line = ' '
       write(30,100) line
