@@ -23,9 +23,10 @@ End Comments
       End Solution
 
       Fixed
-        M, N2, O2, H2O, SO4, CB1, CB2, OC1, OC2, 
-        SSLT01, SSLT02, SSLT03, SSLT04
-        DST01, DST02, DST03, DST04, O3
+        M, N2, O2, H2O, SO4, CB1 -> C, CB2 -> C, OC1 -> C, OC2 -> C
+        SSLT01 -> NaCl, SSLT02 -> NaCl, SSLT03 -> NaCl, SSLT04 -> NaCl
+        DST01 -> AlSiO5, DST02 -> AlSiO5, DST03 -> AlSiO5, DST04 -> AlSiO5 
+        O3
       End Fixed
 
       Col-int
