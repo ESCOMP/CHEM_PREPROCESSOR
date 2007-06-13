@@ -26,7 +26,7 @@
 !        ... local variables
 !-----------------------------------------------------------------------
       integer  ::   j, k, l, rxno
-      character(len=72) :: line
+      character(len=128):: line
       character(len=4)  :: dec_suffix
       logical  ::  first
       logical  ::  divide
