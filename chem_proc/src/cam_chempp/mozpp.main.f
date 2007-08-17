@@ -49,10 +49,10 @@
 
       character(len=128) :: chem_src(50), lib_src(350)
       character(len=128), dimension(100) :: filename, filepath, sub_names
-      character(len=128) :: command, cpp_command
+      character(len=256) :: command, cpp_command
       character(len=80) :: errcom, filout, filin
       character(len=80) :: iout(100)
-      character(len=64), dimension(100) :: mod_names, mod_paths
+      character(len=128), dimension(100) :: mod_names, mod_paths
       character(len=64) :: oper_flpth
       character(len=64) :: cpp_dir, cpp_opts
       character(len=64) :: wrk_dir
@@ -60,7 +60,7 @@
       character(len=64) :: subfile
       character(len=64) :: histinp(4)
       character(len=64) :: histout(6)
-      character(len=64) :: mod_src(100)
+      character(len=128) :: mod_src(100)
       character(len=64) :: filenm
       character(len=64) :: tmp_filenm
       character(len=16) :: param
@@ -165,32 +165,6 @@
       sim_dat_filespec = trim(sim_dat_path) // 'sim.dat'
       cpp_dir  = ' '
       cpp_opts = '-P -C -I.'
-
-!-----------------------------------------------------------------------
-!        ... Find cpp preprocessor
-!-----------------------------------------------------------------------
-      command = 'whereis cpp > ' // trim(temp_path) // 'cpp.path'
-      call system( trim( command ) )
-      open( unit=20, file=trim(temp_path)//'cpp.path', iostat=ios )
-      if( ios /= 0 ) then
-	 write(*,*) ' Failed to locate cpp path'
-	 stop
-      end if
-      read(20,'(a)',iostat=ios) iout(1)
-      if( ios /= 0 ) then
-	 write(*,*) ' Failed to read cpp path'
-	 stop
-      end if
-      if( iout(1)(1:4) == 'cpp:' ) then
-	 nbeg(1) = index( trim(iout(1)), ' ' ) + 1
-	 nend(1) = index( trim(iout(1)(nbeg(1):)), ' ' )
-	 nend(1) = nbeg(1) + nend(1) - 1
-	 cpp_dir = iout(1)(nbeg(1):nend(1))
-	 close( 20 )
-      else
-	 write(*,*) ' Failed to locate cpp path'
-	 stop
-      end if
 
 !-----------------------------------------------------------------------
 !        ... Assign default input, output units
@@ -357,19 +331,10 @@
          call upcase( buffh )
 
 !-----------------------------------------------------------------------
-!        ... Check for output file override and process if present
+!        ... get output_file
 !-----------------------------------------------------------------------
          if( buffh(:12) == 'OUTPUT_FILE=' ) then
-            filout = trim(output_path) // buff(13:nchar)
-            open( unit   = lout, &
-                  file   = trim( filout ), &
-                  status = 'replace', &
-                  iostat = ios )
-            if( ios /= 0 ) then
-	       write(*,*) ' Failed to open file ',trim(filout)
-	       write(*,*) ' Error code = ',ios
-	       stop
-            end if
+            filout = buff(13:nchar)
             call cardin( lin, buff, nchar )
             buffh = buff
             call upcase( buffh )
@@ -417,6 +382,11 @@
          else if( buffh(:12) == 'OUTPUT_PATH=' ) then
             output_path = buff(13:nchar)
 !-----------------------------------------------------------------------
+!        ... Check for tmp_path override
+!-----------------------------------------------------------------------
+         else if( buffh(:10) == 'TEMP_PATH=' ) then
+             temp_path= buff(11:nchar)
+!-----------------------------------------------------------------------
 !        ... Check for sim_dat_path override
 !-----------------------------------------------------------------------
          else if( buffh(:13) == 'SIM_DAT_PATH=' ) then
@@ -443,6 +413,46 @@
          buffh = buff
          call upcase( buffh )
       end do
+
+!-----------------------------------------------------------------------
+!        ... Find cpp preprocessor
+!-----------------------------------------------------------------------
+      command = 'whereis cpp > ' // trim(temp_path) // 'cpp.path'
+      call system( trim( command ) )
+      open( unit=20, file=trim(temp_path)//'cpp.path', iostat=ios )
+      if( ios /= 0 ) then
+	 write(*,*) ' Failed to locate cpp path'
+	 stop
+      end if
+      read(20,'(a)',iostat=ios) iout(1)
+      if( ios /= 0 ) then
+	 write(*,*) ' Failed to read cpp path'
+	 stop
+      end if
+      if( iout(1)(1:4) == 'cpp:' ) then
+	 nbeg(1) = index( trim(iout(1)), ' ' ) + 1
+	 nend(1) = index( trim(iout(1)(nbeg(1):)), ' ' )
+	 nend(1) = nbeg(1) + nend(1) - 1
+	 cpp_dir = iout(1)(nbeg(1):nend(1))
+	 close( 20 )
+      else
+	 write(*,*) ' Failed to locate cpp path'
+	 stop
+      end if
+
+!-----------------------------------------------------------------------
+!        ... Check for output file override and process if present
+!-----------------------------------------------------------------------
+      filout = trim(output_path) // filout 
+      open( unit   = lout, &
+           file   = trim( filout ), &
+           status = 'replace', &
+           iostat = ios )
+      if( ios /= 0 ) then
+         write(*,*) ' Failed to open file ',trim(filout)
+         write(*,*) ' Error code = ',ios
+         stop
+      end if
 
 !-----------------------------------------------------------------------
 !        ... Check for comments and process if present
@@ -1747,7 +1757,7 @@ sparse_matrix_loop : &
       end if
       file_cnt = 1
       do k = 1,500
-         read(2,'(a64)',end=1105) mod_src(file_cnt)
+         read(2,'(a128)',end=1105) mod_src(file_cnt)
          if( mod_src(file_cnt) /= ' ' ) then
 	    filelines(5) = filelines(5) + 1
 	    file_cnt = file_cnt + 1
@@ -1761,12 +1771,15 @@ sparse_matrix_loop : &
       if( options(18) ) then
 	 k = 1
 	 mod_paths(k) = './'
+	 mod_paths(k) = ' '
 	 mod_names(k) = trim( temp_path ) // 'spc_names.mod'
          k = 2
          mod_paths(k) = './'
+         mod_paths(k) = ' '
          mod_names(k) = trim( temp_path ) // 'rxt_names.mod'
          k = 3
          mod_paths(k) = './'
+         mod_paths(k) = ' '
          mod_names(k) = trim( temp_path ) // 'het_names.mod'
       else
 	 k = 0
@@ -1945,7 +1958,7 @@ sparse_matrix_loop : &
          end if
          file_cnt = 1
          do k = 1,500
-            read(2,'(a64)',end=1005) lib_src(file_cnt)
+            read(2,'(a128)',end=1005) lib_src(file_cnt)
             if( lib_src(file_cnt) /= ' ' ) then
                filelines(1) = filelines(1) + 1
                file_cnt = file_cnt + 1

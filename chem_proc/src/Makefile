@@ -21,6 +21,10 @@ ifeq ($(SRCLIST),$(null))
 SRCLIST := Base_Srclist_f
 endif
 
+ifeq ($(OBJ_DIR),$(null))
+OBJ_DIR := ./OBJ
+endif
+
 # Load dependency search path.
 # Check for source directories
 ifeq ($(SRCDIRS),$(null))
@@ -42,8 +46,8 @@ VPATH    := $(foreach dir,$(cpp_dirs),$(dir))
 VPATH    := $(subst $(space),:,$(VPATH))               
 
 # Get list of files and determine objects and dependency files
-base_srclist_f := $(shell cat ./$(SRCLIST))
-OBJS      := $(foreach file,$(base_srclist_f),OBJ/$(file:.f=.o))
+base_srclist_f := $(shell cat $(SRCLIST))
+OBJS      := $(foreach file,$(base_srclist_f),$(OBJ_DIR)/$(file:.f=.o))
 
 all: $(MODEL_EXEDIR)/$(EXENAME)
 
@@ -57,13 +61,13 @@ ifeq ($(UNAMEM),alpha)
 objflag    = -o $@
 FC          := f95
 CPP         := /usr/bin/cpp
-FFLAGS      := -O4 -c -tune host -arch host -free -module ./OBJ -I./OBJ
+FFLAGS      := -O4 -c -tune host -arch host -free -module $(OBJ_DIR) -I $(OBJ_DIR)
 
 
 .SUFFIXES:
 .SUFFIXES: .f .F .c .o
 
-OBJ/%.o : %.f
+$(OBJ_DIR)/%.o : %.f
 	$(FC) $(FFLAGS) $(objflag) $<
 
 endif
@@ -75,13 +79,13 @@ ifeq ($(UNAMES),AIX)
 
 objflag    = -o $@
 FC          := xlf95
-FFLAGS      := -g -c -qarch=auto -qnosave -qfree=f90 -qmoddir=./OBJ -I./OBJ -qstrict -O3
+FFLAGS      := -g -c -qarch=auto -qnosave -qfree=f90 -qmoddir=$(OBJ_DIR) -I $(OBJ_DIR) -qstrict -O3
 
 
 .SUFFIXES:
 .SUFFIXES: .f .F .c .o
 
-OBJ/%.o : %.f
+$(OBJ_DIR)/%.o : %.f
 	$(FC) $(FFLAGS) $(objflag) $<
 
 endif
@@ -96,20 +100,20 @@ obj_flag  = -o $@
 ifeq ($(COMPILER),Lahey)
 FC        := lf95
 ifneq ($(DEBUG),ON)
-FFLAGS    := --nfix --nap --nchk --ng --npca --nsav --ntrace --tp4 -c --mod ./OBJ -O
+FFLAGS    := --nfix --nap --nchk --ng --npca --nsav --ntrace --tp4 -c --mod $(OBJ_DIR) -O
 else
-FFLAGS    := --nfix --nap --nchk --g --npca --nsav --trace --trap --tp4 -c --mod ./OBJ -O
+FFLAGS    := --nfix --nap --nchk --g --npca --nsav --trace --trap --tp4 -c --mod $(OBJ_DIR) -O
 endif
 else
 FC          := pgf90
-FFLAGS      := -O2 -c -Mfree -module ./OBJ
+FFLAGS      := -O2 -c -Mfree -module $(OBJ_DIR)
 endif
 
 
 .SUFFIXES:
 .SUFFIXES: .f .F .c .o
 
-OBJ/%.o : %.f
+$(OBJ_DIR)/%.o : %.f
 	$(FC) $(FFLAGS) -o $@ $<
 
 endif
@@ -124,20 +128,20 @@ obj_flag  = -o $@
 ifeq ($(COMPILER),Lahey)
 FC        := lf95
 ifneq ($(DEBUG),ON)
-FFLAGS    := --nfix --nap --nchk --ng --npca --nsav --ntrace --tp4 -c --mod ./OBJ -O
+FFLAGS    := --nfix --nap --nchk --ng --npca --nsav --ntrace --tp4 -c --mod $(OBJ_DIR) -O
 else
-FFLAGS    := --nfix --nap --nchk --g --npca --nsav --trace --trap --tp4 -c --mod ./OBJ -O
+FFLAGS    := --nfix --nap --nchk --g --npca --nsav --trace --trap --tp4 -c --mod $(OBJ_DIR) -O
 endif
 else
 FC          := pgf90
-FFLAGS      := -O2 -c -Mfree -module ./OBJ
+FFLAGS      := -O2 -c -Mfree -module $(OBJ_DIR)
 endif
 
 
 .SUFFIXES:
 .SUFFIXES: .f .F .c .o
 
-OBJ/%.o : %.f
+$(OBJ_DIR)/%.o : %.f
 	$(FC) $(FFLAGS) -o $@ $<
 
 endif
@@ -149,12 +153,12 @@ ifeq ($(UNAMES),IRIX64)
 
 objflag    = -o $@
 FC          := f90
-FFLAGS      := -c -freeform -I ./OBJ -O2 -OPT:Olimit=8200
+FFLAGS      := -c -freeform -I $(OBJ_DIR) -O2 -OPT:Olimit=8200
 
 .SUFFIXES:
 .SUFFIXES: .f .F .c .o
 
-OBJ/%.o : %.f
+$(OBJ_DIR)/%.o : %.f
 	$(FC) $(FFLAGS) $(objflag) $<
 
 endif
@@ -169,7 +173,7 @@ $(MODEL_EXEDIR)/$(EXENAME):	$(OBJS)
 RM := rm
 
 clean:
-	$(RM) -f ./OBJ/*.o ./OBJ/*.mod $(MODEL_EXEDIR)/$(EXENAME)
+	$(RM) -f $(OBJ_DIR)/*.o $(OBJ_DIR)/*.mod $(MODEL_EXEDIR)/$(EXENAME)
 
 realclean:
-	$(RM) -f ./OBJ/*.o *.d $(MODEL_EXEDIR)/$(EXENAME)
+	$(RM) -f $(OBJ_DIR)/*.o *.d $(MODEL_EXEDIR)/$(EXENAME)
