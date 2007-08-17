@@ -481,9 +481,11 @@ contains
                             wrk(l:l) = '.'
                          end if
                          if( model == 'WRF' .or. machine == 'NEC' .or. machine == 'FUJITSU' ) then
-                            line(len_trim(line)+1:) = num(:len_trim(num)) // ') = ' // wrk(:l) // trim(num_suffix) // ' * exp_fac(:)'
+                            line(len_trim(line)+1:) = num(:len_trim(num)) // ') = ' // wrk(:l) // &
+                                                      trim(num_suffix) // ' * exp_fac(:)'
                          else
-                            line(len_trim(line)+1:) = num(:len_trim(num)) // ') = ' // wrk(:l) // trim(num_suffix) // ' * exp_fac(:,:)'
+                            line(len_trim(line)+1:) = num(:len_trim(num)) // ') = ' // wrk(:l) // &
+                                                      trim(num_suffix) // ' * exp_fac(:,:)'
                          end if
                          write(30,100) trim(line)
                       end do
@@ -677,17 +679,21 @@ contains
                 end if
                 select case( model )
                 case( 'MOZART' )
-                   line(len_trim(line)+1:) = num(:len_trim(num)) // '), m, ' // wrk(:l) // trim(num_suffix) // ', ko, kinf, plnplv )'
+                   line(len_trim(line)+1:) = num(:len_trim(num)) // '), m, ' // wrk(:l) // &
+                                             trim(num_suffix) // ', ko, kinf, plnplv )'
                 case( 'CAM' )
                    if( subs == 1 ) then
-                      line(len_trim(line)+1:) = num(:len_trim(num)) // '), m, ' // wrk(:l) // trim(num_suffix) // ', ko, kinf, n )'
+                      line(len_trim(line)+1:) = num(:len_trim(num)) // '), m, ' // wrk(:l) // &
+                                                trim(num_suffix) // ', ko, kinf, n )'
                    else
-                      line(len_trim(line)+1:) = num(:len_trim(num)) // ', m, ' // wrk(:l) // trim(num_suffix) // ', ko, kinf, n )'
+                      line(len_trim(line)+1:) = num(:len_trim(num)) // ', m, ' // wrk(:l) // &
+                                                trim(num_suffix) // ', ko, kinf, n )'
                       write(30,100) trim(line)
                       line = '      rate(:,:kbot,' // numa(:len_trim(numa)) // ') = wrk(:,:)'
                    end if
                 case( 'WRF' )
-                   line(len_trim(line)+1:) = num(:len_trim(num)) // '), m, ' // wrk(:l) // trim(num_suffix) // ', ko, kinf, n )'
+                   line(len_trim(line)+1:) = num(:len_trim(num)) // '), m, ' // wrk(:l) // &
+                                             trim(num_suffix) // ', ko, kinf, n )'
                 end select
                 write(30,100) trim(line)
              end if do_troe_rate
