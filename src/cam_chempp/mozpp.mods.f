@@ -7,13 +7,13 @@
       integer :: lout     ! output unit number
       character(len=120) :: buff        ! primary line input buffer
       character(len=120) :: buffh       ! upcase xform of buff
-      character(len=80) :: procout_path
-      character(len=80) :: procfiles_path
-      character(len=80) :: output_path
-      character(len=80) :: input_path
-      character(len=80) :: temp_path
-      character(len=80) :: src_dir
-      character(len=80) :: sim_dat_path, sim_dat_filespec, sim_dat_filename
+      character(len=320) :: procout_path
+      character(len=320) :: procfiles_path
+      character(len=320) :: output_path
+      character(len=320) :: input_path
+      character(len=320) :: temp_path
+      character(len=320) :: src_dir
+      character(len=320) :: sim_dat_path, sim_dat_filespec, sim_dat_filename
 
       end module IO
 
