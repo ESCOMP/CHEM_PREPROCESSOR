@@ -50,7 +50,7 @@
       character(len=128) :: chem_src(50), lib_src(350)
       character(len=128), dimension(100) :: filename, filepath, sub_names
       character(len=256) :: command, cpp_command
-      character(len=80) :: errcom, filout, filin
+      character(len=256) :: errcom, filout, filin
       character(len=80) :: iout(100)
       character(len=128), dimension(100) :: mod_names, mod_paths
       character(len=64) :: oper_flpth
