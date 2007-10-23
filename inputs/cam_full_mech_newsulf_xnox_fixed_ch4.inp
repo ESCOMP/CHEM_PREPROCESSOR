@@ -17,14 +17,13 @@ Comments
      "(6)  no N atom"
      "(7)  new treatment of: SO4, NH4, NH4NO3"
      "(8)  XNOx for surface emissions"
-     "(9)  Fixed CH4
 End Comments
 
       SPECIES
 
       Solution
  O3, O, O1D ->  O, N2O, NO, NO2, NO3, HNO3, HO2NO2, N2O5, H2, OH, HO2, H2O2, 
- CO, CH3O2, CH3OOH, CH2O, CH3OH, C2H5OH
+ CH4CHML->CH4,CO, CH3O2, CH3OOH, CH2O, CH3OH, C2H5OH
  C2H4, EO -> HOCH2CH2O, EO2 -> HOCH2CH2O2, CH3COOH, GLYALD -> HOCH2CHO
  C2H6, C2H5O2, C2H5OOH, CH3CHO, CH3CO3, CH3COOOH
  C3H6, C3H8, C3H7O2, C3H7OOH, PO2 -> C3H6OHO2, POOH -> C3H6OHOOH
@@ -67,7 +66,7 @@ End Comments
 
    Solution Classes
       Explicit
-       N2O, CO, Rn, Pb, H2, O3INERT, O3S, SYNOZ, O3RAD
+       CH4CHML, N2O, CO, Rn, Pb, H2, O3INERT, O3S, SYNOZ, O3RAD
       End Explicit
       Implicit
        O3, O1D, O, NO, NO2, NO3, HNO3, HO2NO2, N2O5, OH, HO2, H2O2
@@ -215,7 +214,11 @@ End Comments
  [usr17ab] XNO2  -> 0.5*XNO + 0.5*XHNO3
 *          CH4 + OH -> CH3O2 + H2O                                        ; 2.45e-12, -1775
 *          CH4 + O1D -> .75*CH3O2 + .75*OH + .25*CH2O + .4*HO2 + .05*H2   ; 1.5e-10
+          CH4 + OH -> CH3O2 + H2O + CH4CHML                              ; 2.45e-12, -1775
+          CH4 + O1D -> .75*CH3O2 + .75*OH + .25*CH2O + .4*HO2 + .05*H2 + CH4CHML  ; 1.5e-10
 *          CH4 + O1DA -> CH4                                              ; 1.5e-10
+          CH4 + O1DA ->                                                  ; 1.5e-10
+          CH4CHML ->                                                     ; 7.1 e-6 
  [ox_p2]  CH3O2 + NO -> CH2O + NO2 + HO2                                 ; 2.8e-12, 300
           CH3O2 + XNO -> CH3O2 + XNO2                                    ; 2.8e-12, 300
           CH3O2 + CH3O2 -> 2 * CH2O + 2 * HO2                            ; 5.e-13,-424
@@ -244,8 +247,10 @@ End Comments
           C2H5O2 + C2H5O2 -> 1.6 * CH3CHO + 1.2 * HO2 + .4 * C2H5OH      ; 6.8e-14
           C2H5OOH + OH -> .5 * C2H5O2 + .5 * CH3CHO + .5 * OH            ; 3.8e-12, 200
  [usr10]  C3H6 + OH + M -> PO2 + M                                       ; 8.e-27,3.5, 3.e-11,0, .5
+* [ox_l4]  C3H6 + O3 -> .54*CH2O + .19*HO2 + .33*OH                       ; 6.5e-15, -1900
+*                      + .08*CH4 + .56*CO + .5*CH3CHO + .31*CH3O2 + .25*CH3COOH
  [ox_l4]  C3H6 + O3 -> .54*CH2O + .19*HO2 + .33*OH                       ; 6.5e-15, -1900
-                      + .08*CH4 + .56*CO + .5*CH3CHO + .31*CH3O2 + .25*CH3COOH
+                                + .56*CO + .5*CH3CHO + .31*CH3O2 + .25*CH3COOH
           C3H6 + O3A -> C3H6                                             ; 6.5e-15, -1900
           C3H6 + NO3 -> ONIT                                             ; 4.6e-13,-1156
  [new2]   C3H6 + XNO3 -> XONIT +C3H6                                     ; 4.6e-13,-1156
