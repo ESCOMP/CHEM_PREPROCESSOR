@@ -26,7 +26,8 @@ End Comments
       End Solution
 
       Fixed
- M, N2, O2, H2O, O3, OH, NO3, HO2
+ M, N2, O2, H2O
+ O3, OH, NO3, HO2
       End Fixed
 
       Col-int
@@ -41,8 +42,8 @@ End Comments
       End Explicit
       Implicit
         H2O2, SO2, SO4, DMS
-        CB1, CB2
-        OC1, OC2, SSLT01, SSLT02, SSLT03, SSLT04
+        CB1, CB2. OC1, OC2
+        SSLT01, SSLT02, SSLT03, SSLT04
         DST01, DST02, DST03, DST04
       End Implicit
    End Solution Classes
