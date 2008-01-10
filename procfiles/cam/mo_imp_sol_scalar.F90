@@ -2,7 +2,8 @@
 
 module mo_imp_sol
   use shr_kind_mod, only : r8 => shr_kind_r8
-  use chem_mods, only : clscnt4, gas_pcnst, clsmap
+  use chem_mods,    only : clscnt4, gas_pcnst, clsmap
+  use cam_logfile,  only : iulog
   implicit none
   private
   public :: imp_slv_inti, imp_sol
@@ -264,7 +265,7 @@ contains
        full_ozone_chem = .false.
     end if has_o3_chem
     if ( reduced_ozone_chem .and. full_ozone_chem ) then
-       write(*,*) 'can not have both full_ozone_chem and reduced_ozone_chem'
+       write(iulog,*) 'can not have both full_ozone_chem and reduced_ozone_chem'
        call endrun
     endif
     do i = 1,clscnt4
@@ -487,7 +488,7 @@ contains
                 !-----------------------------------------------------------------------
                 fail_cnt = fail_cnt + 1
                 nstep = get_nstep()
-                write(*,'('' imp_sol: Time step '',1p,e21.13,'' failed to converge @ (lchnk,lev,col,nstep) = '',4i6)') &
+                write(iulog,'('' imp_sol: Time step '',1p,e21.13,'' failed to converge @ (lchnk,lev,col,nstep) = '',4i6)') &
                      dt,lchnk,lev,i,nstep
                 stp_con_cnt = 0
                 if( cut_cnt < cut_limit ) then
@@ -499,11 +500,11 @@ contains
                    end if
                    cycle time_step_loop
                 else
-                   write(*,'('' imp_sol: Failed to converge @ (lchnk,lev,col,nstep,dt,time) = '',4i6,1p,2e21.13)') &
+                   write(iulog,'('' imp_sol: Failed to converge @ (lchnk,lev,col,nstep,dt,time) = '',4i6,1p,2e21.13)') &
                         lchnk,lev,i,nstep,dt,interval_done+dt
                    do m = 1,clscnt4
                       if( .not. converged(m) ) then
-                         write(*,'(1x,a8,1x,1pe10.3)') solsym(clsmap(m,4)), max_delta(m)
+                         write(iulog,'(1x,a8,1x,1pe10.3)') solsym(clsmap(m,4)), max_delta(m)
                       end if
                    end do
                 end if
@@ -514,7 +515,7 @@ contains
              interval_done = interval_done + dt
              if( abs( delt - interval_done ) <= .0001_r8 ) then
                 if( fail_cnt > 0 ) then
-                   write(*,*) 'imp_sol : @ (lchnk,lev,col) = ',lchnk,lev,i,' failed ',fail_cnt,' times'
+                   write(iulog,*) 'imp_sol : @ (lchnk,lev,col) = ',lchnk,lev,i,' failed ',fail_cnt,' times'
                 end if
                 exit time_step_loop
              else
@@ -532,7 +533,7 @@ contains
                    stp_con_cnt = 0
                 end if
                 dt = min( dt,delt-interval_done )
-                ! write(*,'('' imp_sol: New time step '',1p,e21.13)') dt
+                ! write(iulog,'('' imp_sol: New time step '',1p,e21.13)') dt
              end if
           end do time_step_loop
           !-----------------------------------------------------------------------

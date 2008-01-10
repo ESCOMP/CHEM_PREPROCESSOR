@@ -40,6 +40,9 @@ End Comments
         PRO2 -> C3H8
         BUT2 -> C4H10
         ETH2 -> C2H6
+        LVOC -> C
+        MVOC -> C
+        SVOC -> C
       End Solution
 
       Fixed
@@ -74,6 +77,9 @@ End Comments
         PRO2
         BUT2
         ETH2
+        LVOC
+        MVOC
+        SVOC
       End Explicit
       Implicit
       End Implicit
@@ -84,31 +90,36 @@ End Comments
       End Photolysis
 
       Reactions
-        CO ->                   ; 2.3148 e-07
-        COEA ->                 ; 2.3148 e-07
-        COSA ->                 ; 2.3148 e-07
-        COEU ->                 ; 2.3148 e-07
-        CONA ->                 ; 2.3148 e-07
+        CO ->                   ; 2.3148e-07
+        COEA ->                 ; 2.3148e-07
+        COSA ->                 ; 2.3148e-07
+        COEU ->                 ; 2.3148e-07
+        CONA ->                 ; 2.3148e-07
 
-        SCO ->                   ; 2.3148 e-07
-        SCOEA ->                 ; 2.3148 e-07
-        SCOSA ->                 ; 2.3148 e-07
-        SCOEU ->                 ; 2.3148 e-07
-        SCONA ->                 ; 2.3148 e-07
+        SCO ->                   ; 2.3148e-07
+        SCOEA ->                 ; 2.3148e-07
+        SCOSA ->                 ; 2.3148e-07
+        SCOEU ->                 ; 2.3148e-07
+        SCONA ->                 ; 2.3148e-07
 
-        COAVOC ->               ; 2.3148 e-07
-        COBVOC ->               ; 2.3148 e-07
-        COCH4 ->                ; 2.3148 e-07
+        COAVOC ->               ; 2.3148e-07
+        COBVOC ->               ; 2.3148e-07
+        COCH4 ->                ; 2.3148e-07
 
         CAVOC -> 0.7*COAVOC     ; 1.65344e-06
         CBVOC -> 0.4*COBVOC     ; 1.15741e-05
-        CH4  -> 0.86*COCH4      ; 3.73e-9
-        PRO1 ->                 ; 0.86e-7
-        BUT1 ->                 ; 2.05e-7
-        ETH1 ->                 ; 0.18e-7
-        PRO2 ->                 ; 1.72e-7
-        BUT2 ->                 ; 4.10e-7
-        ETH2 ->                 ; 0.36e-7
+        CH4  -> 0.86*COCH4      ; 3.73e-09
+        PRO1 ->                 ; 0.86e-07
+        BUT1 ->                 ; 2.05e-07
+        ETH1 ->                 ; 0.18e-07
+        PRO2 ->                 ; 1.72e-07
+        BUT2 ->                 ; 4.10e-07
+        ETH2 ->                 ; 0.36e-07
+
+        LVOC ->                 ; 1.81e-07
+        MVOC ->                 ; 1.81e-07
+        SVOC ->                 ; 1.81e-07
+
       End Reactions
 
    Heterogeneous
