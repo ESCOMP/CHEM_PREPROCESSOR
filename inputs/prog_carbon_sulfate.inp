@@ -11,9 +11,6 @@ Comments
      "This is a mozart4 simulation with :"
      "(1)  New hydrocarbon chemistry (lumped alkane, alkene, aromatic)"
      "(2)  New aerosol chemistry"
-     "(3)  No groups"
-     "(4)  NCEP inputs (28 levels)"
-     "(5)  no N atom; no NH4, no H2SO4"
 End Comments
 
       SPECIES
@@ -21,8 +18,6 @@ End Comments
       Solution
  H2O2, SO2, SO4, DMS -> CH3SCH3
  CB1 -> C, CB2 -> C, OC1 -> C, OC2 -> C
- SSLT01 -> NaCl, SSLT02 -> NaCl, SSLT03 -> NaCl, SSLT04 -> NaCl
- DST01 -> AlSiO5, DST02 -> AlSiO5, DST03 -> AlSiO5, DST04 -> AlSiO5
       End Solution
 
       Fixed
@@ -43,12 +38,10 @@ End Comments
       Implicit
         H2O2, SO2, SO4, DMS
         CB1, CB2, OC1, OC2
-        SSLT01, SSLT02, SSLT03, SSLT04
-        DST01, DST02, DST03, DST04
       End Implicit
    End Solution Classes
 
- CHEMISTRY
+   CHEMISTRY
       Photolysis
       End Photolysis
 
