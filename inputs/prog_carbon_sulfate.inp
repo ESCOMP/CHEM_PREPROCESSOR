@@ -5,7 +5,7 @@ procout_path       = ../output/
 src_path           = ../bkend/
 procfiles_path     = ../procfiles/cam/
 sim_dat_path       = ../output/
-sim_dat_filename   = cam_fixed_oxidants.dat
+sim_dat_filename   = prog_carbon_sulfate.dat
 
 Comments
      "This is a mozart4 simulation with :"
