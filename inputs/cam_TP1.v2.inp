@@ -116,9 +116,9 @@ End Comments
         BUT2 ->                 ; 4.10e-07
         ETH2 ->                 ; 0.36e-07
 
-        LVOC ->                 ; 1.81e-07
-        MVOC ->                 ; 1.81e-07
-        SVOC ->                 ; 1.81e-07
+        LVOC ->                 ; 1.80845E-07
+        MVOC ->                 ; 8.90313E-07
+        SVOC ->                 ; 2.0668E-06
 
       End Reactions
 
