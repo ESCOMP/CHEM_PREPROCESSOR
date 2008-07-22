@@ -8,12 +8,12 @@
       use sp_mods, only : sparsity
       use var_mod, only : clscnt, clsmap, permute, new_nq, new_solsym
       use var_mod, only : nq, newind, mass, temp_mass
-      use rxt_mod, only : cls_rxt_cnt
-      use rxt_mod, only : usrcnt, usrmap, frc_from_dataset
-      use rxt_mod, only : rxt_has_alias, rxt_alias
-!!      use var_mod, only : dvel_cnt, dvel_map
       use var_mod, only : nfs, fixsym
-      use rxt_mod
+      use rxt_mod, only : cls_rxt_cnt, rxntot
+      use rxt_mod, only : rxt_has_tag, rxt_tag
+      use rxt_mod, only : phtcnt, pht_alias, pht_alias_mult
+      use rxt_mod, only : hetcnt, hetmap
+      use rxt_mod, only : usrcnt, usrmap, frc_from_dataset
 
       implicit none
 
@@ -28,15 +28,15 @@
 !-------------------------------------------------------------------
       integer, parameter :: max_len= 128
 
-      character(len=8) ::  wrk_chr(5)
-      integer, allocatable   ::  ndx(:)
-      integer  :: m1, l
-      integer  ::  i, m, n, n1
+      integer  ::  i, l, m, m1, n, n1
       integer  ::  lpos
       integer  ::  lstrt
+      integer, allocatable   :: ndx(:)
       character(len=max_len) :: line
       character(len=64)      :: frmt
       character(len=24)      :: number
+      character(len=16)      :: rxt_string
+      character(len=8)       :: wrk_chr(5)
       logical  ::  flush
       logical  ::  lexist
 
@@ -66,25 +66,27 @@
       write(30,100) trim(line)
       line = ' '
       write(30,100) trim(line)
-      line(7:) = 'use chem_mods,   only : clscnt, cls_rxt_cnt, clsmap, permute, adv_mass, fix_mass'
+      line(7:) = 'use chem_mods,   only  : clscnt, cls_rxt_cnt, clsmap, permute, adv_mass, fix_mass'
       write(30,100) trim(line)
       if( clscnt(4) > 0 ) then
         line(7:) = 'use chem_mods,   only : diag_map'
         write(30,100) trim(line)
       endif
-      line(7:) = 'use chem_mods,   only : het_lst, extfrc_lst, inv_lst'
+      line(7:) = 'use chem_mods,   only  : phtcnt, rxt_tag_cnt, rxt_tag_lst, rxt_tag_map'
+      write(30,100) trim(line)
+      line(7:) = 'use chem_mods,   only  : pht_alias_lst, pht_alias_mult'
+      write(30,100) trim(line)
+      line(7:) = 'use chem_mods,   only  : het_lst, extfrc_lst, inv_lst'
+      write(30,100) trim(line)
+      line(7:) = 'use abortutils,  only  : endrun'
       write(30,100) trim(line)
       line(7:) = 'use mo_tracname, only  : solsym'
       write(30,100) trim(line)
       line(7:) = 'use chem_mods,   only : frc_from_dataset'
       write(30,100) trim(line)
-      line(7:) = 'use chem_mods,   only : rxt_alias_map, rxt_alias_lst, rxt_alias_cnt'
+      line(7:) = 'use shr_kind_mod,only : r8 => shr_kind_r8'
       write(30,100) trim(line)
-!      line(7:) = 'use chem_mods,   only : drydep_lst, drydep_cnt'
-!      write(30,100) trim(line)
-      line(7:) = 'use abortutils,  only : endrun'
-      write(30,100) trim(line)
-      line(7:) = 'use shr_kind_mod, only : r8 => shr_kind_r8'
+      line(7:) = 'use cam_logfile, only : iulog'
       write(30,100) trim(line)
       line = ' '
       write(30,100) trim(line)
@@ -99,6 +101,8 @@
       line = '!--------------------------------------------------------------'
       write(30,100) trim(line)
       line = '      integer :: ios'
+      write(30,100) trim(line)
+      line = ' '
       write(30,100) trim(line)
 !-------------------------------------------------------------------
 !	... set the simulation chemical mechanism data
@@ -166,7 +170,8 @@
          lstrt = m
          do n = 1,new_nq
             number = ' '
-            write(number,'(g15.9)') temp_mass(n)
+!           write(number,'(g15.9)') temp_mass(n)
+            write(number,*) temp_mass(n)
             number = adjustl( number )
             lpos   = scan( number, '0123456789', back=.true. ) + 1
             if( n < new_nq ) then
@@ -191,23 +196,17 @@
             end if
          end do
       end if
-      ! fixed species masses
+!-------------------------------------------------------------------
+! 	... fixed species masses
+!-------------------------------------------------------------------
       if( nfs > 0 ) then
          line = ' '
          write(30,100) trim(line)
-!!$         temp_mass(:) = 0.
-!!$         do n = 1,nfs
-!!$            if( newind(n) /= 0 ) then
-!!$               temp_mass(newind(n)) = mass(nqs)
-!!$            end if
-!!$         end do
          temp_mass(newind(n)) = mass(nfs)
-
          line = '      fix_mass(:'
          write(line(len_trim(line)+1:),'(i3,") = (/")') nfs
          m     = len_trim(line) + 2
          lstrt = m
-
          do n = 1,nfs
             number = ' '
 !!$            write(number,'(g15.9)') temp_mass(n+new_nq)
@@ -355,7 +354,6 @@
 !        ... Write the ext frcing species
 !-----------------------------------------------------------------------
    if( usrcnt > 0 ) then
-
       line = ' '
       write(30,100) trim(line)
       write(line,'("      extfrc_lst(:",i3,") = (/")') usrcnt
@@ -380,43 +378,43 @@
          write(30,'(a)') trim(line)
          line = ' '
       end do
-
-         line = ' '
-         write(30,100) trim(line)
-         write(line,'("      frc_from_dataset(:",i3,") = (/")') usrcnt
-         m1 = len_trim(line) + 2
-         do n = 1,usrcnt,5
-            n1 = min( n+4,usrcnt )
-            m = m1
-            do l = n,n1
-               if( l /= usrcnt ) then
-                  if( l /= n1 ) then
-                     if( frc_from_dataset(l) ) then
-                        write(line(m:),'(".true.,")')
-                     else
-                        write(line(m:),'(".false.,")')
-                     end if
+      
+      ! frc_from_dataset
+      line = ' '
+      write(30,100) trim(line)
+      write(line,'("      frc_from_dataset(:",i3,") = (/")') usrcnt
+      m1 = len_trim(line) + 2
+      do n = 1,usrcnt,5
+         n1 = min( n+4,usrcnt )
+         m = m1
+         do l = n,n1
+            if( l /= usrcnt ) then
+               if( l /= n1 ) then
+                  if( frc_from_dataset(l) ) then
+                     write(line(m:),'(".true.,")')
                   else
-                     if( frc_from_dataset(l) ) then
-                        write(line(m:),'(".true., &")')
-                     else
-                        write(line(m:),'(".false., &")')
-                     end if
+                     write(line(m:),'(".false.,")')
                   end if
                else
                   if( frc_from_dataset(l) ) then
-                     write(line(m:),'(".true. /)")')
+                     write(line(m:),'(".true., &")')
                   else
-                     write(line(m:),'(".false. /)")')
+                     write(line(m:),'(".false., &")')
                   end if
                end if
-               m = len_trim(line) + 2
-            end do
-            write(30,'(a)') trim(line)
-            line = ' '
+            else
+               if( frc_from_dataset(l) ) then
+                  write(line(m:),'(".true. /)")')
+               else
+                  write(line(m:),'(".false. /)")')
+               end if
+            end if
+            m = len_trim(line) + 2
          end do
-    end if
-
+         write(30,'(a)') trim(line)
+         line = ' '
+      end do
+   end if
 
 !-------------------------------------------------------------------
 !	... fixed species
@@ -446,73 +444,77 @@
          end do
       end if
 
-
 !-------------------------------------------------------------------
-!	... reaction aliases
+!	... reaction tags
 !-------------------------------------------------------------------
-      i = count( rxt_has_alias(:rxntot) )
+      i = count( rxt_has_tag(:rxntot) )
       if( i > 0 ) then
          allocate( ndx(i) )
          l = 0
          do m = 1,rxntot
-            if( rxt_has_alias(m) ) then
+            if( rxt_has_tag(m) ) then
                l = l + 1
                ndx(l) = m
             end if
          end do 
          line = ' '
          write(30,100) trim(line)
-!!$         write(line,'("      rxt_alias_cnt = ",i4)') l
+!!$         write(line,'("      rxt_tag_cnt = ",i4)') i
 !!$         write(30,100) trim(line)
-         line = ' '
-         line(7:) = 'if( allocated( rxt_alias_lst ) ) then'
+!!$         line = ' '
+         line(7:) = 'if( allocated( rxt_tag_lst ) ) then'
          write(30,100) trim(line)
-         line(7:) = '   deallocate( rxt_alias_lst )'
+         line(7:) = '   deallocate( rxt_tag_lst )'
          write(30,100) trim(line)
          line(7:) = 'end if'
          write(30,100) trim(line)
-         line(7:) = 'allocate( rxt_alias_lst(rxt_alias_cnt),stat=ios )'
+         line(7:) = 'allocate( rxt_tag_lst(rxt_tag_cnt),stat=ios )'
          write(30,100) trim(line)
          line(7:) = 'if( ios /= 0 ) then'
          write(30,100) trim(line)
          line = ' '
-         line(10:) = 'write(*,*) ''set_sim_dat: failed to allocate rxt_alias_lst; error = '',ios'
+         line(10:) = 'write(iulog,*) ''set_sim_dat: failed to allocate rxt_tag_lst; error = '',ios'
          write(30,100) trim(line)
          line(10:) = 'call endrun'
          write(30,100) trim(line)
          line(7:) = 'end if'
          write(30,100) trim(line)
-         line(7:) = 'if( allocated( rxt_alias_map ) ) then'
+         line(7:) = 'if( allocated( rxt_tag_map ) ) then'
          write(30,100) trim(line)
-         line(7:) = '   deallocate( rxt_alias_map )'
+         line(7:) = '   deallocate( rxt_tag_map )'
          write(30,100) trim(line)
          line(7:) = 'end if'
          write(30,100) trim(line)
-         line(7:) = 'allocate( rxt_alias_map(rxt_alias_cnt),stat=ios )'
+         line(7:) = 'allocate( rxt_tag_map(rxt_tag_cnt),stat=ios )'
          write(30,100) trim(line)
          line(7:) = 'if( ios /= 0 ) then'
          write(30,100) trim(line)
          line = ' '
-         line(10:) = 'write(*,*) ''set_sim_dat: failed to allocate rxt_alias_map; error = '',ios'
+         line(10:) = 'write(iulog,*) ''set_sim_dat: failed to allocate rxt_tag_map; error = '',ios'
          write(30,100) trim(line)
          line(10:) = 'call endrun'
          write(30,100) trim(line)
          line(7:) = 'end if'
          write(30,100) trim(line)
-         line = '      rxt_alias_lst(:rxt_alias_cnt) = (/ '
+         line = '      rxt_tag_lst(:rxt_tag_cnt) = (/ '
          m1 = len_trim(line) + 2
          do n = 1,i,4
             n1 = min( n+3,i )
             m = m1
             do l = n,n1
+               rxt_string = rxt_tag(ndx(l))
+               lpos = index( rxt_string, ',cph' )
+               if( lpos > 0 ) then
+                  rxt_string = trim( rxt_string(:lpos-1) )
+               end if
                if( l /= i ) then
                   if( l /= n1 ) then
-                     write(line(m:),'("''",a16,"'',")') rxt_alias(ndx(l))
+                     write(line(m:),'("''",a16,"'',")') rxt_string
                   else
-                     write(line(m:),'("''",a16,"'', &")') rxt_alias(ndx(l))
+                     write(line(m:),'("''",a16,"'', &")') rxt_string
                   end if
                else
-                  write(line(m:),'("''",a16,"'' /)")') rxt_alias(ndx(l))
+                  write(line(m:),'("''",a16,"'' /)")') rxt_string
                end if
                m = len_trim(line) + 2
             end do
@@ -520,7 +522,7 @@
             line = ' '
          end do
 
-         line = '      rxt_alias_map(:rxt_alias_cnt) = (/'
+         line = '      rxt_tag_map(:rxt_tag_cnt) = (/'
          m = len_trim(line) + 2
          do n = 1,i,10
             n1 = min( n+9,i )
@@ -541,54 +543,114 @@
          deallocate( ndx )
       end if
 
+!-------------------------------------------------------------------
+!	... photoreactions alias
+!-------------------------------------------------------------------
+      if( phtcnt > 0 ) then
+         line = ' '
+         line(7:) = 'if( allocated( pht_alias_lst ) ) then'
+         write(30,100) trim(line)
+         line(7:) = '   deallocate( pht_alias_lst )'
+         write(30,100) trim(line)
+         line(7:) = 'end if'
+         write(30,100) trim(line)
+         line(7:) = 'allocate( pht_alias_lst(phtcnt,2),stat=ios )'
+         write(30,100) trim(line)
+         line(7:) = 'if( ios /= 0 ) then'
+         write(30,100) trim(line)
+         line = ' '
+         line(10:) = 'write(iulog,*) ''set_sim_dat: failed to allocate pht_alias_lst; error = '',ios'
+         write(30,100) trim(line)
+         line(10:) = 'call endrun'
+         write(30,100) trim(line)
+         line(7:) = 'end if'
+         write(30,100) trim(line)
+         line = ' '
+         line(7:) = 'if( allocated( pht_alias_mult ) ) then'
+         write(30,100) trim(line)
+         line(7:) = '   deallocate( pht_alias_mult )'
+         write(30,100) trim(line)
+         line(7:) = 'end if'
+         write(30,100) trim(line)
+         line(7:) = 'allocate( pht_alias_mult(phtcnt,2),stat=ios )'
+         write(30,100) trim(line)
+         line(7:) = 'if( ios /= 0 ) then'
+         write(30,100) trim(line)
+         line = ' '
+         line(10:) = 'write(iulog,*) ''set_sim_dat: failed to allocate pht_alias_mult; error = '',ios'
+         write(30,100) trim(line)
+         line(10:) = 'call endrun'
+         write(30,100) trim(line)
+         line(7:) = 'end if'
+         write(30,100) trim(line)
+         do i = 1,2
+            if( i == 1 ) then
+               line = '      pht_alias_lst(:,1) = (/ '
+            else
+               line = '      pht_alias_lst(:,2) = (/ '
+            end if
+            m1 = len_trim(line) + 2
+            do n = 1,phtcnt,4
+               n1 = min( n+3,phtcnt )
+               m = m1
+               do l = n,n1
+                  rxt_string = pht_alias(l,i)
+                  if( l /= phtcnt ) then
+                     if( l /= n1 ) then
+                        write(line(m:),'("''",a16,"'',")') rxt_string
+                     else
+                        write(line(m:),'("''",a16,"'', &")') rxt_string
+                     end if
+                  else
+                     write(line(m:),'("''",a16,"'' /)")') rxt_string
+                  end if
+                  m = len_trim(line) + 2
+               end do
+               write(30,'(a)') trim(line)
+               line = ' '
+            end do
+         end do
 
-!!$!-------------------------------------------------------------------
-!!$!	... dry deposition
-!!$!-------------------------------------------------------------------
-!!$      if( dvel_cnt > 0 ) then
-!!$         line = ' '
-!!$         write(30,100) trim(line)
-!!$         write(line,'("      drydep_cnt = ",i4)') dvel_cnt
-!!$         write(30,100) trim(line)
-!!$         line = ' '
-!!$         line(7:) = 'if( allocated( drydep_lst ) ) then'
-!!$         write(30,100) trim(line)
-!!$         line(7:) = '   deallocate( drydep_lst )'
-!!$         write(30,100) trim(line)
-!!$         line(7:) = 'end if'
-!!$         write(30,100) trim(line)
-!!$         line(7:) = 'allocate( drydep_lst(drydep_cnt),stat=ios )'
-!!$         write(30,100) trim(line)
-!!$         line(7:) = 'if( ios /= 0 ) then'
-!!$         write(30,100) trim(line)
-!!$         line = ' '
-!!$         line(10:) = 'write(*,*) ''set_sim_dat: failed to allocate drydep_lst; error = '',ios'
-!!$         write(30,100) trim(line)
-!!$         line(10:) = 'call endrun'
-!!$         write(30,100) trim(line)
-!!$         line(7:) = 'end if'
-!!$         write(30,100) trim(line)
-!!$         line = '      drydep_lst(:drydep_cnt) = (/ '
-!!$         m1 = len_trim(line) + 2
-!!$         do n = 1,dvel_cnt,5
-!!$            n1 = min( n+4,dvel_cnt )
-!!$            m = m1
-!!$            do l = n,n1
-!!$               if( l /= dvel_cnt ) then
-!!$                  if( l /= n1 ) then
-!!$                     write(line(m:),'("''",a8,"'',")') new_solsym(dvel_map(l))
-!!$                  else
-!!$                     write(line(m:),'("''",a8,"'', &")') new_solsym(dvel_map(l))
-!!$                  end if
-!!$               else
-!!$                  write(line(m:),'("''",a8,"'' /)")') new_solsym(dvel_map(l))
-!!$               end if
-!!$               m = len_trim(line) + 2
-!!$            end do
-!!$            write(30,'(a)') trim(line)
-!!$            line = ' '
-!!$         end do
-!!$      end if
+         do i = 1,2
+            if( i == 1 ) then
+               line = '      pht_alias_mult(:,1) = (/ '
+            else
+               line = '      pht_alias_mult(:,2) = (/ '
+            end if
+            m = len_trim(line) + 2
+            do n = 1,phtcnt
+               number = ' '
+               write(number,'(g15.9)') pht_alias_mult(n,i)
+               number = adjustl( number )
+               lpos   = scan( number, '0123456789', back=.true. )
+               if( lpos == 1 ) then
+                  lpos = lpos + 1
+                  number(lpos:lpos) = '.'
+               end if
+               lpos = lpos + 1
+               if( n < phtcnt ) then
+                  if( mod(n,5) /= 0 ) then
+                     number(lpos:) = '_r8,'
+                     flush = .false.
+                  else
+                     number(lpos:) = '_r8, &'
+                     flush = .true.
+                  end if
+               else
+                  number(lpos:) = '_r8 /)'
+                  flush = .true.
+               end if
+               line(m:) = trim( number )
+               if( .not. flush ) then
+                  m = len_trim(line) + 2
+               else
+                  write(30,'(a)') trim(line)
+                  line = ' '
+                  m = lstrt
+               end if
+            end do
+         end do
+      end if
 
       line = ' '
       write(30,100) trim(line)

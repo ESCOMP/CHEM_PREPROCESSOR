@@ -1,7 +1,6 @@
-
 module set_rxt_rates
 
-  use rxt_mod, only : rxntot, rxt_alias, rxt_has_alias, cph_flg
+  use rxt_mod, only : rxntot, cph_flg
   use io,      only : temp_path
 
   private
@@ -601,11 +600,19 @@ contains
                    end if
                    if( model == 'WRF' .or. machine == 'NEC' .or. machine == 'FUJITSU' ) then
                       if( rate /= 0. ) then
-                         line(len_trim(line)+1:) = ' * itemp(:)**' // wrk(:l) // trim(num_suffix)
+                         if ( rate < 0. ) then
+                            line(len_trim(line)+1:) = ' * itemp(:)**(' // wrk(:l) // trim(num_suffix)//')'
+                         else
+                            line(len_trim(line)+1:) = ' * itemp(:)**' // wrk(:l) // trim(num_suffix)
+                         endif
                       end if
                    else
                       if( rate /= 0. ) then
-                         line(len_trim(line)+1:) = ' * itemp(:,:)**' // wrk(:l) // trim(num_suffix)
+                         if ( rate < 0. ) then
+                            line(len_trim(line)+1:) = ' * itemp(:,:)**(' // wrk(:l) // trim(num_suffix)//')'
+                         else
+                            line(len_trim(line)+1:) = ' * itemp(:,:)**' // wrk(:l) // trim(num_suffix)
+                         endif
                       end if
                    end if
                 end if
@@ -637,7 +644,11 @@ contains
                    if( model == 'WRF' .or. machine == 'NEC' .or. machine == 'FUJITSU' ) then
                       if( rate /= 0. ) then
                          if( rate /= 1. ) then
-                            line(len_trim(line)+1:) = ' * itemp(:)**' // wrk(:l) // trim(num_suffix)
+                            if ( rate < 0. ) then
+                               line(len_trim(line)+1:) = ' * itemp(:)**(' // wrk(:l) // trim(num_suffix)//')'
+                            else
+                               line(len_trim(line)+1:) = ' * itemp(:)**' // wrk(:l) // trim(num_suffix)
+                            endif
                          else
                             line(len_trim(line)+1:) = ' * itemp(:)'
                          end if
@@ -645,7 +656,11 @@ contains
                    else
                       if( rate /= 0. ) then
                          if( rate /= 1. ) then
-                            line(len_trim(line)+1:) = ' * itemp(:,:)**' // wrk(:l) // trim(num_suffix)
+                            if ( rate < 0. ) then
+                               line(len_trim(line)+1:) = ' * itemp(:,:)**(' // wrk(:l) // trim(num_suffix)//')'
+                            else
+                               line(len_trim(line)+1:) = ' * itemp(:,:)**' // wrk(:l) // trim(num_suffix)
+                            endif
                          else
                             line(len_trim(line)+1:) = ' * itemp(:,:)'
                          end if

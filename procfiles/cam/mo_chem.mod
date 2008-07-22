@@ -28,29 +28,31 @@
                             clscnt5   = CLSCNT5, &   ! number of species in rodas class
                             indexm    = INDEXM, &    ! index of total atm density in invariant array
                             indexh2o  = INDEXH2O, &  ! index of water vapor density
-                            clsze      = CLSZE, &       ! loop length for implicit chemistry
-                            rxt_alias_cnt = ALIASCNT
+                            clsze     = CLSZE, &     ! loop length for implicit chemistry
+                            rxt_tag_cnt = RXTTAGCNT
 
-      integer   :: clscnt(5)
-      integer   :: cls_rxt_cnt(4,5)
-      integer   :: clsmap(gas_pcnst,5)
-      integer   :: permute(gas_pcnst,5)
+      integer   :: clscnt(5)            = 0
+      integer   :: cls_rxt_cnt(4,5)     = 0
+      integer   :: clsmap(gas_pcnst,5)  = 0
+      integer   :: permute(gas_pcnst,5) = 0
 # if CLSCNT4 != 0
-      integer   :: diag_map(clscnt4)
+      integer   :: diag_map(clscnt4)    = 0
 # elif CLSCNT5 != 0
-      integer   :: diag_map(clscnt5)
+      integer   :: diag_map(clscnt5)    = 0
 # endif
-      real(r8)  :: adv_mass(gas_pcnst)
+      real(r8)  :: adv_mass(gas_pcnst)  = 0._r8
       real(r8)  :: fix_mass(max(1,nfs))
 # if GRPCNT != 0
-      real(r8)  :: nadv_mass(grpcnt)
+      real(r8)  :: nadv_mass(grpcnt)    = 0._r8
 # endif
 
+      integer, allocatable :: rxt_tag_map(:)
+      real(r8), allocatable :: pht_alias_mult(:,:)
+      character(len=16), allocatable :: rxt_tag_lst(:)
+      character(len=16), allocatable :: pht_alias_lst(:,:)
       character(len=8)               :: het_lst(max(1,hetcnt))
       character(len=8)               :: inv_lst(max(1,nfs))
       character(len=8)               :: extfrc_lst(max(1,extcnt))
       logical                        :: frc_from_dataset(max(1,extcnt))
-      integer,           allocatable :: rxt_alias_map(:)
-      character(len=16), allocatable :: rxt_alias_lst(:)
 
       end module chem_mods

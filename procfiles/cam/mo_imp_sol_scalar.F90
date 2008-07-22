@@ -158,7 +158,7 @@ contains
        wrk(1:17) = (/ ox_p1_ndx, ox_p2_ndx, ox_p3_ndx, ox_p4_ndx, ox_p5_ndx, &
             ox_p6_ndx, ox_p7_ndx, ox_p8_ndx, ox_p9_ndx, ox_p10_ndx, ox_p11_ndx, &
             ox_p12_ndx, ox_p13_ndx, ox_p14_ndx, ox_p15_ndx, ox_p16_ndx, ox_p17_ndx /)
-       if( all( wrk(1:11) > 0 ) ) then
+       if( all( wrk(1:17) > 0 ) ) then
           full_ozone_chem = .true.
        end if
        if ( .not. full_ozone_chem ) then

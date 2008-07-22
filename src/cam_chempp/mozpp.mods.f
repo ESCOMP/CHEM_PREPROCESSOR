@@ -1,21 +1,24 @@
 
-      module IO
+      module io
 
       implicit none
 
       integer :: lin      ! input unit number
       integer :: lout     ! output unit number
+
       character(len=120) :: buff        ! primary line input buffer
       character(len=120) :: buffh       ! upcase xform of buff
-      character(len=320) :: procout_path
-      character(len=320) :: procfiles_path
-      character(len=320) :: output_path
+      character(len=320) :: procout_path   = "../output/"
+      character(len=320) :: procfiles_path = "../procfiles/cam/"
+      character(len=320) :: output_path    = "../output/"
       character(len=320) :: input_path
       character(len=320) :: temp_path
-      character(len=320) :: src_dir
-      character(len=320) :: sim_dat_path, sim_dat_filespec, sim_dat_filename
+      character(len=320) :: src_dir      = "../bkend/"
+      character(len=320) :: sim_dat_path = "../output/"
+      character(len=320) :: sim_dat_filespec
+      character(len=320) :: sim_dat_filename
 
-      end module IO
+      end module io
 
 !-----------------------------------------------------------
 !	... Table of the elements; symbol and amu
@@ -535,15 +538,18 @@
       character(len=16), allocatable :: &
                    sym_rates(:,:), &
                    troe_sym_rates(:,:), &
-                   rxt_alias(:)
+                   pht_alias(:,:), &
+                   pht_alias_mult(:,:), &
+                   rxt_tag(:)
       character(len=8), allocatable :: &
                    phtsym(:)
       logical, allocatable :: &
+                   rxt_has_tag(:), &
                    rxt_has_alias(:) 
       logical, allocatable :: &
-                   frc_from_dataset(:)
-      logical, allocatable :: &
                    cph_flg(:) 
+      logical, allocatable :: &
+                   frc_from_dataset(:)
 
       integer :: cls_rxt_cnt(4,5) = 0
       integer, allocatable :: &
@@ -622,7 +628,7 @@
 	 stop
       end if
       hetmap(:,:) = 0
-      allocate( usrmap(rxt_lim),stat=astat )
+      allocate( usrmap(var_lim),stat=astat )
       if( astat /= 0 ) then
 	 write(*,*) 'RXT_INI: Failed to allocate usrmap'
 	 stop
@@ -694,24 +700,32 @@
 	 stop
       end if
       phtsym(:) = ' '
-      allocate( rxt_alias(rxt_lim),stat=astat )
+      allocate( rxt_tag(rxt_lim),stat=astat )
       if( astat /= 0 ) then
-	 write(*,*) 'RXT_INI: Failed to allocate rxt_alias'
+	 write(*,*) 'RXT_INI: Failed to allocate rxt_tag'
 	 stop
       end if
-      rxt_alias(:) = ' '
+      rxt_tag(:) = ' '
+      allocate( rxt_has_tag(rxt_lim),rxt_has_alias(rxt_lim),stat=astat )
+      if( astat /= 0 ) then
+	 write(*,*) 'RXT_INI: Failed to allocate rxt_has_tag,rxt_has_alias'
+	 stop
+      end if
+      rxt_has_tag(:)   = .false.
+      rxt_has_alias(:) = .false.
       allocate( cph_flg(rxt_lim),stat=astat )
       if( astat /= 0 ) then
 	 write(*,*) 'RXT_INI: Failed to allocate cph_flg'
 	 stop
       end if
       cph_flg(:) = .false.
-      allocate( rxt_has_alias(rxt_lim),stat=astat )
+      allocate( pht_alias(rxt_lim,2),pht_alias_mult(rxt_lim,2),stat=astat )
       if( astat /= 0 ) then
-	 write(*,*) 'RXT_INI: Failed to allocate rxt_has_alias'
+	 write(*,*) 'RXT_INI: Failed to allocate pht_alias,pht_alias_mult'
 	 stop
       end if
-      rxt_has_alias(:) = .false.
+      pht_alias(:,:) = ' '
+      pht_alias_mult(:,:) = '1.'
       allocate( frc_from_dataset(var_lim),stat=astat )
       if( astat /= 0 ) then
 	 write(*,*) 'RXT_INI: Failed to allocate frc_from_dataset'

@@ -4,7 +4,7 @@
 !	... Makes a module of parameter reaction names
 !--------------------------------------------------------------------------------
 
-      use rxt_mod, only : rxtcnt => rxntot, gascnt, phtcnt, rxt_alias, rxt_has_alias
+      use rxt_mod, only : rxtcnt => rxntot, gascnt, phtcnt, rxt_tag, rxt_has_tag
       use io,      only : temp_path
 
       implicit none
@@ -38,30 +38,30 @@
       write(30,'(a)') buff
 
       do i = 1,rxtcnt
-         if( rxt_alias(i) /= ' ' ) then
-            rxt_has_alias(i) = .true.
+         if( rxt_tag(i) /= ' ' ) then
+            rxt_has_tag(i) = .true.
             write(buff(7:),'(''integer, parameter :: rid_'',a,1x,''='',1x,i4)') &
-                             rxt_alias(i)(:len_trim(rxt_alias(i))), i
+                             rxt_tag(i)(:len_trim(rxt_tag(i))), i
             write(30,'(a)') buff
          end if
       end do
 
-      if( any( rxt_has_alias(:rxtcnt) ) ) then
+      if( any( rxt_has_tag(:rxtcnt) ) ) then
          buff = ''
          write(30,'(a)') buff
       end if
 
       do i = 1,rxtcnt
-         if( .not. rxt_has_alias(i) ) then
+         if( .not. rxt_has_tag(i) ) then
             write(num,'(i5)') i+10000
             if( i <= phtcnt ) then
                write(buff(7:),'(''integer, parameter :: rid_j'',a,1x,''='',1x,i4)') &
                    num(2:5), i
-               write(rxt_alias(i)(:5),'(''j'',a)') num(2:5)
+               write(rxt_tag(i)(:5),'(''j'',a)') num(2:5)
             else
                write(buff(7:),'(''integer, parameter :: rid_r'',a,1x,''='',1x,i4)') &
                         num(2:5), i
-               write(rxt_alias(i)(:5),'(''r'',a)') num(2:5)
+               write(rxt_tag(i)(:5),'(''r'',a)') num(2:5)
             end if
             write(30,'(a)') buff
          end if

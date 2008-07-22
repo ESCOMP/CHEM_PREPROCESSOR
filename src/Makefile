@@ -105,8 +105,8 @@ else
 FFLAGS    := --nfix --nap --nchk --g --npca --nsav --trace --trap --tp4 -c --mod $(OBJ_DIR) -O
 endif
 else
-FC          := pgf90
-FFLAGS      := -O2 -c -Mfree -module $(OBJ_DIR)
+FC          := pgf95
+FFLAGS      := -O2 -c -g -Mfree -module $(OBJ_DIR)
 endif
 
 
@@ -133,8 +133,8 @@ else
 FFLAGS    := --nfix --nap --nchk --g --npca --nsav --trace --trap --tp4 -c --mod $(OBJ_DIR) -O
 endif
 else
-FC          := pgf90
-FFLAGS      := -O2 -c -Mfree -module $(OBJ_DIR)
+FC          := pgf95
+FFLAGS      := -O2 -c -g -Mfree -module $(OBJ_DIR)
 endif
 
 

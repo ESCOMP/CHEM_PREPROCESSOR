@@ -1,6 +1,11 @@
 
       module mo_chem
 
+      implicit none
+
+      character(len=256) :: buff
+      character(len=256) :: buffh
+
       private
       public :: chem
 
@@ -11,18 +16,19 @@
 !	... Scan chemical reactions and produce base chemistry maps
 !-----------------------------------------------------------------------
 
-      use io
-      use var_mod, only : solsym, fixsym, pcesym
-      use var_mod, only : nq, nfs, spcsym, spccnt, var_lim
-      use rxt_mod, only : phtsym, phtcnt, rxt_lim, prd_lim, rxtnt_lim
-      use rxt_mod, only : rxno => rxntot, irc => rxmcnt
-      use rxt_mod, only : prdcnt, ipcep, ipcel, fixcnt, prdmap
-      use rxt_mod, only : fixmap, pcep, pcel, rxmap, hetcnt
-      use rxt_mod, only : hetmap, usrcnt, usrmap, rates => rxparm
-      use rxt_mod, only : troe_rxparm, troetab, troecnt, troe_sym_rates
-      use rxt_mod, only : rattab => rxptab, rateno => rxpcnt
-      use rxt_mod, only : pcoeff_cnt, pcoeff_ind, pcoeff, sym_rates
-      use rxt_mod, only : rxt_alias, has_cph => cph_flg
+      use io,      only : lin, lout
+      use var_mod, only : solsym, fixsym, pcesym, &
+			  nq, nfs, spcsym, spccnt, var_lim
+      use rxt_mod, only : rxno => rxntot, irc => rxmcnt, &
+			  prdcnt, ipcep, ipcel, fixcnt, prdmap, &
+			  fixmap, pcep, pcel, rxmap, hetcnt, &
+			  hetmap, usrcnt, usrmap, rates => rxparm, &
+			  troe_rxparm, troetab, troecnt, troe_sym_rates, &
+			  rattab => rxptab, rateno => rxpcnt, &
+			  pcoeff_cnt, pcoeff_ind, pcoeff, sym_rates, &
+			  phtsym, phtcnt, pht_alias, pht_alias_mult, rxt_lim, rxt_tag, &
+                          prd_lim, rxtnt_lim
+      use rxt_mod, only : has_cph => cph_flg
       use rxt_mod, only : frc_from_dataset
 
       implicit none
@@ -42,13 +48,18 @@
       character(len=16) :: rxparms(prd_lim)
       character(len=16) :: sym_rate(5)
       character(len=16) :: keywords(4) = (/ 'PHOTOLYSIS      ', &
-                                            'REACTIONS       ', &
-                                            'HETEROGENEOUS   ', &
-                                            'EXTFORCING      ' /)
+	                                    'REACTIONS       ', &
+	                                    'HETEROGENEOUS   ', &
+	                                    'EXTFORCING      ' /)
 
+!-----------------------------------------------------------------------
+!	... local variables
+!-----------------------------------------------------------------------
       integer  ::  nchar, k, nr, np, nsr, nsp, nf, &
-                   npr, npp, ic, kc, i, npl, l, j, m, il, ipp, im, &
+                   npr, npp, ic, kc, i, npl, l, j, m, ipp, im, &
                    photo, rxtn, npce = 0, ipl
+      integer  ::  il, iu, istat
+      integer  ::  beg_alias
       integer  ::  rxttab(5,prd_lim)
       integer  ::  parsw(4), &
                    count1(var_lim), &
@@ -56,12 +67,17 @@
       integer, allocatable :: toklen(:)
       integer  ::  tokcnt
       
-      character(len=16) ::  loc_rxt_alias
-      character(len=8) ::  rxtsym(rxtnt_lim), prdsym(prd_lim)
+      character(len=128) :: line
+      character(len=32) ::  loc_rxt_tag
+      character(len=32) ::  loc_pht_alias(2)
+      character(len=16) ::  wrk_char
+      character(len=8)  ::  rxtsym(rxtnt_lim)
+      character(len=8)  ::  prdsym(prd_lim)
+      character(len=1)  ::  char
       character(len=24), allocatable ::  ext_tokens(:)
-      character(len=8), allocatable ::  tokens(:)
-      character(len=1) ::  char
+      character(len=8),  allocatable ::  tokens(:)
 
+      real  ::     number
       real  ::     rate(5), pcoeffs(prd_lim)
 
       logical  ::  cph_flg
@@ -82,18 +98,18 @@ keyword_loop : &
          buffh = buff
          call upcase( buffh )
          if( buffh == 'ENDCHEMISTRY' ) then
-            exit
+	    exit
          end if
          found = .false.
          do i = 1,4
-            if( buffh == keywords(i) ) then
-               if( parsw(i) /= 0 ) then
+	    if( buffh == keywords(i) ) then
+	       if( parsw(i) /= 0 ) then
                   call errmes ( ' # Keyword already used@', &
                                 lout, &
                                 keywords(i), &
                                 len_trim(keywords(i)), &
                                 buff )
-               else if( i == 1 .and. parsw(2) /= 0 ) then
+	       else if( i == 1 .and. parsw(2) /= 0 ) then
                   call errmes ( 'Must specify Photolysis before Reactions@', &
                                 lout, char, 1, buff )
 	       end if
@@ -123,6 +139,33 @@ photolysis_loop : &
                   call upcase( buffh )
                   if( buffh == 'ENDPHOTOLYSIS' ) then
                      phtcnt = rxno
+!-----------------------------------------------------------------------
+!        ... Check that all photorates have a reaction tag
+!-----------------------------------------------------------------------
+                     if( phtcnt > 0 ) then
+                        k = count(  rxt_tag(:phtcnt) /= ' ' )
+                        if( k /= phtcnt ) then
+                           call errmes( 'All photoreactions must have a reaction tag@', lout, char, 1, buff )
+                        end if
+                        do ic = 1,phtcnt
+                           if( any( pht_alias(ic,:) /= ' ' ) ) then
+                              line = ' '
+                              m = len_trim(rxt_tag(ic))
+                              line = rxt_tag(ic)(:m) // ' -> '
+                              do k = 1,2
+                                 if( pht_alias(ic,k) /= ' ' ) then
+                                    if( k == 2 .and. pht_alias(ic,1) /= ' ' ) then
+                                       line(len_trim(line)+1:) = ','
+                                    end if
+                                    m = len_trim(pht_alias_mult(ic,k))
+                                    line(len_trim(line)+2:) = pht_alias_mult(ic,k)(:m) // ' * '
+                                    m = len_trim(pht_alias(ic,k))
+                                    line(len_trim(line)+2:) = pht_alias(ic,k)(:m)
+                                 end if
+                              end do
+                           end if
+                        end do
+                     end if
                      cycle keyword_loop
                   end if
                   rxtsym(1:3) = ' '
@@ -133,7 +176,7 @@ photolysis_loop : &
 !-----------------------------------------------------------------------
                   call rxtprs( nchar, nr, np, rxtsym, prdsym, &
                                rate, pcoeffs, coeff_flg, rxparms, sym_rate, &
-                               loc_rxt_alias, cph_flg, .true. )
+                               loc_rxt_tag, cph_flg, .true. )
 !-----------------------------------------------------------------------
 !        ... Check for reaction string errors from parsing routine
 !-----------------------------------------------------------------------
@@ -258,46 +301,94 @@ photolysis_loop : &
                      pcoeff_ind(rxno) = pcoeff_cnt
                      pcoeff(1:nsp,pcoeff_cnt) = pcoeffs(1:nsp)
                   end if
-                  do m = 1, rxno-1
-                     if( trim( loc_rxt_alias ) /= ' ' ) then
-                        if( trim( rxt_alias(m) ) == trim( loc_rxt_alias ) ) then
+!-----------------------------------------------------------------------
+!        ... Check for photorate alias
+!-----------------------------------------------------------------------
+                 m = index( loc_rxt_tag, '=' )
+                 if( m /= 0 ) then
+                    beg_alias = m + 1
+                 else
+                    m = index( loc_rxt_tag, '->' )
+                    if( m > 0 ) then
+                       beg_alias = m + 2
+                    end if
+                 end if
+                 if( m > 0 ) then
+                    loc_pht_alias(1) = loc_rxt_tag(beg_alias:)
+                    loc_rxt_tag(m:)  = ' '
+                    m = index( loc_pht_alias(1), ',' )
+                    il = 1
+                    iu = 2
+                    if( m == 0 ) then
+                       iu = 1
+                    else if( m == 1 ) then
+                       il = 2
+                       loc_pht_alias(2) = loc_pht_alias(1)(2:)
+                    else
+                       loc_pht_alias(2) = loc_pht_alias(1)(m+1:)
+                       loc_pht_alias(1) = loc_pht_alias(1)(:m-1)
+                    end if
+                    do ic = il,iu
+                       k = index( loc_pht_alias(ic), '*' )
+                       if( k == 0 ) then
+		          pht_alias(rxno,ic)      = loc_pht_alias(ic)
+                       else
+		          pht_alias_mult(rxno,ic) = loc_pht_alias(ic)(:k-1)
+		          read(pht_alias_mult(rxno,ic),*,iostat=istat) number
+                          if( istat /= 0 ) then
+                             call errmes ( ' # is not a valid number@', &
+                                           lout, &
+                                           pht_alias_mult(rxno,ic), &
+                                           len_trim(pht_alias_mult(rxno,ic)), &
+                                           buff )
+                          end if
+		          pht_alias(rxno,ic)      = loc_pht_alias(ic)(k+1:)
+                       end if
+                    end do
+                 end if
+!-----------------------------------------------------------------------
+!        ... Check for duplicate reaction tag
+!-----------------------------------------------------------------------
+		  do m = 1,rxno-1
+		     if( trim( loc_rxt_tag ) /= ' ' ) then
+		        if( trim( rxt_tag(m) ) == trim( loc_rxt_tag ) ) then
                            call errmes ( ' # rxtnt alias already in use@', &
                                          lout, &
-                                         loc_rxt_alias, &
-                                         len_trim(loc_rxt_alias), &
+                                         loc_rxt_tag, &
+                                         len_trim(loc_rxt_tag), &
                                          buff )
-                         end if
-                      end if
-                  end do
-                  rxt_alias(rxno) = loc_rxt_alias
+		        end if
+		     end if
+		  end do
+		  rxt_tag(rxno) = loc_rxt_tag
                   has_cph(rxno)   = cph_flg
 !-----------------------------------------------------------------------
 !        ... Print the reaction on unit lout
 !-----------------------------------------------------------------------
-                   call outp( rxparms, nr, np, rxtsym, prdsym, sym_rate, rxno, rate, loc_rxt_alias, lout )
-               end do photolysis_loop
+                   call outp( rxparms, nr, np, rxtsym, prdsym, sym_rate, rxno, rate, loc_rxt_tag, lout )
+	       end do photolysis_loop
       
-            case( gas_phase )
+	    case( gas_phase )
 !=======================================================================
 !    	... The chemical reactions
 !=======================================================================
                write(lout,*) ' '
                write(lout,260)
 gas_phase_rxt_loop : &
-               do
+	       do
                   call cardin( lin, buff, nchar )
                   buffh = buff
                   call upcase( buffh )
                   if( buffh == 'ENDREACTIONS' ) then
-                     cycle keyword_loop
+	             cycle keyword_loop
                   end if
 
                   rxtsym(1:3) = ' '
                   prdsym(1:4) = ' '
-                  sym_rate = ' '
+		  sym_rate = ' '
                   call rxtprs( nchar, nr, np, rxtsym, prdsym, &
                                rate, pcoeffs, coeff_flg, rxparms, sym_rate, &
-                               loc_rxt_alias, cph_flg, .false. )
+                               loc_rxt_tag, cph_flg, .false. )
 
                   if( nr < 0 ) then
                      call errmes ( 'there are no reactants@', lout, char, 1, buff )
@@ -328,32 +419,35 @@ gas_phase_rxt_loop : &
 !	... User specified reaction rate ?
 !-----------------------------------------------------------------------
                   if( sym_rate(1) /= ' ' ) then
-                     if( sym_rate(3) == ' ' ) then
+		     if( sym_rate(3) == ' ' ) then
                         rateno = rateno + 1
                         rattab(rateno) = rxno
                         rates(:2,rateno) = rate(:2)
-                        sym_rates(:2,rateno) = sym_rate(:2)
-                     else if( sym_rate(5) /= ' ' ) then
+		        sym_rates(:2,rateno) = sym_rate(:2)
+		     else if( sym_rate(5) /= ' ' ) then
                         troecnt = troecnt + 1
                         troetab(troecnt) = rxno
                         troe_rxparm(:,troecnt) = rate(:)
-                        troe_sym_rates(:,troecnt) = sym_rate(:)
+		        troe_sym_rates(:,troecnt) = sym_rate(:)
                      end if
                   end if
-                  do m = 1, rxno-1
-                     if( trim( loc_rxt_alias ) /= ' ' ) then
-                        if( trim( rxt_alias(m) ) == trim( loc_rxt_alias ) ) then
+!-----------------------------------------------------------------------
+!        ... Check for duplicate reaction tag
+!-----------------------------------------------------------------------
+		  do m = 1, rxno-1
+		     if( trim( loc_rxt_tag ) /= ' ' ) then
+		        if( trim( rxt_tag(m) ) == trim( loc_rxt_tag ) ) then
                            call errmes ( ' # rxtnt alias already in use@', &
                                          lout, &
-                                         loc_rxt_alias, &
-                                         len_trim(loc_rxt_alias), &
+                                         loc_rxt_tag, &
+                                         len_trim(loc_rxt_tag), &
                                          buff )
-                        end if
-                     end if
-                  end do
-                  rxt_alias(rxno) = loc_rxt_alias
+		        end if
+		     end if
+		  end do
+		  rxt_tag(rxno) = loc_rxt_tag
                   has_cph(rxno)   = cph_flg
-                  call outp( rxparms, nr, np, rxtsym, prdsym, sym_rate, rxno-phtcnt, rate, loc_rxt_alias, lout )
+                  call outp( rxparms, nr, np, rxtsym, prdsym, sym_rate, rxno-phtcnt, rate, loc_rxt_tag, lout )
 
                   if( nf /= 0 ) then
                      fixcnt(nf) = fixcnt(nf) + 1  
@@ -446,22 +540,22 @@ gas_phase_rxt_loop : &
 !=======================================================================
                write(lout,*) ' '
                write(lout,7175)
-	       ALLOCATE( toklen(64) )
-	       ALLOCATE( tokens(64) )
+	       allocate( toklen(64) )
+	       allocate( tokens(64) )
 hetero_loop :  do
                   call cardin( lin, buff, nchar )
                   buffh = buff
                   call upcase( buffh )
                   if( buffh == 'ENDHETEROGENEOUS' ) then
-		     DEALLOCATE( toklen )
-		     DEALLOCATE( tokens )
+		     deallocate( toklen )
+		     deallocate( tokens )
                      cycle keyword_loop
                   end if
 
 		  call gettokens( buff, nchar, ',', 8, tokens, toklen, 64, tokcnt )
 		  if( tokcnt <= 0 ) then
-		     DEALLOCATE( toklen )
-		     DEALLOCATE( tokens )
+		     deallocate( toklen )
+		     deallocate( tokens )
                      call errmes ( ' Error in het list@', lout, param, k, buff )
 		  end if
 het_tok_loop :    do j = 1,tokcnt
@@ -470,8 +564,8 @@ het_tok_loop :    do j = 1,tokcnt
 			   if( hetcnt > 1 ) then
 			      if( any(hetmap(:hetcnt,1) == m ) ) then
                                  call errmes( ' # is already in hetero list@', lout, tokens(j), toklen(j), buff )
-                              end if
-                           end if
+			      end if
+			   end if
                            hetcnt = hetcnt + 1
                            if( hetcnt > rxt_lim ) then
                               call errmes( ' Hetero reaction count exceeds limit@', lout, buff, 1, buff )
@@ -491,24 +585,24 @@ het_tok_loop :    do j = 1,tokcnt
 !=======================================================================
                write(lout,*) ' '
                write(lout,8175)
-	       ALLOCATE( toklen(64) )
+               allocate( toklen(64) )
                allocate( ext_tokens(64) )
 extfrc_loop :  do
                   call cardin( lin, buff, nchar )
                   buffh = buff
                   call upcase( buffh )
                   if( buffh == 'ENDEXTFORCING' ) then
-		     DEALLOCATE( toklen )
-		     DEALLOCATE( ext_tokens )
+                     deallocate( toklen )
+                     deallocate( ext_tokens )
                      cycle keyword_loop
                   end if
 
                   call gettokens( buff, nchar, ',', 24, ext_tokens, toklen, 64, tokcnt )
-		  if( tokcnt <= 0 ) then
-		     DEALLOCATE( toklen )
-		     DEALLOCATE( ext_tokens )
+                  if( tokcnt <= 0 ) then
+                     deallocate( toklen )
+                     deallocate( ext_tokens )
                      call errmes ( ' Error in ext prod list@', lout, param, k, buff )
-		  end if
+                  end if
 ext_tok_loop :    do j = 1,tokcnt
                      do m = 1,spccnt(1)
                         k = index( ext_tokens(j), '<' ) - 1
@@ -519,17 +613,17 @@ ext_tok_loop :    do j = 1,tokcnt
                            found = .true.
                         end if
                         if( ext_tokens(j)(:k) == spcsym(m,1) ) then
-			   if( usrcnt > 1 ) then
-			      if( any(usrmap(:usrcnt) == m ) ) then
+                           if( usrcnt > 1 ) then
+                              if( any(usrmap(:usrcnt) == m ) ) then
                                  call errmes( ' # is already in ext frc list@', lout, ext_tokens(j), toklen(j), buff )
-                              end if
-                           end if
+			      end if
+			   end if
                            usrcnt = usrcnt + 1
                            if( usrcnt > rxt_lim ) then
                               call errmes( ' Extran reaction count exceeds limit@', lout, buff, 1, buff )
                            end if
                            usrmap(usrcnt) = m
-                           !write(lout,7177) usrcnt, spcsym(m,1)
+                           !write(lout,'(1x,''('',i2,'')'',3x,a)') usrcnt, trim(spcsym(m,1))
 
                            if( .not. found ) then
                               write(lout,'(1x,''('',i2,'')'',3x,a)') usrcnt, trim(spcsym(m,1))
@@ -539,8 +633,8 @@ ext_tok_loop :    do j = 1,tokcnt
                            end if
 
 
-			   cycle ext_tok_loop
-			end if
+                           cycle ext_tok_loop
+                        end if
                      end do
                      call errmes ( ' # is not in Solution list@', lout, ext_tokens(j), toklen(j), buff )
                   end do ext_tok_loop
@@ -582,11 +676,21 @@ ext_tok_loop :    do j = 1,tokcnt
 
       end subroutine chem
 
-      subroutine rxtprs( nchar, rxtcnt, prdcnt, rxtsym, prdsym, &
-                         rate, pcoeffs, coeff_flg, prdprms, sym_rate, &
-                         loc_rxt_alias, cph_flg, is_photorate )
+      subroutine rxtprs( nchar, &
+                         rxtcnt, &
+                         prdcnt, &
+                         rxtsym, &
+                         prdsym, &
+                         rate, &
+                         pcoeffs, &
+                         coeff_flg, &
+                         prdprms, &
+                         sym_rate, &
+                         loc_rxt_tag, &
+                         cph_flg, &
+			 is_photorate )
 
-      use io,      only : lin, lout, buff, buffh
+      use io, only : lin, lout
       use rxt_mod, only : rxtnt_lim, prd_lim
 
       implicit none
@@ -610,13 +714,14 @@ ext_tok_loop :    do j = 1,tokcnt
       integer, intent(in)  ::     nchar
       integer, intent(out) ::     rxtcnt, prdcnt
       real, intent(out)    ::     rate(*), pcoeffs(prd_lim)
-      character(len=16), intent(out)  ::  loc_rxt_alias
+      character(len=*), intent(out)  ::  loc_rxt_tag
       character(len=8), intent(out)  ::  rxtsym(rxtnt_lim), prdsym(prd_lim)
       character(len=16), intent(out) :: prdprms(prd_lim)
       character(len=16), intent(out) :: sym_rate(*)
       logical, intent(in)  ::     is_photorate
       logical, intent(out) ::     coeff_flg
       logical, intent(out) ::     cph_flg
+      
       
 !-----------------------------------------------------------------------
 !	... Local variables
@@ -637,27 +742,26 @@ ext_tok_loop :    do j = 1,tokcnt
       rate(:5)    = 0.
       pcoeffs(:)  = 1.
       ncharl      = nchar
-      ALLOCATE( slen(MAX(5,prd_lim)) )
-      ALLOCATE( rxparms(MAX(5,prd_lim)) )
+      allocate( slen(MAX(5,prd_lim)) )
+      allocate( rxparms(MAX(5,prd_lim)) )
 !-----------------------------------------------------------------------
 !	... Check for reaction name alias, cph
 !-----------------------------------------------------------------------
       k = index( buff(:ncharl), ']' ) - 1
       if( k > 0 ) then
          j = index( buff(:ncharl), '[' ) + 1
+         loc_rxt_tag = buff(j:k)
          comma = index( buff(j:k), ',' )
          if( comma /= 0 ) then
             if( buff(j+comma:k) == 'cph' ) then
                cph_flg = .true.
+               loc_rxt_tag = buff(j:j+comma-2)
             end if
-            loc_rxt_alias = buff(j:j+comma-2)
-         else
-            loc_rxt_alias = buff(j:k)
          end if
          buff = buff(k+2:ncharl)
-         ncharl = nchar - (k+1)
+	 ncharl = nchar - (k+1)
       else
-         loc_rxt_alias = ' '
+         loc_rxt_tag = ' '
       end if
 
       length = index( buff(:ncharl), '=' )
@@ -693,7 +797,7 @@ ext_tok_loop :    do j = 1,tokcnt
       end if
 
       if( index( buff(:ncharl),'->' ) /= 0 ) then
-         length = length + 1
+	 length = length + 1
       end if
       if( length == ncharl ) then       ! reaction has reactants only
          return
@@ -737,7 +841,7 @@ ext_tok_loop :    do j = 1,tokcnt
             end if
             read(prdprms(k)(:j-1),*,iostat=retcod) pcoeffs(k)
             if( retcod /= 0 ) then
-               call errmes( 'number format error in product multiplier #@', lout, &
+	       call errmes( 'number format error in product multiplier #@', lout, &
                              prdprms(k), slen(k), buff )
 	    end if
             prdsym(k) = prdprms(k)(j+1:)
@@ -787,10 +891,10 @@ ext_tok_loop :    do j = 1,tokcnt
          call upcase( buffhl )
          if( .not. is_photorate .and. buffhl == 'ENDREACTIONS' ) then
             backspace( lin )
-            exit
+	    exit
          else if( is_photorate .and. buffhl == 'ENDPHOTOLYSIS' ) then
             backspace( lin )
-            exit
+	    exit
          else
             length = index( buffl(:ncharl), '=' )
             if( length == 0 ) then
@@ -798,10 +902,10 @@ ext_tok_loop :    do j = 1,tokcnt
             end if
             if( length /= 0 ) then
                backspace( lin )
-               exit
+	       exit
             end if
          end if
-         if( buffl(1:1) /= '+' ) then
+	 if( buffl(1:1) /= '+' ) then
             call errmes ( 'Extended Reactions must start with + delimiter@', lout, buffl, 1, buffl )
 	 end if
          if( prdcnt >= prd_lim ) then
@@ -847,8 +951,8 @@ ext_tok_loop :    do j = 1,tokcnt
 	 prdcnt = prdcnt + tprdcnt
       end do
 
-      DEALLOCATE( slen )
-      DEALLOCATE( rxparms )
+      deallocate( slen )
+      deallocate( rxparms )
 
 !-----------------------------------------------------------------------
 !        ... Formats
@@ -864,7 +968,7 @@ ext_tok_loop :    do j = 1,tokcnt
                          nf,       npr,      npp,      rxttab, &
                          rxtype,   coeff_flg,pcoeffs )
 
-      use io, only : lout, buff
+      use io, only : lout
       use rxt_mod, only : rxtnt_lim, prd_lim
 
       implicit none
@@ -989,7 +1093,7 @@ rxtnt_scan : &
                        sym_rate, &
                        irxn, &
                        rate, &
-                       loc_rxt_alias, &
+                       loc_rxt_tag, &
                        lout )
 
       use rxt_mod, only : rxtnt_lim, prd_lim
@@ -1018,7 +1122,7 @@ rxtnt_scan : &
       real, intent(in)    ::      rate(:)
       character(len=16), intent(in) :: rxparms(prd_lim)
       character(len=16), intent(in) :: sym_rate(5)
-      character(len=16), intent(in)  :: loc_rxt_alias
+      character(len=*), intent(in)  :: loc_rxt_tag
       character(len=8), intent(in)  :: rxtsym(rxtnt_lim), prdsym(prd_lim)
 
 !-----------------------------------------------------------------------
@@ -1105,19 +1209,19 @@ rxtnt_scan : &
 	       if( i == np ) then
 		  kl = line_cnt
 	          do k = kl,max(4,line_cnt)
-                     call write_rxt( buff, sym_rate, rate, loc_rxt_alias, irxn, line_cnt )
+                     call write_rxt( buff, sym_rate, rate, loc_rxt_tag, irxn, line_cnt )
 	             line_cnt = line_cnt + 1
 		  end do
 	       end if
 	    else
-               call write_rxt( buff, sym_rate, rate, loc_rxt_alias, irxn, line_cnt )
+               call write_rxt( buff, sym_rate, rate, loc_rxt_tag, irxn, line_cnt )
 	       line_cnt = line_cnt + 1
 	       buff(arrow_pos+1:) = trim( rx_piece )
 	       buff_pos = len_trim( buff ) + 2
 	       if( i == np ) then
 		  kl = line_cnt
 	          do k = kl,max(4,line_cnt)
-                     call write_rxt( buff, sym_rate, rate, loc_rxt_alias, irxn, line_cnt )
+                     call write_rxt( buff, sym_rate, rate, loc_rxt_tag, irxn, line_cnt )
 	             line_cnt = line_cnt + 1
 		  end do
 	       end if
@@ -1126,14 +1230,14 @@ rxtnt_scan : &
       else
          buff(j:) = '(No products)'
 	 do k = 1,3
-            call write_rxt( buff, sym_rate, rate, loc_rxt_alias, irxn, line_cnt )
+            call write_rxt( buff, sym_rate, rate, loc_rxt_tag, irxn, line_cnt )
 	    line_cnt = line_cnt + 1
 	 end do
       end if
 
       end subroutine outp
 
-      subroutine write_rxt( buff, sym_rate, rate, loc_rxt_alias, irxn, line_cnt )
+      subroutine write_rxt( buff, sym_rate, rate, loc_rxt_tag, irxn, line_cnt )
 !-----------------------------------------------------------------------
 !        ... Print the reaction rate
 !-----------------------------------------------------------------------
@@ -1150,7 +1254,7 @@ rxtnt_scan : &
       real, intent(in)    :: rate(:)
       character(len=120), intent(inout) :: buff
       character(len=16), intent(in)     :: sym_rate(:)
-      character(len=16), intent(in)      :: loc_rxt_alias
+      character(len=*), intent(in)      :: loc_rxt_tag
 
 !-----------------------------------------------------------------------
 !        ... Local variables
@@ -1163,7 +1267,7 @@ rxtnt_scan : &
 	    if( line_cnt == 1 ) then
 	       if( rate(1) == 0. ) then
                   buff(69:) = ' rate = 0.'
-                  write(lout,100) loc_rxt_alias, irxn, buff, irxn+phtcnt
+                  write(lout,100) loc_rxt_tag, irxn, buff, irxn+phtcnt
 	       else if( .not. troe_rate ) then
                   buff(69:) = ' rate = '
                   write(buff(77:),'(1pe8.2)') rate(1)
@@ -1172,7 +1276,7 @@ rxtnt_scan : &
                      write(buff(90:),'(f8.0)') rate(2)
                      buff(98:) = '/t)'
                   end if
-                  write(lout,100) loc_rxt_alias, irxn, buff, irxn+phtcnt
+                  write(lout,100) loc_rxt_tag, irxn, buff, irxn+phtcnt
 	       else
                   buff(69:) = ' troe : ko='
                   write(buff(80:),'(1pe8.2)') rate(1)
@@ -1180,7 +1284,7 @@ rxtnt_scan : &
                      buff(88:) = '*(300/t)**'
                      write(buff(98:),'(f4.2)') rate(2)
                   end if
-                  write(lout,110) loc_rxt_alias, irxn, buff, irxn+phtcnt
+                  write(lout,110) loc_rxt_tag, irxn, buff, irxn+phtcnt
                end if
 	    else if( troe_rate ) then
 	       if( line_cnt == 2 ) then
@@ -1205,7 +1309,7 @@ rxtnt_scan : &
          else
 	    if( line_cnt == 1 ) then
                buff(69:) = ' rate = ** User defined **'
-               write(lout,100) loc_rxt_alias, irxn, buff, irxn+phtcnt
+               write(lout,100) loc_rxt_tag, irxn, buff, irxn+phtcnt
             else if( buff /= ' ' ) then
                write(lout,120) buff
             end if

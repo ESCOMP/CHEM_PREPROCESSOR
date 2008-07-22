@@ -45,58 +45,65 @@
 !            (2) == "implicit" iteration count
 !            (3) == "implicit" jacobian update count( first count iterations)
 !-----------------------------------------------------------------------
+      character(len=1), parameter :: on = 'y'
+      character(len=1), parameter :: off = 'n'
+
       integer  ::  iter_counts(4) = (/ 7, 4, 2, 5 /)
 
-      character(len=128) :: chem_src(50), lib_src(350)
-      character(len=128), dimension(100) :: filename, filepath, sub_names
+      character(len=128) :: lib_src(350)
+      character(len=128) :: chem_src(50)
+      character(len=128) :: filename(100)
+      character(len=128) :: filepath(100)
+      character(len=128) :: sub_names(100)
+      character(len=80)  :: iout(100)
+      character(len=128) :: mod_names(100)
+      character(len=128) :: mod_paths(100)
+      character(len=128) :: mod_src(100)
+      character(len=64)  :: histinp(4)
+      character(len=64)  :: histout(6)
+      character(len=16)  :: jobctl(8)
+      character(len=16)  :: wrk_rxt(10)
+      character(len=10)  :: clshdr(5)
+      character(len=8)   :: wrk_chr(10)
       character(len=256) :: command, cpp_command
       character(len=256) :: errcom, filout, filin
-      character(len=80) :: iout(100)
-      character(len=128), dimension(100) :: mod_names, mod_paths
-      character(len=64) :: oper_flpth
-      character(len=64) :: cpp_dir, cpp_opts
-      character(len=64) :: wrk_dir
-      character(len=64) :: tar_flnm
-      character(len=64) :: subfile
-      character(len=64) :: histinp(4)
-      character(len=64) :: histout(6)
-      character(len=128) :: mod_src(100)
-      character(len=64) :: filenm
-      character(len=64) :: tmp_filenm
-      character(len=16) :: param
-      character(len=16) :: hostname
-      character(len=16) :: jobname
-      character(len=16) :: jobctl(8)
-      character(len=16) :: wrk_rxt(10)
-      character(len=10) :: clshdr(5)
+      character(len=64)  :: oper_flpth
+      character(len=64)  :: cpp_dir, cpp_opts
+      character(len=64)  :: wrk_dir
+      character(len=64)  :: tar_flnm
+      character(len=64)  :: subfile
+      character(len=64)  :: filenm
+      character(len=64)  :: tmp_filenm
+      character(len=16)  :: param
+      character(len=16)  :: hostname
+      character(len=16)  :: jobname
     
-      character(len=8) ::  wrk_chr(10)
-      character(len=8) ::  machine = 'CRAYYMP'
-      character(len=8) ::  march   = 'SCALAR'
-      character(len=8) ::  model   = 'MOZART'
-      character(len=8) ::  arch_type = 'omp'
+      character(len=8) ::  machine   = 'IBM'
+      character(len=8) ::  march     = 'SCALAR'
+      character(len=8) ::  model     = 'CAM'
+      character(len=8) ::  arch_type = 'HYBRID'
       character(len=8) ::  char
       character(len=4) ::  ftunit = 'ft'
       character(len=1) ::  errflg
-      character(len=1), parameter :: on = 'y', off = 'n'
 
-      integer ::  file_cnt, hst_file_cnt
+      integer, allocatable :: mask(:)
       integer ::  entry(11)
       integer ::  filelines(5)
       integer ::  dyn_hst_fld_cnt(2)                        ! multi and single level field count
       integer ::  ratind(2)
-      integer ::  nchar, k, noff, m, j, l, il, iu, &
-                  i, indx, ntab, ios, astat
+      integer ::  additions(2)
+      integer ::  multiplications(2)
+      integer ::  nzcnt(2)  = 0                             ! number of nonzero entries in lu
+      integer ::  file_cnt, hst_file_cnt
+      integer ::  nchar, k, noff, m, j, l, il, iu
+      integer ::  i, indx, ntab, ios, astat
       integer ::  spcno, counter, rxno, col, retcod, length, place
       integer ::  fixrows, rxmrows, pcelrows, pceprows
       integer ::  cpucnt = 1                                ! number of cpu's
-      integer ::  nzcnt(2)  = 0                             ! number of nonzero entries in lu
-      integer, dimension(2) ::  additions, multiplications
-      integer, allocatable :: mask(:)
       
-      logical, target  ::  options(20)
-      logical, allocatable, dimension(:)     :: lin_mat_pat
-      logical, pointer :: usemods
+      logical, target      ::  options(20)
+      logical, allocatable :: lin_mat_pat(:)
+      logical, pointer     :: usemods
       logical ::  null_flag
       logical ::  found
       logical ::  lexist
@@ -107,7 +114,7 @@
       logical ::  tavgprnt = .false.            ! time averaged printout
       logical ::  longnames = .false.           ! do not use long names
 
-      integer :: rxt_alias_cnt
+      integer :: rxt_tag_cnt
 
       type(SPARSITY) :: sparse(2)
 
@@ -554,7 +561,6 @@
 	    mass(i) = com_mass( solsym(i) )
 	 end if
       end do
-      ! fvitt include the mass of fixed species... 
       do i = spccnt(1)+1, spccnt(1)+spccnt(3)
 	 if( aliases(i) /= ' ' ) then
 	    mass(i) = com_mass( aliases(i) )
@@ -701,6 +707,11 @@
          call chem
          options(1) = .true.
          gascnt = rxntot - phtcnt
+         do i = 1,rxntot
+            if( rxt_tag(i) /= ' ' ) then
+               rxt_has_tag(i) = .true.
+            end if
+         end do
          call cardin( lin, &
                       buff, &
                       nchar )
@@ -1538,7 +1549,7 @@ sparse_matrix_loop : &
 	    do m = 1,rxntot
 	       if( rxt_has_alias(m) ) then
 	          i = i + 1
-	          wrk_rxt(i) = rxt_alias(m)
+	          wrk_rxt(i) = rxt_tag(m)
 	          if( i == 5 ) then
                      write(20,'(5a16)') wrk_rxt(:5)
 		     i = 0
@@ -1598,12 +1609,12 @@ sparse_matrix_loop : &
       end if
       close( 20)
 
-     rxt_alias_cnt = count( rxt_has_alias )
+     rxt_tag_cnt = count( rxt_has_tag )
 
 !-----------------------------------------------------------------------
 !        ... Write the chemistry header file
 !-----------------------------------------------------------------------
-      call chm_hdr( rxt_alias_cnt, hetcnt, usrcnt, cls_rxt_cnt, radj_flag, phtcnt, &
+      call chm_hdr( rxt_tag_cnt, hetcnt, usrcnt, cls_rxt_cnt, radj_flag, phtcnt, &
                     rxpcnt, rxparm, rxntot, ncol, nfs, &
                     indexm, indexh2o, new_nq, relcnt, grp_mem_cnt, &
                     clscnt, iter_counts, nzcnt, vec_ftns, machine, options(1) )
@@ -1770,16 +1781,16 @@ sparse_matrix_loop : &
 !-----------------------------------------------------------------------
       if( options(18) ) then
 	 k = 1
-	 mod_paths(k) = './'
+!!$	 mod_paths(k) = './'
 	 mod_paths(k) = ' '
 	 mod_names(k) = trim( temp_path ) // 'spc_names.mod'
          k = 2
-         mod_paths(k) = './'
-         mod_paths(k) = ' '
+!!$         mod_paths(k) = './'
+	 mod_paths(k) = ' '
          mod_names(k) = trim( temp_path ) // 'rxt_names.mod'
          k = 3
-         mod_paths(k) = './'
-         mod_paths(k) = ' '
+!!$         mod_paths(k) = './'
+	 mod_paths(k) = ' '
          mod_names(k) = trim( temp_path ) // 'het_names.mod'
       else
 	 k = 0
@@ -1861,7 +1872,7 @@ sparse_matrix_loop : &
             do i = 1,filelines(5)
                call system( 'cat ' // trim( temp_path ) // 'wrk.stub.F > wrk.F' )
                call system( 'cat '// trim( mod_src(i) ) // ' >> wrk.F' )
-               write(*,*) 'cpp file ',trim(mod_src(i))
+!              write(*,*) 'cpp file ',trim(mod_src(i))
 	       il = index( mod_src(i), '/', back = .true. ) + 1
 	       iu = index( mod_src(i), '.mod', back = .true. ) - 1
                select case( mod_src(i)(il:iu) )
@@ -1871,7 +1882,7 @@ sparse_matrix_loop : &
                      tmp_filenm = mod_src(i)(il:iu)
                end select 
                filenm = trim(tmp_filenm) // '.F90'
-               write(*,*) 'tar file ',trim(filenm)
+!              write(*,*) 'tar file ',trim(filenm)
                call system( trim( cpp_command ) // ' wrk.F > '// trim(filenm) )
                if( i == 1 ) then
                   call system( 'tar -cf ' // trim(temp_path) // trim(tar_flnm) // ' ' // trim(filenm) )
@@ -1886,7 +1897,7 @@ sparse_matrix_loop : &
             do i = 1,filelines(2)
                call system( 'cat ' // trim( temp_path ) // 'wrk.stub.F > wrk.F' )
                call system( 'cat '// trim( mod_paths(i) ) // trim(mod_names(i) ) // ' >> wrk.F' )
-               write(*,*) 'cpp file ',trim(mod_paths(i)) // trim(mod_names(i))
+!              write(*,*) 'cpp file ',trim(mod_paths(i)) // trim(mod_names(i))
                il = index( mod_names(i), '/', back = .true. ) + 1
                iu = index( mod_names(i), '.mod', back = .true. ) - 1
                select case( mod_names(i)(il:iu) )
@@ -1900,7 +1911,7 @@ sparse_matrix_loop : &
                   tmp_filenm = mod_src(i)(il:iu)
                end select 
                filenm = trim(tmp_filenm) // '.F90'
-               write(*,*) 'tar file ',trim(filenm)
+!              write(*,*) 'tar file ',trim(filenm)
                call system( trim( cpp_command ) // ' wrk.F > '// trim(filenm) )
                if( filelines(5) == 0 .and. i == 1 ) then
                   call system( 'tar -cf ' // trim(temp_path) // trim(tar_flnm) // ' ' // trim(filenm) )
@@ -2031,7 +2042,7 @@ sparse_matrix_loop : &
 	       iu = index( lib_src(i), '.F', back = .true. ) - 1
                if( lib_src(i)(il:iu) /= 'mo_setrxt' ) then
                   call system( 'cat ' // trim( temp_path ) // 'wrk.stub.F > wrk.F' )
-                  write(*,*) 'cpp file ',trim(lib_src(i))
+!                 write(*,*) 'cpp file ',trim(lib_src(i))
                end if
                call system( 'cat '// trim( lib_src(i) ) // ' >> wrk.F' )
                if( lib_src(i)(il:iu) == 'mo_imp_sol_scalar' .or. &
@@ -2046,7 +2057,7 @@ sparse_matrix_loop : &
                else
                   call system( 'cp wrk.F ' // trim(filenm) )
                end if
-               write(*,*) 'tar file ',trim(filenm)
+!              write(*,*) 'tar file ',trim(filenm)
                call system( 'tar -rf ' // trim(temp_path) // trim(tar_flnm) // ' ' // trim(filenm) )
                call system( 'rm -f wrk.F' )
                call system( 'rm -f ' // trim(filenm) )
@@ -2056,7 +2067,7 @@ sparse_matrix_loop : &
             do i = 1,sub_cnt
                call system( 'cat ' // trim( temp_path ) // 'wrk.stub.F > wrk.F' )
                call system( 'cat '// trim( filepath(i) ) // trim(filename(i) ) // ' >> wrk.F' )
-               write(*,*) 'cpp file ',trim(filepath(i)) // trim(filename(i))
+!              write(*,*) 'cpp file ',trim(filepath(i)) // trim(filename(i))
 	       il = index( filename(i), '/', back = .true. ) + 1
 	       iu = index( filename(i), '.F', back = .true. ) - 1
                filenm = filename(i)(il:iu) // '.F90'
@@ -2100,7 +2111,7 @@ sparse_matrix_loop : &
       end if
       file_cnt = 1
       do k = 1,500
-         read(2,'(a64)',end=1015) lib_src(file_cnt)
+         read(2,'(a128)',end=1015) lib_src(file_cnt)
 	 if( lib_src(file_cnt) /= ' ' ) then
 	    lib_src(file_cnt) = trim( temp_path ) // trim( lib_src(file_cnt) )
 	    filelines(3) = filelines(3) + 1
@@ -2134,7 +2145,7 @@ sparse_matrix_loop : &
             do i = 1,filelines(3)
                call system( 'cat ' // trim( temp_path ) // 'wrk.stub.F > wrk.F' )
                call system( 'cat '// trim( lib_src(i) ) // ' >> wrk.F' )
-               write(*,*) 'cpp file ',trim(lib_src(i))
+!              write(*,*) 'cpp file ',trim(lib_src(i))
                il = index( lib_src(i), '/', back = .true. ) + 1
                iu = index( lib_src(i), '.F', back = .true. ) - 1
                select case( lib_src(i)(il:iu) )
@@ -2152,7 +2163,7 @@ sparse_matrix_loop : &
                      mod_src(1) = lib_src(i)(il:iu)
                end select 
                filenm = 'mo_' // trim(mod_src(1)) // '.F90'
-               write(*,*) 'tar file ',trim(filenm)
+!              write(*,*) 'tar file ',trim(filenm)
                call system( trim( cpp_command ) // ' wrk.F > '// trim(filenm) )
                call system( 'tar -rf ' // trim(temp_path) // trim(tar_flnm) // ' ' // trim(filenm) )
                call system( 'rm -f wrk.F' )
@@ -2173,7 +2184,11 @@ sparse_matrix_loop : &
 !-----------------------------------------------------------------------
       call system( 'mv *.h ' // trim( temp_path ) // '.' )
 
-      stop 'Ok'
+      write(*,*) ' '
+      write(*,*) '================================================'
+      write(*,*) 'CAM-Chem preprocessor has successfully completed'
+      write(*,*) '================================================'
+      write(*,*) ' '
 
 !-----------------------------------------------------------------------
 !       ... Format statements
