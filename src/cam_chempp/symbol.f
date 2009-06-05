@@ -6,7 +6,7 @@ subroutine SYMBOL( iout )
 
   use IO
   use VAR_MOD, only : indexh2o, spccnt, indexm, grpsym, grpcof, &
-       grpmap, grpcnt, colsym, colmap, spcsym, &
+       grpmap, grpcnt, colsym, colmap, spcsym, slvdsym, nslvd, &
        colub, relmap, aliases, var_lim
 
   implicit none
@@ -21,7 +21,7 @@ subroutine SYMBOL( iout )
   !-----------------------------------------------------------------------
   integer, parameter :: symlen = 8
 
-  integer  ::  retcod, parsw(5), nchar
+  integer  ::  retcod, parsw(6), nchar
   integer  ::  spclim(5)
   integer  ::  kpar, i
   integer  ::  symbol_len
@@ -32,10 +32,18 @@ subroutine SYMBOL( iout )
 
   character(len=80), allocatable ::  tokens(:)
   character(len=16) ::  param
-  character(len=8)  ::  spchdr(5) = (/ 'SOLUTION', 'PCE     ', 'FIXED   ', &
-       'GROUPS  ', 'COL-INT ' /)
-  character(len=11)  :: spcend(5) = (/ 'ENDSOLUTION', 'ENDPCE     ', 'ENDFIXED   ', &
-       'ENDGROUPS  ', 'ENDCOL-INT ' /)
+  character(len=16)  :: spchdr(6) = (/ 'SOLUTION        ', &
+                                       'PCE             ', &
+                                       'FIXED           ', &
+                                       'GROUPS          ', &
+                                       'COL-INT         ', &
+                                       'NOT-TRANSPORTED '  /)
+  character(len=20)  :: spcend(6) = (/ 'ENDSOLUTION         ', &
+                                       'ENDPCE              ', &
+                                       'ENDFIXED            ', &
+                                       'ENDGROUPS           ', &
+                                       'ENDCOL-INT          ', &
+                                       'ENDNOT-TRANSPORTED  '  /)
   character(len=8)  ::  upname
   character(len=1)  ::  char
 
@@ -62,7 +70,7 @@ subroutine SYMBOL( iout )
      end if
      count = 0
      found = .false.
-     do kpar = 1,5
+     do kpar = 1,6
         if( buffh == spchdr(kpar) ) then
            found = .true.
            exit
@@ -323,7 +331,49 @@ subroutine SYMBOL( iout )
               colsym(count) = tokens(j)(:jeq-1)
            end do
         end do
+     else if( kpar == 6 ) then
+        !-----------------------------------------------------------------------
+        !     ... The Short Lived Species
+        !-----------------------------------------------------------------------
+        do
+
+           call CARDIN( lin, buff, nchar )
+           buffh = buff
+           call UPCASE( buffh )
+           if( buffh == spcend(kpar) ) then
+              exit
+           end if
+           call GETTOKENS(  buff(:nchar),     nchar,    ',', 32, &
+                tokens,   toklen,   20,       no_tokens )
+!!$           if( no_tokens <= 0 ) then
+!!$!              call ERRMES( 'Column integral list improperly specified@', lout, buff, 1, buff )
+!!$           end if
+
+           do j=1,no_tokens
+
+              found = .false.
+              slvd_srch_loop : do ic = 1,2
+                 do m = 1,spccnt(ic)
+                    if( tokens(j) == spcsym(m,ic) ) then
+                       found = .true.
+                       exit slvd_srch_loop
+                    end if
+                 end do
+              end do slvd_srch_loop
+              if( .not. found ) then
+                 call ERRMES( 'Short Lived Species # not in sol,pce lists@', lout, tokens(j), toklen(j), buff )
+              end if
+
+              slvdsym(j) = trim(tokens(j))
+           enddo
+
+           nslvd = no_tokens
+
+
+        end do
+     
      end if
+
   end do
 
 end subroutine SYMBOL

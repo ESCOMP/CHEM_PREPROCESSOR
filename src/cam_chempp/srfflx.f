@@ -30,8 +30,8 @@
       integer  ::  j, k
       integer  ::  no_tokens
 
-      character(len=120) ::  buff
-      character(len=120) ::  buffh
+      character(len=320) ::  buff
+      character(len=320) ::  buffh
       character(len=8)  ::  tokens(20)
 
       logical  ::  found

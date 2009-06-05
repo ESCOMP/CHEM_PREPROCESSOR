@@ -731,7 +731,7 @@ ext_tok_loop :    do j = 1,tokcnt
       integer  ::   comma
       integer  ::   k, j, length, ratcnt, start, position
       integer, allocatable  ::   slen(:)
-      character(len=120) :: buffl, buffhl
+      character(len=320) :: buffl, buffhl
       character(len=16), allocatable  :: rxparms(:)
 
       rxtcnt = 0
@@ -1131,7 +1131,7 @@ rxtnt_scan : &
       integer  ::    i, j, k, kl, length, slen, retcod, line_cnt
       integer  ::    buff_pos, arrow_pos
       real     ::    coeff
-      character(len=120) :: buff
+      character(len=320) :: buff
       character(len=64)  :: rx_piece
 
 !-----------------------------------------------------------------------
@@ -1252,7 +1252,7 @@ rxtnt_scan : &
 !-----------------------------------------------------------------------
       integer, intent(in) :: line_cnt, irxn
       real, intent(in)    :: rate(:)
-      character(len=120), intent(inout) :: buff
+      character(len=320), intent(inout) :: buff
       character(len=16), intent(in)     :: sym_rate(:)
       character(len=*), intent(in)      :: loc_rxt_tag
 

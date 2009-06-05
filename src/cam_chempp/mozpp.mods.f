@@ -6,8 +6,8 @@
       integer :: lin      ! input unit number
       integer :: lout     ! output unit number
 
-      character(len=120) :: buff        ! primary line input buffer
-      character(len=120) :: buffh       ! upcase xform of buff
+      character(len=320) :: buff        ! primary line input buffer
+      character(len=320) :: buffh       ! upcase xform of buff
       character(len=320) :: procout_path   = "../output/"
       character(len=320) :: procfiles_path = "../procfiles/cam/"
       character(len=320) :: output_path    = "../output/"
@@ -292,7 +292,11 @@
                                      grpsym(:), &
                                      colsym(:), &
                                      new_solsym(:), &
-                                     grp_mem_sym(:)
+                                     grp_mem_sym(:), &
+                                     slvdsym(:)
+
+      integer :: nslvd
+
       character(len=8), allocatable :: &
                    user_hst_names(:,:)
 
@@ -430,7 +434,7 @@
 	 stop
       end if
       aliases(:) = ' '
-      allocate( spcsym(var_lim,7),stat=astat )
+      allocate( spcsym(var_lim,8),stat=astat )
       if( astat /= 0 ) then
 	 write(*,*) 'VAR_INI: Failed to allocate spcsym'
 	 stop
@@ -475,6 +479,8 @@
       colsym => spcsym(:,5)
       new_solsym => spcsym(:,6)
       grp_mem_sym => spcsym(:,7)
+
+      slvdsym => spcsym(:,8)
 
       end subroutine VAR_INI
 

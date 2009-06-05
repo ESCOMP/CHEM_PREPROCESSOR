@@ -50,15 +50,15 @@
 
       integer  ::  iter_counts(4) = (/ 7, 4, 2, 5 /)
 
-      character(len=128) :: lib_src(350)
-      character(len=128) :: chem_src(50)
-      character(len=128) :: filename(100)
-      character(len=128) :: filepath(100)
-      character(len=128) :: sub_names(100)
+      character(len=320) :: lib_src(350)
+      character(len=320) :: chem_src(50)
+      character(len=320) :: filename(100)
+      character(len=320) :: filepath(100)
+      character(len=320) :: sub_names(100)
       character(len=80)  :: iout(100)
-      character(len=128) :: mod_names(100)
-      character(len=128) :: mod_paths(100)
-      character(len=128) :: mod_src(100)
+      character(len=320) :: mod_names(100)
+      character(len=320) :: mod_paths(100)
+      character(len=320) :: mod_src(100)
       character(len=64)  :: histinp(4)
       character(len=64)  :: histout(6)
       character(len=16)  :: jobctl(8)
@@ -1615,7 +1615,7 @@ sparse_matrix_loop : &
 !        ... Write the chemistry header file
 !-----------------------------------------------------------------------
       call chm_hdr( rxt_tag_cnt, hetcnt, usrcnt, cls_rxt_cnt, radj_flag, phtcnt, &
-                    rxpcnt, rxparm, rxntot, ncol, nfs, &
+                    rxpcnt, rxparm, rxntot, ncol, nfs, nslvd, &
                     indexm, indexh2o, new_nq, relcnt, grp_mem_cnt, &
                     clscnt, iter_counts, nzcnt, vec_ftns, machine, options(1) )
 

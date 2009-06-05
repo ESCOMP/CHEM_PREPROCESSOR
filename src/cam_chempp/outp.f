@@ -44,7 +44,7 @@
       integer  ::    i, j, k, kl, length, retcod, line_cnt
       integer  ::    buff_pos, arrow_pos
       real     ::    coeff
-      character(len=120) :: buff
+      character(len=320) :: buff
       character(len=64)  :: rx_piece
 
       buff = ' '
@@ -147,7 +147,7 @@
 !-----------------------------------------------------------------------
       integer, intent(in) :: line_cnt, irxn
       real, intent(in)    :: rate(:)
-      character(len=120), intent(inout) :: buff
+      character(len=320), intent(inout) :: buff
       character(len=16), intent(in)     :: sym_rate(:)
       character(len=8), intent(in)      :: loc_rxt_alias
 

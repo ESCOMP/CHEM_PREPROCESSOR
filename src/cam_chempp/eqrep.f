@@ -50,7 +50,7 @@
       integer  ::   spc_num, length, beg_mark
       integer  ::   line_pos, line_num, buf_pos, rxno
       
-      character(len=120) ::  lines(2)
+      character(len=320) ::  lines(2)
       character(len=80)  ::  eq_piece
       character(len=8)   ::  symbol
       

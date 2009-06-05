@@ -288,10 +288,11 @@
 !	... Local variables
 !-----------------------------------------------------------------------
       integer  ::  ls, i
-      character(len=120) :: copy
+      character(len=320) :: copy
 
       copy = '0 *** '
       ls  = 6
+
       do i = 1,MIN( LEN(string),120 )
          if( string(i:i) == '@' ) then
             exit
@@ -305,9 +306,12 @@
       end do
 
       write(lout,'(a)') copy(:ls)
+      write(   *,'(a)') copy(:ls)
       if( card /= ' ' ) then
          write(lout,'('' Input line:'')')
+         write(   *,'('' Input line:'')')
          write(lout,'(1x,a80)') card
+         write(   *,'(1x,a80)') card
       end if
 
       stop 'abort'
@@ -565,7 +569,7 @@
 !     	... Local variables
 !-----------------------------------------------------------------------
       integer  ::  offset, i, il, iu, len, j
-      character(len=120) :: copy
+      character(len=320) :: copy
 
       len = MIN( ls,120 )
       copy(:len) = string(:len)

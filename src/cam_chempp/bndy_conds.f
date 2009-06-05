@@ -32,8 +32,8 @@
       integer  ::  parsw(2) = 0
       integer  ::  bndy
 
-      character(len=120) ::  buff
-      character(len=120) ::  buffh
+      character(len=320) ::  buff
+      character(len=320) ::  buffh
       character(len=8)  ::  tokens(20)
 
       logical  ::  found

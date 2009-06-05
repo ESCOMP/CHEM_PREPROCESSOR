@@ -1,6 +1,6 @@
 
       subroutine chm_hdr( rxt_tag_cnt, hetcnt, usrcnt, cls_rxt_cnt, radj_flag, phtcnt, &
-                          rxpcnt, rxparm, rxntot, ncol, nfs, &
+                          rxpcnt, rxparm, rxntot, ncol, nfs, nslvd, &
                           indexm, indexh2o, spcno, relcnt, grpcnt, &
                           clscnt, iter_counts, nzcnt, vec_ftns, machine, chemistry )
 !-----------------------------------------------------------------------
@@ -20,6 +20,7 @@
       integer, intent(in) ::    rxntot                ! count of totol reactions
       integer, intent(in) ::    ncol                  ! number of column integrals
       integer, intent(in) ::    nfs                   ! number of "fixed" species
+      integer, intent(in) ::    nslvd                 ! number of "short lived" species
       integer, intent(in) ::    indexm                ! index for "m"
       integer, intent(in) ::    indexh2o              ! index for h2o
       integer, intent(in) ::    spcno                 ! total number of xported species
@@ -81,6 +82,7 @@
       write(30,'(''# define TDEPCNT '',i5)') gascnt
       write(30,'(''# define NCOL '',i5)') ncol
       write(30,'(''# define NFS '',i5)') nfs
+      write(30,'(''# define NSLVD '',i5)') nslvd
       write(30,'(''# define INDEXM '',i5)') indexm
       write(30,'(''# define INDEXH2O '',i5)') indexh2o
       write(30,'(''# define PCNST '',i5)') spcno

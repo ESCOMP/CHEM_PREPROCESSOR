@@ -54,6 +54,38 @@ all: $(MODEL_EXEDIR)/$(EXENAME)
 # Architecture-specific flags and rules
 
 #------------------------------------------------------------------------
+# Altix (columbia)
+#------------------------------------------------------------------------
+ifeq ($(UNAMEM),ia64)
+ifeq ($(COMPILER),ifort)
+
+# @echo $(COMPILER)
+
+ objflag    = -o $@
+
+  FC          := ifort
+  FFLAGS      := -c -132 -ftz -g -FR  -I $(OBJ_DIR)
+
+  ifeq ($(DEBUG),TRUE)
+    FFLAGS    += -CB
+  else
+    # Check for override of default Fortran compiler optimizations
+    ifeq ($(F_OPTIMIZATION_OVERRIDE),$(null))
+      FORTRAN_OPTIMIZATION := -O2
+    endif
+    FFLAGS    += $(FORTRAN_OPTIMIZATION)
+  endif
+
+.SUFFIXES:
+.SUFFIXES: .f .F .c .o
+
+$(OBJ_DIR)/%.o : %.f
+	$(FC) $(FFLAGS) $(objflag) $<
+
+endif
+endif
+
+#------------------------------------------------------------------------
 # Alpha ?
 #------------------------------------------------------------------------
 ifeq ($(UNAMEM),alpha)
@@ -76,6 +108,24 @@ endif
 # AIX ?
 #------------------------------------------------------------------------
 ifeq ($(UNAMES),AIX)
+
+objflag    = -o $@
+FC          := xlf95
+FFLAGS      := -g -c -qarch=auto -qnosave -qfree=f90 -qmoddir=$(OBJ_DIR) -I $(OBJ_DIR) -qstrict -O3
+
+
+.SUFFIXES:
+.SUFFIXES: .f .F .c .o
+
+$(OBJ_DIR)/%.o : %.f
+	$(FC) $(FFLAGS) $(objflag) $<
+
+endif
+
+#------------------------------------------------------------------------
+# BG/L, BG/P
+#------------------------------------------------------------------------
+ifeq ($(UNAMEM),ppc64)
 
 objflag    = -o $@
 FC          := xlf95
@@ -122,6 +172,7 @@ endif
 # Linux - lightning
 #------------------------------------------------------------------------
 ifeq ($(UNAMES),Linux)
+ifeq ($(UNAMEM),x86_64)
 
 obj_flag  = -o $@ 
 
@@ -144,6 +195,7 @@ endif
 $(OBJ_DIR)/%.o : %.f
 	$(FC) $(FFLAGS) -o $@ $<
 
+endif
 endif
 
 #------------------------------------------------------------------------

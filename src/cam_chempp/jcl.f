@@ -38,7 +38,7 @@
       integer       :: spos
       real          :: time, days, seconds
       real          :: dtime
-      character(len=120) :: buff
+      character(len=320) :: buff
       character(len=64)  :: caps
       character(len=64)  :: fpth
       character(len=64)  :: fname

@@ -275,7 +275,7 @@ contains
     enddo
   end subroutine imp_slv_inti
   subroutine imp_sol( base_sol, reaction_rates, het_rates, extfrc, delt, &
-       xhnm, ncol, lchnk )
+       xhnm, ncol, lchnk, ltrop )
     !-----------------------------------------------------------------------
     ! ... imp_sol advances the volumetric mixing ratio
     ! forward one time step via the fully implicit euler scheme.
@@ -305,6 +305,7 @@ contains
          het_rates(ncol,pver,max(1,hetcnt)) ! washout rates (1/s)
     real(r8), intent(inout) :: base_sol(ncol,pver,gas_pcnst) ! species mixing ratios (vmr)
     real(r8), intent(in) :: xhnm(ncol,pver)
+    integer, intent(in) :: ltrop(ncol) ! chemistry troposphere boundary (index)
     !-----------------------------------------------------------------------
     ! ... local variables
     !-----------------------------------------------------------------------
@@ -351,6 +352,7 @@ contains
     end if
     level_loop : do lev = 1,pver
        column_loop : do i = 1,ncol
+          IF (lev <= ltrop(i)) CYCLE column_loop
           !-----------------------------------------------------------------------
           ! ... transfer from base to local work arrays
           !-----------------------------------------------------------------------

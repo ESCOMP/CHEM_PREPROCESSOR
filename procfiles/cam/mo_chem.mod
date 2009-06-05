@@ -29,7 +29,8 @@
                             indexm    = INDEXM, &    ! index of total atm density in invariant array
                             indexh2o  = INDEXH2O, &  ! index of water vapor density
                             clsze     = CLSZE, &     ! loop length for implicit chemistry
-                            rxt_tag_cnt = RXTTAGCNT
+                            rxt_tag_cnt = RXTTAGCNT, &
+                            nslvd     = NSLVD
 
       integer   :: clscnt(5)            = 0
       integer   :: cls_rxt_cnt(4,5)     = 0
@@ -54,5 +55,6 @@
       character(len=8)               :: inv_lst(max(1,nfs))
       character(len=8)               :: extfrc_lst(max(1,extcnt))
       logical                        :: frc_from_dataset(max(1,extcnt))
+      character(len=8)               :: slvd_lst(max(1,nslvd))
 
       end module chem_mods

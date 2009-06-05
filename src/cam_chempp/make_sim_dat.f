@@ -9,6 +9,7 @@
       use var_mod, only : clscnt, clsmap, permute, new_nq, new_solsym
       use var_mod, only : nq, newind, mass, temp_mass
       use var_mod, only : nfs, fixsym
+      use var_mod, only : nslvd, slvdsym
       use rxt_mod, only : cls_rxt_cnt, rxntot
       use rxt_mod, only : rxt_has_tag, rxt_tag
       use rxt_mod, only : phtcnt, pht_alias, pht_alias_mult
@@ -76,7 +77,7 @@
       write(30,100) trim(line)
       line(7:) = 'use chem_mods,   only  : pht_alias_lst, pht_alias_mult'
       write(30,100) trim(line)
-      line(7:) = 'use chem_mods,   only  : het_lst, extfrc_lst, inv_lst'
+      line(7:) = 'use chem_mods,   only  : het_lst, extfrc_lst, inv_lst, slvd_lst'
       write(30,100) trim(line)
       line(7:) = 'use abortutils,  only  : endrun'
       write(30,100) trim(line)
@@ -436,6 +437,34 @@
                   end if
                else
                   write(line(m:),'("''",a8,"'' /)")') fixsym(l)
+               end if
+               m = len_trim(line) + 2
+            end do
+            write(30,'(a)') trim(line)
+            line = ' '
+         end do
+      end if
+
+!-------------------------------------------------------------------
+!	... short lived species
+!-------------------------------------------------------------------
+      if( nslvd > 0 ) then
+         line = ' '
+         write(30,100) trim(line)
+         write(line,'("      slvd_lst(:",i3,") = (/")') nslvd
+         m1 = len_trim(line) + 2
+         do n = 1,nslvd,5
+            n1 = min( n+4,nslvd )
+            m = m1
+            do l = n,n1
+               if( l /= nslvd ) then
+                  if( l /= n1 ) then
+                     write(line(m:),'("''",a8,"'',")') slvdsym(l)
+                  else
+                     write(line(m:),'("''",a8,"'', &")') slvdsym(l)
+                  end if
+               else
+                  write(line(m:),'("''",a8,"'' /)")') slvdsym(l)
                end if
                m = len_trim(line) + 2
             end do
