@@ -65,7 +65,7 @@
       character(len=16)  :: wrk_rxt(10)
       character(len=10)  :: clshdr(5)
       character(len=8)   :: wrk_chr(10)
-      character(len=256) :: command, cpp_command
+      character(len=580) :: command, cpp_command
       character(len=256) :: errcom, filout, filin
       character(len=64)  :: oper_flpth
       character(len=64)  :: cpp_dir, cpp_opts
@@ -1768,7 +1768,7 @@ sparse_matrix_loop : &
       end if
       file_cnt = 1
       do k = 1,500
-         read(2,'(a128)',end=1105) mod_src(file_cnt)
+         read(2,'(a320)',end=1105) mod_src(file_cnt)
          if( mod_src(file_cnt) /= ' ' ) then
 	    filelines(5) = filelines(5) + 1
 	    file_cnt = file_cnt + 1
@@ -1969,7 +1969,7 @@ sparse_matrix_loop : &
          end if
          file_cnt = 1
          do k = 1,500
-            read(2,'(a128)',end=1005) lib_src(file_cnt)
+            read(2,'(a320)',end=1005) lib_src(file_cnt)
             if( lib_src(file_cnt) /= ' ' ) then
                filelines(1) = filelines(1) + 1
                file_cnt = file_cnt + 1
@@ -2111,7 +2111,7 @@ sparse_matrix_loop : &
       end if
       file_cnt = 1
       do k = 1,500
-         read(2,'(a128)',end=1015) lib_src(file_cnt)
+         read(2,'(a320)',end=1015) lib_src(file_cnt)
 	 if( lib_src(file_cnt) /= ' ' ) then
 	    lib_src(file_cnt) = trim( temp_path ) // trim( lib_src(file_cnt) )
 	    filelines(3) = filelines(3) + 1
