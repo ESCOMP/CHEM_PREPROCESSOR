@@ -106,7 +106,7 @@
       End Photolysis
 
       Reactions
- [usr1]   O + O2 + M -> O3 + M
+ [usr_O_O2]   O + O2 + M -> O3 + M
           O + O3 -> 2*O2                                                 ; 8e-12, -2060
  [o1d_n2] O1D + N2 -> O + N2                                             ; 2.1e-11, 115
  [o1d_o2] O1D + O2 -> O + O2                                             ; 3.2e-11, 70
@@ -117,7 +117,7 @@
           HO2 + O -> OH + O2                                             ; 3e-11, 200
  [ox_l2]  OH + O3 -> HO2 + O2                                            ; 1.7e-12, -940
  [ox_l3]  HO2 + O3 -> OH + 2*O2                                          ; 1.e-14, -490
- [usr9]   HO2 + HO2 -> H2O2
+ [usr_HO2_HO2] HO2 + HO2 -> H2O2
           H2O2 + OH -> H2O + HO2                                         ; 2.9e-12, -160
           OH + HO2 -> H2O + O2                                           ; 4.8e-11, 250
           OH + OH -> H2O + O                                             ; 4.2e-12, -240
@@ -129,17 +129,17 @@
           NO2 + O -> NO + O2                                             ; 5.6e-12, 180
           NO2 + O3 -> NO3 + O2                                           ; 1.2e-13, -2450
           NO3 + HO2 -> OH + NO2                                          ; 2.3e-12, 170.
- [usr2]   NO2 + NO3 + M -> N2O5 + M                                      ; 2.e-30,4.4, 1.4e-12,.7, .6
- [usr3]   N2O5 + M -> NO2 + NO3 + M
- [usr4]   NO2 + OH + M -> HNO3 + M                                       ; 2.0e-30,3.0, 2.5e-11,0., .6
- [usr5]   HNO3 + OH -> NO3 + H2O
+ [tag_NO2_NO3] NO2 + NO3 + M -> N2O5 + M                                ; 2.e-30,4.4, 1.4e-12,.7, .6
+ [usr_N2O5_M] N2O5 + M -> NO2 + NO3 + M
+ [tag_NO2_OH] NO2 + OH + M -> HNO3 + M                                   ; 2.0e-30,3.0, 2.5e-11,0., .6
+ [usr_HNO3_OH] HNO3 + OH -> NO3 + H2O
           NO3 + NO -> 2*NO2                                              ; 1.5e-11, 170
- [usr6]   NO2 + HO2 + M -> HO2NO2 + M                                    ; 1.8e-31,3.2, 4.7e-12,1.4, .6
+ [tag_NO2_HO2] NO2 + HO2 + M -> HO2NO2 + M                               ; 1.8e-31,3.2, 4.7e-12,1.4, .6
           HO2NO2 + OH -> H2O + NO2 + O2                                  ; 1.3e-12, 380
- [usr7]   HO2NO2 + M -> HO2 + NO2 + M
- [usr16]  N2O5 -> 2 * HNO3
- [usr17]  NO3  -> HNO3
- [usr17a] NO2  -> 0.5*OH + 0.5*NO + 0.5*HNO3
+ [usr_HO2NO2_M] HO2NO2 + M -> HO2 + NO2 + M
+ [usr_N2O5_aer] N2O5 -> 2 * HNO3
+ [usr_NO3_aer] NO3  -> HNO3
+ [usr_NO2_aer] NO2  -> 0.5*OH + 0.5*NO + 0.5*HNO3
           CH4 + OH -> CH3O2 + H2O                                        ; 2.45e-12, -1775
           CH4 + O1D -> .75*CH3O2 + .75*OH + .25*CH2O + .4*HO2 + .05*H2   ; 1.5e-10
  [ox_p2]  CH3O2 + NO -> CH2O + NO2 + HO2                                 ; 2.8e-12, 300
@@ -149,8 +149,8 @@
           CH3OOH + OH -> .7 * CH3O2 + .3 * OH + .3 * CH2O + H2O          ; 3.8e-12, 200
           CH2O + NO3 -> CO + HO2 + HNO3                                  ; 6.0e-13, -2058
           CH2O + OH -> CO + H2O +HO2                                     ; 9.e-12
- [usr8]   CO + OH -> CO2 + HO2
- [usr13]  C2H4 + OH + M -> .75*EO2 + .5*CH2O + .25*HO2 + M               ; 1.e-28,.8, 8.8e-12,0., .6
+ [usr_CO_OH_a] CO + OH -> CO2 + HO2
+ [tag_C2H4_OH] C2H4 + OH + M -> .75*EO2 + .5*CH2O + .25*HO2 + M               ; 1.e-28,.8, 8.8e-12,0., .6
  [ox_l6]  C2H4 + O3 -> CH2O + .12 * HO2 + .5 * CO                        ; 1.2e-14, -2630
                       + .12 * OH + .25 * CH3COOH
  [ox_p16] EO2 + NO -> EO + NO2                                           ; 4.2e-12,180
@@ -164,7 +164,7 @@
 	                   + .3 * CH3OH + .2 * C2H5OH
           C2H5O2 + C2H5O2 -> 1.6 * CH3CHO + 1.2 * HO2 + .4 * C2H5OH      ; 6.8e-14
           C2H5OOH + OH -> .5 * C2H5O2 + .5 * CH3CHO + .5 * OH            ; 3.8e-12, 200
- [usr10]  C3H6 + OH + M -> PO2 + M                                       ; 8.e-27,3.5, 3.e-11,0, .5
+ [tag_C3H6_OH] C3H6 + OH + M -> PO2 + M                                       ; 8.e-27,3.5, 3.e-11,0, .5
  [ox_l4]  C3H6 + O3 -> .54*CH2O + .19*HO2 + .33*OH                       ; 6.5e-15, -1900
                       + .08*CH4 + .56*CO + .5*CH3CHO + .31*CH3O2 + .25*CH3COOH
           C3H6 + NO3 -> ONIT                                             ; 4.6e-13,-1156
@@ -174,18 +174,18 @@
           CH3CHO + OH -> CH3CO3 + H2O                                    ; 5.6e-12, 270
           CH3CHO + NO3 -> CH3CO3 + HNO3                                  ; 1.4e-12, -1900
  [ox_p4]  CH3CO3 + NO -> CH3O2 + CO2 + NO2                               ; 8.1e-12, 270
- [usr11]  CH3CO3 + NO2 + M -> PAN + M                                    ; 8.5e-29,6.5, 1.1e-11,1., .6
+ [tag_CH3CO3_NO2]  CH3CO3 + NO2 + M -> PAN + M                                    ; 8.5e-29,6.5, 1.1e-11,1., .6
           CH3CO3 + HO2 -> .75*CH3COOOH + .25*CH3COOH + .25*O3            ; 4.3e-13, 1040
           CH3CO3 + CH3O2 -> .9*CH3O2 + CH2O + .9*HO2 + .9*CO2 + .1*CH3COOH        ; 2.0e-12,500
           CH3COOOH + OH -> .5*CH3CO3 + .5*CH2O + .5*CO2 + H2O            ; 1e-12
- [usr12]  PAN + M -> CH3CO3 + NO2 + M
+ [usr_PAN_M]  PAN + M -> CH3CO3 + NO2 + M
           CH3CO3 + CH3CO3 -> 2*CH3O2 + 2*CO2                             ; 2.5e-12, 500
           C3H8 + OH -> C3H7O2 + H2O                                      ; 1.0e-11, -660
  [ox_p9]  C3H7O2 + NO -> .82 * CH3COCH3 + NO2 + HO2 + .27 * CH3CHO       ; 4.2e-12, 180
           C3H7O2 + HO2 -> C3H7OOH + O2                                   ; 7.5e-13, 700
           C3H7O2 + CH3O2 -> CH2O + HO2 + .82 * CH3COCH3                  ; 3.75e-13, -40
           C3H7OOH + OH -> H2O + C3H7O2                                   ; 3.8e-12, 200
- [usr22]  CH3COCH3 + OH -> RO2 + H2O
+ [usr_CH3COCH3_OH]  CH3COCH3 + OH -> RO2 + H2O
  [ox_p10] RO2 + NO -> CH3CO3 + CH2O + NO2                                ; 2.9e-12, 300
           RO2 + HO2 -> ROOH + O2                                         ; 8.6e-13, 700
           RO2 + CH3O2 -> .3*CH3CO3 + .8*CH2O + .3*HO2 + .2*HYAC          ; 2.0e-12, 500
@@ -249,8 +249,8 @@
           MCO3 + CH3O2 -> 2 * CH2O + HO2 + CO2 + CH3CO3                   ; 2.0e-12,500
           MCO3 + CH3CO3 -> 2 * CO2 + CH3O2 + CH2O + CH3CO3                ; 4.6e-12, 530
           MCO3 + MCO3 -> 2 * CO2 + 2 * CH2O + 2 * CH3CO3                  ; 2.3e-12, 530
- [usr14]  MCO3 + NO2 + M -> MPAN + M       
- [usr15]  MPAN + M -> MCO3 + NO2 + M
+ [usr_MCO3_NO2] MCO3 + NO2 + M -> MPAN + M       
+ [usr_MPAN_M] MPAN + M -> MCO3 + NO2 + M
  [soa2]   C10H16 + OH -> TERPO2                                           ; 1.2e-11, 444
  [soa1]   C10H16 + O3 -> .7*OH + MVK + MACR + HO2                         ; 1.e-15, -732
  [soa3]   C10H16 + NO3 -> TERPO2 + NO2                                    ; 1.2e-12, 490
@@ -281,7 +281,7 @@
           XO2 + CH3CO3 -> CO + CH3O2 + 1.5 * HO2 + CO2                     ; 1.3e-12,640
 	                  + .25 * HYAC + .25 * CH3COCHO + .25 * GLYALD
           XOOH + OH -> H2O + XO2                                           ; 1.90e-12, 190
- [usr21]  XOOH + OH -> H2O + OH
+ [usr_XOOH_OH] XOOH + OH -> H2O + OH
           CH3OH + OH -> HO2 + CH2O                                         ; 7.3e-12,-620
           C2H5OH + OH -> HO2 + CH3CHO                                      ; 6.9e-12,-230
           MPAN + OH   -> .5*HYAC + .5*NO3 + .5*CH2O + .5*HO2 + .5*CO2      ; 8.e-27,3.5,3.e-11,0.,.5
@@ -290,13 +290,13 @@
           GLYALD + OH -> HO2 + .2*GLYOXAL + .8*CH2O + .8*CO2               ; 1.e-11
           Rn -> Pb                                                         ; 2.1e-6
           CB1 -> CB2                                                       ; 7.1e-6
- [usr23]  SO2 + OH -> SO4
+ [usr_SO2_OH] SO2 + OH -> SO4
           DMS + OH -> SO2                                                  ; 9.6e-12,-234.
- [usr24]  DMS + OH -> .5 * SO2 + .5 * HO2
+ [usr_DMS_OH] DMS + OH -> .5 * SO2 + .5 * HO2
           DMS + NO3 -> SO2 + HNO3                                          ; 1.9e-13, 520.
           NH3 + OH -> H2O                                                  ; 1.7e-12, -710.
           OC1 -> OC2                                                       ; 7.1e-6
- [usr26]  HO2 -> 0.5*H2O2
+ [usr_HO2_aer] HO2 -> 0.5*H2O2
    End Reactions
 
    Heterogeneous

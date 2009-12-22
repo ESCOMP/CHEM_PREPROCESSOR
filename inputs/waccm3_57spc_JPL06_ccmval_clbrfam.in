@@ -125,9 +125,9 @@
 * --------------------------------------------------------------
 * Odd-Oxygen Reactions
 * --------------------------------------------------------------
- [usr1] O + O2 + M -> O3 + M
+ [usr_O_O2] O + O2 + M -> O3 + M
  [cph1,cph] O + O3 -> 2*O2                                      ; 8.00e-12, -2060.
- [usr2] O + O + M -> O2 + M
+ [usr_O_O] O + O + M -> O2 + M
  [cph18,cph] O2_1S + O -> O2_1D + O                             ; 8.00e-14
  [cph19,cph] O2_1S + O2 -> O2_1D + O2                           ; 3.90e-17
  [cph20,cph] O2_1S + N2 -> O2_1D + N2                           ; 1.80e-15,    45.
@@ -177,17 +177,17 @@
  [cph13,cph] NO2 + O -> NO + O2                                 ; 5.20e-12,    210.
  NO2 + O + M -> NO3 + M                                         ; 2.50e-31, 1.8, 2.2e-11, 0.7, 0.6
  NO2 + O3 -> NO3 + O2                                           ; 1.20e-13,  -2450.
- [usr3] NO2 + NO3 + M -> N2O5 + M                               ; 2.00e-30, 4.4, 1.4e-12, 0.7, 0.6
- [usr3a] N2O5 + M -> NO2 + NO3 + M
+ [tag_NO2_NO3] NO2 + NO3 + M -> N2O5 + M                        ; 2.00e-30, 4.4, 1.4e-12, 0.7, 0.6
+ [usr_N2O5_M] N2O5 + M -> NO2 + NO3 + M
  NO2 + OH + M -> HNO3 + M                                       ; 1.80e-30, 3.0, 2.8e-11, 0.0, 0.6
- [usr4] HNO3 + OH -> NO3 + H2O
+ [usr_HNO3_OH] HNO3 + OH -> NO3 + H2O
  NO3 + NO -> 2*NO2                                              ; 1.50e-11,    170.
  NO3 + O -> NO2 + O2                                            ; 1.00e-11
  NO3 + OH -> HO2 + NO2                                          ; 2.20e-11
  NO3 + HO2 -> OH + NO2 + O2                                     ; 3.50e-12
- [usr5] NO2 + HO2 + M -> HO2NO2 + M                             ; 2.00e-31, 3.4, 2.9e-12, 1.1, 0.6
+ [tag_NO2_HO2] NO2 + HO2 + M -> HO2NO2 + M                      ; 2.00e-31, 3.4, 2.9e-12, 1.1, 0.6
  HO2NO2 + OH -> H2O + NO2 + O2                                  ; 1.30e-12,    380.
- [usr5a] HO2NO2 + M -> HO2 + NO2 + M
+ [usr_HO2NO2_M] HO2NO2 + M -> HO2 + NO2 + M
 
 * --------------------------------------------------------------
 * Methane, CO, CH2O and derivatives
@@ -200,7 +200,7 @@
  CH2O + OH -> CO + H2O + H                                      ; 5.50e-12,    125.
  CH2O + O -> HO2 + OH + CO                                      ; 3.40e-11,  -1600.
  CO + OH + M -> CO2 + HO2 + M                                   ; 5.90e-33, 1.4,  1.10e-12, -1.3, 0.6
- [usr6] CO + OH -> CO2 + H                                  
+ [usr_CO_OH_b] CO + OH -> CO2 + H                                  
 
 * --------------------------------------------------------------
 * Odd Hydrogen Reactions
@@ -219,7 +219,7 @@
  OH + H2O2 -> H2O + HO2                                         ; 1.80e-12
  [cph4,cph] HO2 + O -> OH + O2                                  ; 3.00e-11,    200.
  [cph9,cph] HO2 + O3 -> OH + 2*O2                               ; 1.00e-14,   -490.
- [usr7] HO2 + HO2 -> H2O2 + O2
+ [usr_HO2_HO2] HO2 + HO2 -> H2O2 + O2
  H2O2 + O -> OH + HO2                                           ; 1.40e-12,  -2000.
 
 * --------------------------------------------------------------
@@ -241,8 +241,8 @@
  CLO + CLO -> 2*CL + O2                                         ; 3.00e-11,  -2450.
  CLO + CLO -> CL2 + O2                                          ; 1.00e-12,  -1590.
  CLO + CLO -> CL + OCLO                                         ; 3.50e-13,  -1370.
- [usr8] CLO + CLO + M -> CL2O2 + M                              ; 1.60e-32, 4.5, 2.0e-12, 2.4, 0.6
- [usr8a] CL2O2 + M -> CLO + CLO + M
+ [tag_CLO_CLO] CLO + CLO + M -> CL2O2 + M                       ; 1.60e-32, 4.5, 2.0e-12, 2.4, 0.6
+ [usr_CL2O2_M] CL2O2 + M -> CLO + CLO + M
  HCL + OH -> H2O + CL                                           ; 2.60e-12,   -350.
  HCL + O -> CL + OH                                             ; 1.00e-11,  -3300.
  HOCL + O -> CLO + OH                                           ; 1.70e-13

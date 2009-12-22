@@ -70,13 +70,13 @@
       End Photolysis
 
       Reactions
- [usr9]   HO2 + HO2 -> H2O2
-          H2O2 + OH -> H2O + HO2                                           ; 2.9e-12, -160
- [usr23]  SO2 + OH -> H2SO4
-          DMS + OH -> SO2                                                  ; 9.6e-12, -234.
- [usr24]  DMS + OH -> .5 * SO2 + .5 * HO2
-          DMS + NO3 -> SO2 + HNO3                                          ; 1.9e-13,  520.
-          NH3 + OH -> H2O                                                  ; 1.7e-12, -710.
+ [usr_HO2_HO2] HO2 + HO2 -> H2O2
+               H2O2 + OH -> H2O + HO2                             ; 2.9e-12, -160
+ [usr_SO2_OH]  SO2 + OH -> H2SO4
+               DMS + OH -> SO2                                    ; 9.6e-12, -234.
+ [usr_DMS_OH]  DMS + OH -> .5 * SO2 + .5 * HO2
+               DMS + NO3 -> SO2 + HNO3                            ; 1.9e-13,  520.
+               NH3 + OH -> H2O                                    ; 1.7e-12, -710.
       End Reactions
 
       Heterogeneous
