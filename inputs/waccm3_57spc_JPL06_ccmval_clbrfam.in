@@ -331,7 +331,7 @@
    End Heterogeneous
 
    Ext Forcing
-      NO, CO, Op, O2p, Np, N2p, N2D, N, e, OH
+      NO<-dataset, NO2<-dataset, CO<-dataset, Op, O2p, Np, N2p, N2D, N, e, OH
    End Ext Forcing
 
    END Chemistry
