@@ -182,12 +182,33 @@ contains
              ox_l9_ndx = get_rxt_ndx( 'soa1' )
           end if
           usr4_ndx = get_rxt_ndx( 'usr4' )
+          if (usr4_ndx < 1) then
+             usr4_ndx = get_rxt_ndx( 'tag_NO2_OH' )
+          endif
           usr16_ndx = get_rxt_ndx( 'usr16' )
+          if (usr16_ndx < 1) then
+            usr16_ndx = get_rxt_ndx( 'usr_N2O5_aer' )
+          endif
           usr17_ndx = get_rxt_ndx( 'usr17' )
+          if (usr17_ndx < 1) then
+            usr17_ndx = get_rxt_ndx( 'usr_NO3_aer' )
+          endif
           usr4a_ndx = get_rxt_ndx( 'usr4a' )
+          if (usr4a_ndx < 1) then
+            usr4a_ndx = get_rxt_ndx( 'tag_XNO2_OH' )
+          endif
           usr16b_ndx = get_rxt_ndx( 'usr16b' )
+          if (usr16b_ndx < 1) then
+            usr16b_ndx = get_rxt_ndx( 'usr_NO2XNO3_aer' )
+          endif
           usr16a_ndx = get_rxt_ndx( 'usr16a' )
+          if (usr16a_ndx < 1) then
+            usr16a_ndx = get_rxt_ndx( 'usr_XNO2NO3_aer' )
+          endif
           usr17b_ndx = get_rxt_ndx( 'usr17b' )
+          if (usr17b_ndx < 1) then
+            usr17b_ndx = get_rxt_ndx( 'usr_NO2_aer' )
+          endif
           if ( full_ozone_chem ) then
              wrk(1:12) = (/ ox_l1_ndx, ox_l2_ndx, ox_l3_ndx, ox_l4_ndx, ox_l5_ndx, &
                   ox_l6_ndx, ox_l7_ndx, ox_l8_ndx, ox_l9_ndx, usr4_ndx, &
