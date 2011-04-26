@@ -558,25 +558,6 @@ hetero_loop :  do
 		     deallocate( tokens )
                      call errmes ( ' Error in het list@', lout, param, k, buff )
 		  end if
-het_tok_loop :    do j = 1,tokcnt
-                     do m = 1,spccnt(1)
-                        if( tokens(j) == spcsym(m,1) ) then
-			   if( hetcnt > 1 ) then
-			      if( any(hetmap(:hetcnt,1) == m ) ) then
-                                 call errmes( ' # is already in hetero list@', lout, tokens(j), toklen(j), buff )
-			      end if
-			   end if
-                           hetcnt = hetcnt + 1
-                           if( hetcnt > rxt_lim ) then
-                              call errmes( ' Hetero reaction count exceeds limit@', lout, buff, 1, buff )
-                           end if
-                           hetmap(hetcnt,1) = m
-                           write(lout,7177) hetcnt, spcsym(m,1)
-			   cycle het_tok_loop
-			end if
-                     end do
-                     call errmes ( ' # is not in Solution list@', lout, tokens(j), toklen(j), buff )
-                  end do het_tok_loop
                end do hetero_loop
 
 	    case( extraneous )
@@ -641,7 +622,10 @@ ext_tok_loop :    do j = 1,tokcnt
                end do extfrc_loop
          end select
       end do keyword_loop
-      
+      hetcnt = spccnt(1)
+      do j=1,hetcnt
+        hetmap(j,1) = j
+      enddo
 !-----------------------------------------------------------------------
 !        ... Check for pce,sol reaction validity
 !-----------------------------------------------------------------------
