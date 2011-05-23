@@ -1266,7 +1266,11 @@ rxtnt_scan : &
                   write(buff(80:),'(1pe8.2)') rate(1)
 	          if( rate(2) /= 0. ) then
                      buff(88:) = '*(300/t)**'
-                     write(buff(98:),'(f4.2)') rate(2)
+                     if ( rate(2)>=0. ) then 
+                        write(buff(98:),'(f4.2)') rate(2)
+                     else
+                        write(buff(98:),'(f5.2)') rate(2)
+                     endif
                   end if
                   write(lout,110) loc_rxt_tag, irxn, buff, irxn+phtcnt
                end if
@@ -1277,7 +1281,11 @@ rxtnt_scan : &
 	          if( rate(4) /= 0. ) then
 	             if( rate(4) /= 1. ) then
                         buff(88:) = '*(300/t)**'
-                        write(buff(98:),'(f4.2)') rate(4)
+                        if ( rate(4)>=0. ) then 
+                           write(buff(98:),'(f4.2)') rate(4)
+                        else
+                           write(buff(98:),'(f5.2)') rate(4)
+                        endif
 	             else
                         buff(88:) = '*(300/t)'
 	             end if
@@ -1308,7 +1316,7 @@ rxtnt_scan : &
 !-----------------------------------------------------------------------
 100   format(2x,a16,1x,'(',i3,')',3x,a100,3x,'(',i3,')')
 110   format(2x,a16,1x,'(',i3,')',3x,a101,2x,'(',i3,')')
-120   format(27x,a101)
+120   format(27x,a103)
 
       end subroutine write_rxt
 
