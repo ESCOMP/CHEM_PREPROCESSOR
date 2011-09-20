@@ -20,6 +20,7 @@ module mo_imp_sol
   logical :: factor(itermax)
   integer :: ox_ndx
   integer :: o1d_ndx = -1
+  integer :: h2o_ndx = -1
   integer :: oh_ndx, ho2_ndx, ch3o2_ndx, po2_ndx, ch3co3_ndx
   integer :: c2h5o2_ndx, isopo2_ndx, macro2_ndx, mco3_ndx, c3h7o2_ndx
   integer :: ro2_ndx, xo2_ndx, no_ndx, no2_ndx, no3_ndx, n2o5_ndx
@@ -61,6 +62,7 @@ contains
     factor(:) = .true.
     eps(:) = rel_err
     ox_ndx = get_spc_ndx( 'OX' )
+    h2o_ndx = get_spc_ndx( 'H2O' )
     if( ox_ndx < 1 ) then
        ox_ndx = get_spc_ndx( 'O3' )
        o1d_ndx = get_spc_ndx( 'O1D' )
@@ -392,9 +394,9 @@ contains
           cut_cnt = 0
           fail_cnt = 0
           stp_con_cnt = 0
-          interval_done = 0.
+          interval_done = 0._r8
           time_step_loop : do
-             dti = 1. / dt
+             dti = 1._r8 / dt
              !-----------------------------------------------------------------------
              ! ... transfer from base to local work arrays
              !-----------------------------------------------------------------------
@@ -578,9 +580,11 @@ contains
                    loss_out(i,lev,k) = reaction_rates(i,lev,ox_l1_ndx)
                 else
                    if (j == ox_ndx) &
-                        loss_out(i,lev,k) = reaction_rates(i,lev,ox_l1_ndx) * base_sol(i,lev,o1d_ndx)/base_sol(i,lev,ox_ndx)
+                      loss_out(i,lev,k) = reaction_rates(i,lev,ox_l1_ndx) * base_sol(i,lev,o1d_ndx)/base_sol(i,lev,ox_ndx)
                    if (j == o3a_ndx) &
-                        loss_out(i,lev,k) = reaction_rates(i,lev,ox_l1_ndx) * base_sol(i,lev,o1da_ndx)/base_sol(i,lev,o3a_ndx)
+                      loss_out(i,lev,k) = reaction_rates(i,lev,ox_l1_ndx) * base_sol(i,lev,o1da_ndx)/base_sol(i,lev,o3a_ndx)
+                   if ( h2o_ndx > 0 ) &
+                      loss_out(i,lev,k) = loss_out(i,lev,k) * base_sol(i,lev,h2o_ndx)
                 end if
                 if ( full_ozone_chem ) then
                    prod_out(i,lev,k) = reaction_rates(i,lev,ox_p1_ndx) * base_sol(i,lev,ho2_ndx) &
