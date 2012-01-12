@@ -51,173 +51,116 @@ OBJS      := $(foreach file,$(base_srclist_f),$(OBJ_DIR)/$(file:.f=.o))
 
 all: $(MODEL_EXEDIR)/$(EXENAME)
 
-# Architecture-specific flags and rules
+#------------------------------------------------------------------------
+#------------------------------------------------------------------------
+#------------------------------------------------------------------------
 
+# guess default compiler 
+ifeq ($(COMPILER),$(null))
+
+#------------------------------------------------------------------------
+# Linux -- including pleiades
+#------------------------------------------------------------------------
+ifeq ($(UNAMES),Linux)
+  COMPILER := pgf95
+endif
 #------------------------------------------------------------------------
 # Altix (columbia)
 #------------------------------------------------------------------------
 ifeq ($(UNAMEM),ia64)
-ifeq ($(COMPILER),ifort)
-
-# @echo $(COMPILER)
-
- objflag    = -o $@
-
-  FC          := ifort
-  FFLAGS      := -c -132 -ftz -g -FR  -I $(OBJ_DIR)
-
-  ifeq ($(DEBUG),TRUE)
-    FFLAGS    += -CB
-  else
-    # Check for override of default Fortran compiler optimizations
-    ifeq ($(F_OPTIMIZATION_OVERRIDE),$(null))
-      FORTRAN_OPTIMIZATION := -O2
-    endif
-    FFLAGS    += $(FORTRAN_OPTIMIZATION)
-  endif
-
-.SUFFIXES:
-.SUFFIXES: .f .F .c .o
-
-$(OBJ_DIR)/%.o : %.f
-	$(FC) $(FFLAGS) $(objflag) $<
-
+  COMPILER := ifort
 endif
-endif
-
 #------------------------------------------------------------------------
-# Alpha ?
+# Alpha
 #------------------------------------------------------------------------
 ifeq ($(UNAMEM),alpha)
-
-objflag    = -o $@
-FC          := f95
-CPP         := /usr/bin/cpp
-FFLAGS      := -O4 -c -tune host -arch host -free -module $(OBJ_DIR) -I $(OBJ_DIR)
-
-
-.SUFFIXES:
-.SUFFIXES: .f .F .c .o
-
-$(OBJ_DIR)/%.o : %.f
-	$(FC) $(FFLAGS) $(objflag) $<
-
+  COMPILER := f95
 endif
-
 #------------------------------------------------------------------------
 # AIX ?
 #------------------------------------------------------------------------
 ifeq ($(UNAMES),AIX)
-
-objflag    = -o $@
-FC          := xlf95
-FFLAGS      := -g -c -qarch=auto -qnosave -qfree=f90 -qmoddir=$(OBJ_DIR) -I $(OBJ_DIR) -qstrict -O3
-
-
-.SUFFIXES:
-.SUFFIXES: .f .F .c .o
-
-$(OBJ_DIR)/%.o : %.f
-	$(FC) $(FFLAGS) $(objflag) $<
-
+  COMPILER := xlf95
 endif
-
 #------------------------------------------------------------------------
 # BG/L, BG/P
 #------------------------------------------------------------------------
 ifeq ($(UNAMEM),ppc64)
-
-objflag    = -o $@
-FC          := xlf95
-FFLAGS      := -g -c -qarch=auto -qnosave -qfree=f90 -qmoddir=$(OBJ_DIR) -I $(OBJ_DIR) -qstrict -O3
-
-
-.SUFFIXES:
-.SUFFIXES: .f .F .c .o
-
-$(OBJ_DIR)/%.o : %.f
-	$(FC) $(FFLAGS) $(objflag) $<
-
+  COMPILER := xlf95
 endif
-
 #------------------------------------------------------------------------
-# Intel Pentium ? ; use Lahey/Fujistu F95 compiler
-#------------------------------------------------------------------------
-ifeq ($(UNAMEM),i686)
-
-obj_flag  = -o $@ 
-
-ifeq ($(COMPILER),Lahey)
-FC        := lf95
-ifneq ($(DEBUG),ON)
-FFLAGS    := --nfix --nap --nchk --ng --npca --nsav --ntrace --tp4 -c --mod $(OBJ_DIR) -O
-else
-FFLAGS    := --nfix --nap --nchk --g --npca --nsav --trace --trap --tp4 -c --mod $(OBJ_DIR) -O
-endif
-else
-FC          := pgf95
-FFLAGS      := -O2 -c -g -Mfree -module $(OBJ_DIR)
-endif
-
-
-.SUFFIXES:
-.SUFFIXES: .f .F .c .o
-
-$(OBJ_DIR)/%.o : %.f
-	$(FC) $(FFLAGS) -o $@ $<
-
-endif
-
-#------------------------------------------------------------------------
-# Linux - lightning
-#------------------------------------------------------------------------
-ifeq ($(UNAMES),Linux)
-ifeq ($(UNAMEM),x86_64)
-
-obj_flag  = -o $@ 
-
-ifeq ($(COMPILER),Lahey)
-FC        := lf95
-ifneq ($(DEBUG),ON)
-FFLAGS    := --nfix --nap --nchk --ng --npca --nsav --ntrace --tp4 -c --mod $(OBJ_DIR) -O
-else
-FFLAGS    := --nfix --nap --nchk --g --npca --nsav --trace --trap --tp4 -c --mod $(OBJ_DIR) -O
-endif
-else
-FC          := pgf95
-FFLAGS      := -O2 -c -g -Mfree -module $(OBJ_DIR)
-endif
-
-
-.SUFFIXES:
-.SUFFIXES: .f .F .c .o
-
-$(OBJ_DIR)/%.o : %.f
-	$(FC) $(FFLAGS) -o $@ $<
-
-endif
-endif
-
-#------------------------------------------------------------------------
-# SGI ?
+# SGI
 #------------------------------------------------------------------------
 ifeq ($(UNAMES),IRIX64)
+  COMPILER := f90
+  MACHFLGS := -OPT:Olimit=8200
+endif
 
-objflag    = -o $@
-FC          := f90
-FFLAGS      := -c -freeform -I $(OBJ_DIR) -O2 -OPT:Olimit=8200
-
-.SUFFIXES:
-.SUFFIXES: .f .F .c .o
-
-$(OBJ_DIR)/%.o : %.f
-	$(FC) $(FFLAGS) $(objflag) $<
+#------------------------------------------------------------------------
+#------------------------------------------------------------------------
 
 endif
+
+#------------------------------------------------------------------------
+#------------------------------------------------------------------------
+# set compiler flags ...
+#------------------------------------------------------------------------
+ifeq ($(COMPILER),ifort)
+  FFLAGS      :=  -O2 -c -132 -ftz -g -FR  -I $(OBJ_DIR)
+  ifeq ($(DEBUG),TRUE)
+    FFLAGS    += -CB
+  endif
+endif
+ifeq ($(COMPILER),lf95)
+  ifeq ($(DEBUG),TRUE)
+    FFLAGS    := --nfix --nap --chk --g --npca --nsav --trace --trap -c --mod $(OBJ_DIR) -O
+  else
+    FFLAGS    := --nfix --nap --nchk --ng --npca --nsav --ntrace -c --mod $(OBJ_DIR) -O2
+  endif
+endif
+ifeq ($(COMPILER),pgf90)
+  FFLAGS      := -O2 -c -g -Mfree -module $(OBJ_DIR)
+  ifeq ($(DEBUG),TRUE)
+    FFLAGS    += -C
+  endif
+endif
+ifeq ($(COMPILER),pgf95)
+  FFLAGS      := -O2 -c -g -Mfree -module $(OBJ_DIR)
+  ifeq ($(DEBUG),TRUE)
+    FFLAGS    += -C
+  endif
+endif
+ifeq ($(COMPILER),f90)
+  FFLAGS      := -c -freeform -I $(OBJ_DIR) -O2 $(MACHFLGS)
+endif
+ifeq ($(COMPILER),f95)
+  FFLAGS      := -O4 -c -tune host -arch host -free -module $(OBJ_DIR) -I $(OBJ_DIR)
+endif
+ifeq ($(COMPILER),xlf95)
+  FFLAGS      := -g -c -qarch=auto -qnosave -qfree=f90 -qmoddir=$(OBJ_DIR) -I $(OBJ_DIR) -qstrict -O3
+endif
+ifeq ($(COMPILER),gfortran)
+  FFLAGS      := -g -c -ffree-form
+endif
+ifeq ($(COMPILER),g95)
+  FFLAGS      := -g -c -ffree-form
+endif
+
+#------------------------------------------------------------------------
+#------------------------------------------------------------------------
+#------------------------------------------------------------------------
+
+FC := $(COMPILER)
 
 #------------------------------------------------------------------------
 # Default rules
 #------------------------------------------------------------------------
+
+.SUFFIXES:
+.SUFFIXES: .f .F .c .o
+
+$(OBJ_DIR)/%.o : %.f
+	$(FC) $(FFLAGS) -o $@ $<
 
 $(MODEL_EXEDIR)/$(EXENAME):	$(OBJS)
 	$(FC) -o $@ $(OBJS) $(LDFLAGS)

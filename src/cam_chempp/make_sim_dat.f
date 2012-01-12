@@ -203,7 +203,7 @@
       if( nfs > 0 ) then
          line = ' '
          write(30,100) trim(line)
-         temp_mass(newind(n)) = mass(nfs)
+!         temp_mass(newind(n)) = mass(nfs)
          line = '      fix_mass(:'
          write(line(len_trim(line)+1:),'(i3,") = (/")') nfs
          m     = len_trim(line) + 2
