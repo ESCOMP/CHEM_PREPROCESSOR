@@ -305,7 +305,7 @@ contains
     ! this source is meant for small l1 cache machines such as
     ! the intel pentium and itanium cpus
     !-----------------------------------------------------------------------
-    use chem_mods, only : rxntot, extcnt, nzcnt, permute, hetcnt, cls_rxt_cnt
+    use chem_mods, only : rxntot, extcnt, nzcnt, permute, cls_rxt_cnt
     use mo_tracname, only : solsym
     use ppgrid, only : pver
     use mo_lin_matrix, only : linmat
@@ -325,7 +325,7 @@ contains
     real(r8), intent(in) :: delt ! time step (s)
     real(r8), intent(in) :: reaction_rates(ncol,pver,max(1,rxntot)), & ! rxt rates (1/cm^3/s)
          extfrc(ncol,pver,max(1,extcnt)), & ! external in-situ forcing (1/cm^3/s)
-         het_rates(ncol,pver,max(1,hetcnt)) ! washout rates (1/s)
+         het_rates(ncol,pver,max(1,gas_pcnst)) ! washout rates (1/s)
     real(r8), intent(inout) :: base_sol(ncol,pver,gas_pcnst) ! species mixing ratios (vmr)
     real(r8), intent(in) :: xhnm(ncol,pver)
     integer, intent(in) :: ltrop(ncol) ! chemistry troposphere boundary (index)
@@ -352,7 +352,7 @@ contains
          loss
     real(r8) :: lrxt(max(1,rxntot))
     real(r8) :: lsol(max(1,gas_pcnst))
-    real(r8) :: lhet(max(1,hetcnt))
+    real(r8) :: lhet(max(1,gas_pcnst))
     real(r8), dimension(ncol,pver,max(1,clscnt4)) :: &
          ind_prd
     logical :: convergence
@@ -382,8 +382,8 @@ contains
           do m = 1,rxntot
              lrxt(m) = reaction_rates(i,lev,m)
           end do
-          if( hetcnt > 0 ) then
-             do m = 1,hetcnt
+          if( gas_pcnst > 0 ) then
+             do m = 1,gas_pcnst
                 lhet(m) = het_rates(i,lev,m)
              end do
           end if

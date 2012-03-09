@@ -20,7 +20,7 @@
       integer, intent(in) ::     adv_cnt, nadv_cnt
       integer, intent(in) ::     histout_cnt(20,2)
       logical, intent(in) ::     chemistry, diffusion, convection
-      character(len=8), intent(in) :: arch_type
+      character(len=16), intent(in) :: arch_type
       character(len=*), intent(in) :: filespec
 
 !-----------------------------------------------------------------------

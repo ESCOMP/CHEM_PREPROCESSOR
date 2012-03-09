@@ -11,7 +11,7 @@
       integer, intent(in) ::     cpucnt
       logical, intent(in) ::     cray
       logical, intent(in) ::     multitask
-      character(len=8), intent(in) :: machine
+      character(len=16), intent(in) :: machine
 
 !-----------------------------------------------------------------------
 !        ... The local variables

@@ -23,8 +23,8 @@
 !-----------------------------------------------------------------------
       integer, intent(in) :: n                            ! count of species in class
       integer, intent(in) :: class                        ! class number
-      character(len=8), intent(in) :: march               ! target architecture
-      character(len=8), intent(in) :: model               ! target model
+      character(len=16), intent(in) :: march               ! target architecture
+      character(len=16), intent(in) :: model               ! target model
       logical, intent(in), dimension(n,n) :: lu_sp_pat
       
 !-----------------------------------------------------------------------
@@ -316,8 +316,8 @@ Backward_loop : &
 !-----------------------------------------------------------------------
       integer, intent(in) :: n, class
       integer, intent(in) :: sub_cnt
-      character(len=8), intent(in) :: march
-      character(len=8), intent(in) :: model
+      character(len=16), intent(in) :: march
+      character(len=16), intent(in) :: model
 
 !-----------------------------------------------------------------------
 !        ... Local variables

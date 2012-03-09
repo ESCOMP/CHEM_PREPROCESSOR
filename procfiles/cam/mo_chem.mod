@@ -10,8 +10,7 @@
 
       save
 
-      integer, parameter :: hetcnt    = HETCNT, &    ! number of heterogeneous processes
-                            phtcnt    = PHTCNT, &    ! number of photolysis reactions
+      integer, parameter :: phtcnt    = PHTCNT, &    ! number of photolysis reactions
                             rxntot    = RXNCNT, &    ! number of total reactions
                             gascnt    = GASCNT, &    ! number of gas phase reactions
                             nabscol   = NCOL, &      ! number of absorbing column densities
@@ -42,6 +41,7 @@
       integer   :: diag_map(clscnt5)    = 0
 # endif
       real(r8)  :: adv_mass(gas_pcnst)  = 0._r8
+      real(r8)  :: crb_mass(gas_pcnst)  = 0._r8
       real(r8)  :: fix_mass(max(1,nfs))
 # if GRPCNT != 0
       real(r8)  :: nadv_mass(grpcnt)    = 0._r8
@@ -51,10 +51,9 @@
       real(r8), allocatable :: pht_alias_mult(:,:)
       character(len=16), allocatable :: rxt_tag_lst(:)
       character(len=16), allocatable :: pht_alias_lst(:,:)
-      character(len=8)               :: het_lst(max(1,hetcnt))
-      character(len=8)               :: inv_lst(max(1,nfs))
-      character(len=8)               :: extfrc_lst(max(1,extcnt))
+      character(len=16)              :: inv_lst(max(1,nfs))
+      character(len=16)              :: extfrc_lst(max(1,extcnt))
       logical                        :: frc_from_dataset(max(1,extcnt))
-      character(len=8)               :: slvd_lst(max(1,nslvd))
+      character(len=16)              :: slvd_lst(max(1,nslvd))
 
       end module chem_mods

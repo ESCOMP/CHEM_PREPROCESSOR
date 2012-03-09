@@ -60,7 +60,7 @@
 !           nec sx6 and cray x1
 !-----------------------------------------------------------------------
 
-      use chem_mods,     only : rxntot, extcnt, nzcnt, diag_map, permute, hetcnt, cls_rxt_cnt
+      use chem_mods,     only : rxntot, extcnt, nzcnt, diag_map, permute, cls_rxt_cnt
       use mo_tracname,   only : solsym
       use ppgrid,        only : pver
       use pmgrid,        only : iam
@@ -83,7 +83,7 @@
       real(r8), intent(in)    :: delt                                        ! time step (s)
       real(r8), intent(in)    :: reaction_rates(chnkpnts,max(1,rxntot))      ! rxt rates (1/cm^3/s)
       real(r8), intent(in)    :: extfrc(chnkpnts,max(1,extcnt))              ! external in-situ forcing (1/cm^3/s)
-      real(r8), intent(in)    :: het_rates(chnkpnts,max(1,hetcnt))           ! washout rates (1/s)
+      real(r8), intent(in)    :: het_rates(chnkpnts,max(1,gas_pcnst))           ! washout rates (1/s)
       real(r8), intent(inout) :: base_sol(chnkpnts,gas_pcnst)                ! species mixing ratios (vmr)
 
 !-----------------------------------------------------------------------

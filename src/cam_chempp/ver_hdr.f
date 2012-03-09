@@ -26,9 +26,9 @@
       integer, intent(in)  ::      hetcnt, rxntot, spcno
       integer, intent(in)  ::      nzcnt(2)
       integer, intent(in)  ::      clscnt(5)
-      character(len=8), intent(in) :: machine       ! target machine
-      character(len=8), intent(in) :: model         ! target model
-      character(len=8), intent(in) :: arch_type     ! architecture
+      character(len=16), intent(in) :: machine       ! target machine
+      character(len=16), intent(in) :: model         ! target model
+      character(len=16), intent(in) :: arch_type     ! architecture
       logical, intent(in)  ::      options(*)       ! options array
       logical, intent(in)  ::      ohstflag         ! hist tape write flag
       logical, intent(in)  ::      diagprnt         ! chktrc, negtrc diag printout flag

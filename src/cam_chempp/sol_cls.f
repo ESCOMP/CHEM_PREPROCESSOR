@@ -17,7 +17,7 @@
 !-----------------------------------------------------------------------
 !	... Local variables
 !-----------------------------------------------------------------------
-      integer, parameter ::  symlen = 8
+      integer, parameter ::  symlen = 16
 
       integer  ::  kpar, i, parsw(5), nchar
       integer  ::  toklen(20)

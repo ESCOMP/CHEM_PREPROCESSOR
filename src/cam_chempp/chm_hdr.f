@@ -36,7 +36,7 @@
       logical, intent(in) ::    vec_ftns              ! vector function flag
       logical, intent(in) ::    chemistry             ! chemistry flag
 
-      character(len=8), intent(in)  :: machine        ! target machine
+      character(len=16), intent(in)  :: machine        ! target machine
 
 !-----------------------------------------------------------------------
 !        ... Local variables

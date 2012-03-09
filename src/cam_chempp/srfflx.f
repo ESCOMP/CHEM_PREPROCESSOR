@@ -20,7 +20,7 @@
                                tag          ! emission or deposition tag ( 1,2 )
       integer, intent(inout) ::  srf_flx_cnt  ! count of species with srf flux
       integer, intent(out) ::  srf_flx_map(*)  ! srf flux "map"
-      character(len=8), intent(in) ::  new_solsym(*) ! species names
+      character(len=16), intent(in) ::  new_solsym(*) ! species names
 
 !-----------------------------------------------------------------------
 !       ... Local variables
@@ -32,7 +32,7 @@
 
       character(len=320) ::  buff
       character(len=320) ::  buffh
-      character(len=8)  ::  tokens(20)
+      character(len=16)  ::  tokens(20)
 
       logical  ::  found
 

@@ -24,9 +24,9 @@ contains
     integer, intent(in)           ::    rxpcnt
     integer, intent(in)           ::    rxptab(*)
     character(len=16), intent(in) :: sym_rates(2,*)
-    character(len=8), intent(in)  :: machine
-    character(len=8), intent(in)  :: march
-    character(len=8), intent(in)  :: model
+    character(len=16), intent(in)  :: machine
+    character(len=16), intent(in)  :: march
+    character(len=16), intent(in)  :: model
     logical, intent(in)           :: vec_ftns
 
     !-----------------------------------------------------------------------
@@ -43,7 +43,7 @@ contains
     real     ::   rate
     character(len=132) :: line
     character(len=32)  :: wrk, buff
-    character(len=8)   :: vec_dim
+    character(len=16)   :: vec_dim
     character(len=4)   :: num_suffix 
     character(len=4)   :: dec_suffix
     character(len=3)   :: num

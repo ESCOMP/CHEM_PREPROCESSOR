@@ -36,8 +36,8 @@
       integer, intent(in) ::      permute(max(1,clscnt))
       integer, intent(in) ::      pcoeff_ind(*)
       real, intent(in)    ::      pcoeff(prd_lim,*)
-      character(len=8), intent(in) ::  model                  ! target model
-      character(len=8), intent(in) ::  march                  ! target architecture
+      character(len=16), intent(in) ::  model                  ! target model
+      character(len=16), intent(in) ::  march                  ! target architecture
       logical, intent(out)::      lin_mat_pat(:)
       
 !-----------------------------------------------------------------------
@@ -403,8 +403,8 @@ Species_loop : &
 !	... Dummy arguments
 !-----------------------------------------------------------------------
       integer, intent(in) :: clscnt, sub_cnt
-      character(len=8), intent(in) :: march
-      character(len=8), intent(in) :: model
+      character(len=16), intent(in) :: march
+      character(len=16), intent(in) :: model
 
 !-----------------------------------------------------------------------
 !	... Local variables
@@ -472,28 +472,28 @@ Species_loop : &
             case( 'SCALAR' )
                line = '      use mo_grid,   only : pcnstm1'
                write(30,100) trim(line)
-               line = '      use chem_mods, only : rxntot, hetcnt, ' // hdr // 'nzcnt'
+               line = '      use chem_mods, only : rxntot, ' // hdr // 'nzcnt'
             case ( 'VECTOR' )
                line = '      use mo_grid,   only : pcnstm1, plnplv'
                write(30,100) trim(line)
-               line = '      use chem_mods, only : rxntot, hetcnt, ' // hdr // 'nzcnt'
+               line = '      use chem_mods, only : rxntot, ' // hdr // 'nzcnt'
             case default
                line = '      use mo_grid,   only : pcnstm1'
                write(30,100) trim(line)
-               line = '      use chem_mods, only : rxntot, hetcnt, ' // hdr // 'nzcnt, clsze'
+               line = '      use chem_mods, only : rxntot, ' // hdr // 'nzcnt, clsze'
          end select
       else if( model == 'CAM' ) then
          select case( march )
             case( 'SCALAR' )
-               line = '      use chem_mods, only : gas_pcnst, rxntot, hetcnt, nzcnt'
+               line = '      use chem_mods, only : gas_pcnst, rxntot, nzcnt'
             case ( 'VECTOR' )
                if( model /= 'CAM' ) then
-                  line = '      use chem_mods, only : gas_pcnst, rxntot, hetcnt, nzcnt'
+                  line = '      use chem_mods, only : gas_pcnst, rxntot, nzcnt'
                else
                   line = ' '
                end if
             case default
-               line = '      use chem_mods, only : gas_pcnst, rxntot, hetcnt, nzcnt, clsze'
+               line = '      use chem_mods, only : gas_pcnst, rxntot, nzcnt, clsze'
          end select
          write(30,100) trim(line)
          line = '      use shr_kind_mod, only : r8 => shr_kind_r8'
@@ -521,7 +521,7 @@ Species_loop : &
                write(30,100) trim(line)
                line = '      real, intent(in)    ::  rxt(rxntot)'
                write(30,100) trim(line)
-               line = '      real, intent(in)    ::  het_rates(hetcnt)'
+               line = '      real, intent(in)    ::  het_rates(gas_pcnst)'
                write(30,100) trim(line)
                line = '      real, intent(inout) ::  mat(' // hdr // 'nzcnt)'
             else
@@ -570,7 +570,7 @@ Species_loop : &
             line = '      real, intent(in)    ::  rxt(clsze,rxntot)'
             write(30,100) trim(line)
             if( model /= 'WRF' ) then
-               line = '      real, intent(in)    ::  het_rates(clsze,hetcnt)'
+               line = '      real, intent(in)    ::  het_rates(clsze,gas_pcnst)'
                write(30,100) trim(line)
 	    end if
             line = '      real, intent(inout) ::  mat(clsze,' // hdr // 'nzcnt)'
@@ -602,7 +602,7 @@ Species_loop : &
             write(30,100) trim(line)
             line = '      real(r8), intent(in)    ::  rxt(rxntot)'
             write(30,100) trim(line)
-            line = '      real(r8), intent(in)    ::  het_rates(max(1,hetcnt))'
+            line = '      real(r8), intent(in)    ::  het_rates(max(1,gas_pcnst))'
             write(30,100) trim(line)
             line = '      real(r8), intent(inout) ::  mat(nzcnt)'
             write(30,100) trim(line)
@@ -645,7 +645,7 @@ Species_loop : &
             write(30,100) trim(line)
             line = '      real(r8), intent(in)    ::  rxt(clsze,rxntot)'
             write(30,100) trim(line)
-            line = '      real(r8), intent(in)    ::  het_rates(clsze,max(1,hetcnt))'
+            line = '      real(r8), intent(in)    ::  het_rates(clsze,max(1,gas_pcnst))'
             write(30,100) trim(line)
             line = '      real(r8), intent(inout) ::  mat(clsze,nzcnt)'
             write(30,100) trim(line)

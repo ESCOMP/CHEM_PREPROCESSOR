@@ -1,4 +1,4 @@
-      
+    
       subroutine make_sim_dat( model, sparse )
 !-------------------------------------------------------------------
 !	... write the simulation data routine; only for CAM
@@ -7,13 +7,12 @@
       use io,      only : temp_path
       use sp_mods, only : sparsity
       use var_mod, only : clscnt, clsmap, permute, new_nq, new_solsym
-      use var_mod, only : nq, newind, mass, temp_mass
+      use var_mod, only : nq, newind, mass, c_mass, temp_mass
       use var_mod, only : nfs, fixsym
       use var_mod, only : nslvd, slvdsym
       use rxt_mod, only : cls_rxt_cnt, rxntot
       use rxt_mod, only : rxt_has_tag, rxt_tag
       use rxt_mod, only : phtcnt, pht_alias, pht_alias_mult
-      use rxt_mod, only : hetcnt, hetmap
       use rxt_mod, only : usrcnt, usrmap, frc_from_dataset
 
       implicit none
@@ -21,13 +20,13 @@
 !-------------------------------------------------------------------
 !	... dummy arguments
 !-------------------------------------------------------------------
-      character(len=8), intent(in) :: model
+      character(len=16), intent(in) :: model
       type(sparsity), intent(in)   :: sparse(2)
 
 !-------------------------------------------------------------------
 !	... local variables
 !-------------------------------------------------------------------
-      integer, parameter :: max_len= 128
+      integer, parameter :: max_len= 132
 
       integer  ::  i, l, m, m1, n, n1
       integer  ::  lpos
@@ -36,10 +35,12 @@
       character(len=max_len) :: line
       character(len=64)      :: frmt
       character(len=24)      :: number
+      character(len=12)      :: num12
       character(len=16)      :: rxt_string
-      character(len=8)       :: wrk_chr(5)
+      character(len=16)       :: wrk_chr(5)
       logical  ::  flush
       logical  ::  lexist
+      integer  ::  numlen
 
       inquire( file = trim( temp_path ) // 'mo_sim_dat.F', exist = lexist )
       if( lexist ) then
@@ -67,27 +68,27 @@
       write(30,100) trim(line)
       line = ' '
       write(30,100) trim(line)
-      line(7:) = 'use chem_mods,   only  : clscnt, cls_rxt_cnt, clsmap, permute, adv_mass, fix_mass'
+      line(7:)   = 'use chem_mods,   only : clscnt, cls_rxt_cnt, clsmap, permute, adv_mass, fix_mass, crb_mass'
       write(30,100) trim(line)
       if( clscnt(4) > 0 ) then
         line(7:) = 'use chem_mods,   only : diag_map'
         write(30,100) trim(line)
       endif
-      line(7:) = 'use chem_mods,   only  : phtcnt, rxt_tag_cnt, rxt_tag_lst, rxt_tag_map'
+      line(7:)   = 'use chem_mods,   only : phtcnt, rxt_tag_cnt, rxt_tag_lst, rxt_tag_map'
       write(30,100) trim(line)
-      line(7:) = 'use chem_mods,   only  : pht_alias_lst, pht_alias_mult'
+      line(7:)   = 'use chem_mods,   only : pht_alias_lst, pht_alias_mult'
       write(30,100) trim(line)
-      line(7:) = 'use chem_mods,   only  : het_lst, extfrc_lst, inv_lst, slvd_lst'
+      line(7:)   = 'use chem_mods,   only : extfrc_lst, inv_lst, slvd_lst'
       write(30,100) trim(line)
-      line(7:) = 'use abortutils,  only  : endrun'
+      line(7:)   = 'use abortutils,  only : endrun'
       write(30,100) trim(line)
-      line(7:) = 'use mo_tracname, only  : solsym'
+      line(7:)   = 'use mo_tracname, only : solsym'
       write(30,100) trim(line)
-      line(7:) = 'use chem_mods,   only : frc_from_dataset'
+      line(7:)   = 'use chem_mods,   only : frc_from_dataset'
       write(30,100) trim(line)
-      line(7:) = 'use shr_kind_mod,only : r8 => shr_kind_r8'
+      line(7:)   = 'use shr_kind_mod,only : r8 => shr_kind_r8'
       write(30,100) trim(line)
-      line(7:) = 'use cam_logfile, only : iulog'
+      line(7:)   = 'use cam_logfile, only : iulog'
       write(30,100) trim(line)
       line = ' '
       write(30,100) trim(line)
@@ -110,8 +111,7 @@
 !	    class species count
 !-------------------------------------------------------------------
       line = '      clscnt(:) = (/'
-      write(line(len_trim(line)+2:),*) clscnt(1),',',clscnt(2),',',clscnt(3),',',clscnt(4),',',clscnt(5)
-      line(len_trim(line)+2:) = '/)'
+      write(line(len_trim(line)+2:),'(5(I6,a))') clscnt(1),',',clscnt(2),',',clscnt(3),',',clscnt(4),',',clscnt(5), ' /)'
       write(30,'(a)') trim(line)
       line = ' '
       write(30,100) trim(line)
@@ -124,7 +124,7 @@
             line = '      cls_rxt_cnt(:,'
             write(line(len_trim(line)+1:),'(i1,") = (/")') i
             m = len_trim(line) + 2
-            write(line(m:),*) cls_rxt_cnt(1,i),',',cls_rxt_cnt(2,i),',',cls_rxt_cnt(3,i),',',cls_rxt_cnt(4,i),' /)'
+            write(line(m:),'(4(I6,a))') cls_rxt_cnt(1,i),',',cls_rxt_cnt(2,i),',',cls_rxt_cnt(3,i),',',cls_rxt_cnt(4,i),' /)'
             write(30,'(a)') trim(line)
          end if
       end do
@@ -139,13 +139,13 @@
       do n = 1,new_nq,5
          n1 = min( n+4,new_nq )
          if( n1 /= new_nq ) then
-            write(line(m:),'(5("''",a8,"'',")," &")') new_solsym(n:n1)
+            write(line(m:),'(5("''",a16,"'',")," &")') new_solsym(n:n1)
          else
             if( n1 > n ) then
                write(frmt,'("(",i1)') n1 - n
-               frmt(len_trim(frmt)+1:) = '("''",a8,"'',"),"''",a8,"'' /)")'
+               frmt(len_trim(frmt)+1:) = '("''",a16,"'',"),"''",a16,"'' /)")'
             else
-               frmt = '("''",a8,"'' /)")'
+               frmt = '("''",a16,"'' /)")'
             end if
             write(line(m:),trim(frmt)) new_solsym(n:n1)
          end if
@@ -171,9 +171,58 @@
          lstrt = m
          do n = 1,new_nq
             number = ' '
-!           write(number,'(g15.9)') temp_mass(n)
-            write(number,*) temp_mass(n)
-            number = adjustl( number )
+            if ( temp_mass(n) > 1. ) then
+               write(num12,'(f12.6)') temp_mass(n)
+            else
+               write(num12,'(g12.6)') temp_mass(n)
+            endif
+            numlen = len_trim(num12)
+            number(12-numlen+1:12) = num12(1:numlen)
+            lpos   = scan( number, '0123456789', back=.true. ) + 1
+            if( n < new_nq ) then
+               if( mod(n,5) /= 0 ) then
+                  number(lpos:) = '_r8,'
+                  flush = .false.
+               else
+                  number(lpos:) = '_r8, &'
+                  flush = .true.
+               end if
+            else
+               number(lpos:) = '_r8 /)'
+               flush = .true.
+            end if
+            line(m:) = trim( number )
+            if( .not. flush ) then
+               m = len_trim(line) + 2
+            else
+               write(30,'(a)') trim(line)
+               line = ' '
+               m = lstrt
+            end if
+         end do
+      end if
+
+!-------------------------------------------------------------------
+!	... species carbon mass
+!-------------------------------------------------------------------
+      if( nq > 0 ) then
+         line = ' '
+         write(30,100) trim(line)
+         temp_mass(:) = 0.
+         do n = 1,nq
+            if( newind(n) /= 0 ) then
+               temp_mass(newind(n)) = c_mass(n)
+            end if
+         end do
+         line = '      crb_mass(:'
+         write(line(len_trim(line)+1:),'(i3,") = (/")') new_nq
+         m     = len_trim(line) + 2
+         lstrt = m
+         do n = 1,new_nq
+            number = ' '
+            write(num12,'(f12.6)') temp_mass(n)
+            numlen = len_trim(num12)
+            number(12-numlen+1:12) = num12(1:numlen)
             lpos   = scan( number, '0123456789', back=.true. ) + 1
             if( n < new_nq ) then
                if( mod(n,5) /= 0 ) then
@@ -203,14 +252,12 @@
       if( nfs > 0 ) then
          line = ' '
          write(30,100) trim(line)
-!         temp_mass(newind(n)) = mass(nfs)
          line = '      fix_mass(:'
          write(line(len_trim(line)+1:),'(i3,") = (/")') nfs
          m     = len_trim(line) + 2
          lstrt = m
          do n = 1,nfs
             number = ' '
-!!$            write(number,'(g15.9)') temp_mass(n+new_nq)
             write(number,'(g15.9)') mass(n+new_nq)
             number = adjustl( number )
             lpos   = scan( number, '0123456789', back=.true. ) + 1
@@ -322,36 +369,6 @@
       end do
 
 !-----------------------------------------------------------------------
-!        ... Write the wet removal species
-!-----------------------------------------------------------------------
-    if( hetcnt > 0 ) then
-      line = ' '
-      write(30,100) trim(line)
-      write(line,'("      het_lst(:",i3,") = (/")') hetcnt
-      m = len_trim(line) + 2
-      do n = 1,hetcnt,5
-	 wrk_chr(:) = ' '
-         n1 = min( n+4,hetcnt )
-	 do i = 1,n1-n+1 !!n,n1
-	    wrk_chr(i) = new_solsym(hetmap(i+n-1,1))
-         end do        
-         if( n1 /= hetcnt ) then
-            write(line(m:),'(5("''",a8,"'',")," &")') wrk_chr(1:n1-n+1)
-         else
-            if( n1 > n ) then
-               write(frmt,'("(",i1)') n1 - n
-               frmt(len_trim(frmt)+1:) = '("''",a8,"'',"),"''",a8,"'' /)")'
-            else
-               frmt = '("''",a8,"'' /)")'
-            end if
-            write(line(m:),trim(frmt)) wrk_chr(1:n1-n+1)
-         end if
-         write(30,'(a)') trim(line)
-         line = ' '
-      end do
-    endif
-
-!-----------------------------------------------------------------------
 !        ... Write the ext frcing species
 !-----------------------------------------------------------------------
    if( usrcnt > 0 ) then
@@ -366,13 +383,13 @@
 	    wrk_chr(i) = new_solsym(usrmap(i+n-1))
          end do        
          if( n1 /= usrcnt ) then
-            write(line(m:),'(5("''",a8,"'',")," &")') wrk_chr(1:n1-n+1)
+            write(line(m:),'(5("''",a16,"'',")," &")') wrk_chr(1:n1-n+1)
          else
             if( n1 > n ) then
                write(frmt,'("(",i1)') n1 - n
-               frmt(len_trim(frmt)+1:) = '("''",a8,"'',"),"''",a8,"'' /)")'
+               frmt(len_trim(frmt)+1:) = '("''",a16,"'',"),"''",a16,"'' /)")'
             else
-               frmt = '("''",a8,"'' /)")'
+               frmt = '("''",a16,"'' /)")'
             end if
             write(line(m:),trim(frmt)) wrk_chr(1:n1-n+1)
          end if
@@ -431,12 +448,12 @@
             do l = n,n1
                if( l /= nfs ) then
                   if( l /= n1 ) then
-                     write(line(m:),'("''",a8,"'',")') fixsym(l)
+                     write(line(m:),'("''",a16,"'',")') fixsym(l)
                   else
-                     write(line(m:),'("''",a8,"'', &")') fixsym(l)
+                     write(line(m:),'("''",a16,"'', &")') fixsym(l)
                   end if
                else
-                  write(line(m:),'("''",a8,"'' /)")') fixsym(l)
+                  write(line(m:),'("''",a16,"'' /)")') fixsym(l)
                end if
                m = len_trim(line) + 2
             end do
@@ -459,12 +476,12 @@
             do l = n,n1
                if( l /= nslvd ) then
                   if( l /= n1 ) then
-                     write(line(m:),'("''",a8,"'',")') slvdsym(l)
+                     write(line(m:),'("''",a16,"'',")') slvdsym(l)
                   else
-                     write(line(m:),'("''",a8,"'', &")') slvdsym(l)
+                     write(line(m:),'("''",a16,"'', &")') slvdsym(l)
                   end if
                else
-                  write(line(m:),'("''",a8,"'' /)")') slvdsym(l)
+                  write(line(m:),'("''",a16,"'' /)")') slvdsym(l)
                end if
                m = len_trim(line) + 2
             end do
@@ -649,7 +666,7 @@
             m = len_trim(line) + 2
             do n = 1,phtcnt
                number = ' '
-               write(number,'(g15.9)') pht_alias_mult(n,i)
+               write(number,'(a)') pht_alias_mult(n,i)
                number = adjustl( number )
                lpos   = scan( number, '0123456789', back=.true. )
                if( lpos == 1 ) then
@@ -692,4 +709,5 @@
 
 100   format(a)
 
+      close( unit = 30 )
       end subroutine make_sim_dat

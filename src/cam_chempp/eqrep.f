@@ -40,7 +40,7 @@
      
       real, intent(in)    ::  coeffs(prd_lim,rxt_lim)
       
-      character(len=8), intent(in) ::  solsym(*), &
+      character(len=16), intent(in) ::  solsym(*), &
 				       fixsym(*)
       
 !-----------------------------------------------------------------------
@@ -52,7 +52,7 @@
       
       character(len=320) ::  lines(2)
       character(len=80)  ::  eq_piece
-      character(len=8)   ::  symbol
+      character(len=16)   ::  symbol
       
       logical  ::  production, destruction, blow_off, quadratic
       
@@ -374,13 +374,13 @@
       integer, intent(inout) :: buf_pos
       
       character(len=80), intent(out) ::  eq_piece
-      character(len=8), intent(in)   ::  fixsym(*)
+      character(len=16), intent(in)   ::  fixsym(*)
       
 !-----------------------------------------------------------------------
 !     	... Local variables
 !-----------------------------------------------------------------------
       integer  ::  j, l, index, length
-      character(len=8) ::  symbol
+      character(len=16) ::  symbol
 
       integer  ::  GET_INDEX
 

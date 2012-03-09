@@ -39,8 +39,8 @@
       integer, intent(in) ::      diag_map(:)
       integer, intent(in) ::      pcoeff_ind(*)            ! map for nonunity prod
       real, intent(in)    ::      pcoeff(prd_lim,*)
-      character(len=8), intent(in) ::  march               ! target architecture  
-      character(len=8), intent(in) ::  model               ! target model  
+      character(len=16), intent(in) ::  march               ! target architecture  
+      character(len=16), intent(in) ::  model               ! target model  
       logical, intent(in) ::      lin_mat_pat(:)
       
 !-----------------------------------------------------------------------
@@ -729,8 +729,8 @@ Rates_loop : &
 !        ... Dummy args
 !-----------------------------------------------------------------------
       integer, intent(in)          :: sub_cnt              ! subroutine counter
-      character(len=8), intent(in) :: march                ! targe  architecture
-      character(len=8), intent(in) :: model                ! target model
+      character(len=16), intent(in) :: march                ! targe  architecture
+      character(len=16), intent(in) :: model                ! target model
       
 !-----------------------------------------------------------------------
 !        ... Local variables

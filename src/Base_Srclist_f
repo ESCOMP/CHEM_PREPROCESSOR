@@ -6,6 +6,7 @@ chm_hdr.f
 make_names.f
 slt_hdr.f
 eqrep.f
+rxt_equations.f
 sol_cls.f
 hist_hdr.f
 exe_opts.f

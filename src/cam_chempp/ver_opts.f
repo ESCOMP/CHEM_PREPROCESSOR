@@ -21,10 +21,10 @@
 !   	... Dummy args
 !-----------------------------------------------------------------------
       integer, intent(inout) ::      cpucnt
-      character(len=8), intent(inout)  ::  machine
-      character(len=8), intent(inout)  ::  model
-      character(len=8), intent(inout)  ::  march
-      character(len=8), intent(inout)  ::  arch_type
+      character(len=16), intent(inout)  ::  machine
+      character(len=16), intent(inout)  ::  model
+      character(len=16), intent(inout)  ::  march
+      character(len=16), intent(inout)  ::  arch_type
       character(len=64), intent(out)   ::  wrk_dir
       character(len=64), intent(inout) ::  cpp_dir, cpp_opts
       character(len=64), intent(out)   ::  subfile

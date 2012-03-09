@@ -34,8 +34,8 @@
       integer, intent(in) ::  pcoeff_ind(rxt_lim)
       integer, intent(in) ::  permute(var_lim,5)
       real, intent(in)    ::  pcoeff(prd_lim,rxt_lim)
-      character(len=8), intent(in) :: march
-      character(len=8), intent(in) :: model
+      character(len=16), intent(in) :: march
+      character(len=16), intent(in) :: model
       
 !-----------------------------------------------------------------------
 !        ... Local variables

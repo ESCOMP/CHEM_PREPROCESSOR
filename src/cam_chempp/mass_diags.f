@@ -11,7 +11,7 @@
       type CONSERVATION
 	 integer, dimension(2) :: long_ind, lat_ind, lev_ind
 	 real, dimension(2) :: longitudes, latitudes, levels
-         character(len=8) :: species
+         character(len=16) :: species
       end type CONSERVATION
 
       integer :: ndiags = 0
@@ -31,7 +31,7 @@
 !	... Dummy args
 !--------------------------------------------------------------------
       integer, intent(in) :: plon, plev, plat
-      character(len=8), intent(in) :: name
+      character(len=16), intent(in) :: name
 
       if( ndiags >= max_diags ) then
          write(*,*) ' INIDIAGS: Exceeded diagnostic limit'
@@ -62,8 +62,8 @@
 !	... Dummy args
 !--------------------------------------------------------------------
       integer, intent(in) :: plon, plev, plat
-      integer, intent(in) :: spccnt(*)
-      character(len=8), intent(in) :: spcsym(64,*)
+      integer, intent(in) :: spccnt(:)
+      character(len=16), intent(in) :: spcsym(:,:)
 
 !--------------------------------------------------------------------
 !	... Local variables

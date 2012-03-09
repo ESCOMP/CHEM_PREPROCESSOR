@@ -6,5 +6,5 @@ set objdir=OBJ
 rm -f ../bin/$exenam
 rm -f $objdir/*
 
-gmake SRCLIST=Base_Srclist_f SRCDIRS="$exenam" EXENAME=cam_chempp
+gmake COMPILER=lf95 DEBUG=TRUE EXENAME=cam_chempp
 

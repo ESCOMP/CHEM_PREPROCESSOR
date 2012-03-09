@@ -71,11 +71,11 @@
       character(len=32) ::  loc_rxt_tag
       character(len=32) ::  loc_pht_alias(2)
       character(len=16) ::  wrk_char
-      character(len=8)  ::  rxtsym(rxtnt_lim)
-      character(len=8)  ::  prdsym(prd_lim)
+      character(len=16)  ::  rxtsym(rxtnt_lim)
+      character(len=16)  ::  prdsym(prd_lim)
       character(len=1)  ::  char
       character(len=24), allocatable ::  ext_tokens(:)
-      character(len=8),  allocatable ::  tokens(:)
+      character(len=16),  allocatable ::  tokens(:)
 
       real  ::     number
       real  ::     rate(5), pcoeffs(prd_lim)
@@ -690,7 +690,7 @@ ext_tok_loop :    do j = 1,tokcnt
 !           is performed in this subroutine.
 !-----------------------------------------------------------------------
 
-      integer, parameter ::  symlen = 8
+      integer, parameter ::  symlen = 16
 
 !-----------------------------------------------------------------------
 !	... Dummy args
@@ -699,7 +699,7 @@ ext_tok_loop :    do j = 1,tokcnt
       integer, intent(out) ::     rxtcnt, prdcnt
       real, intent(out)    ::     rate(*), pcoeffs(prd_lim)
       character(len=*), intent(out)  ::  loc_rxt_tag
-      character(len=8), intent(out)  ::  rxtsym(rxtnt_lim), prdsym(prd_lim)
+      character(len=16), intent(out) ::  rxtsym(rxtnt_lim), prdsym(prd_lim)
       character(len=16), intent(out) :: prdprms(prd_lim)
       character(len=16), intent(out) :: sym_rate(*)
       logical, intent(in)  ::     is_photorate
@@ -966,15 +966,15 @@ ext_tok_loop :    do j = 1,tokcnt
       integer, intent(out) :: rxttab(5,*)
       real, intent(inout)  :: pcoeffs(prd_lim)
       logical, intent(inout) :: coeff_flg
-      character(len=8), intent(in)  ::  rxtsym(rxtnt_lim), prdsym(prd_lim)
-      character(len=8), intent(in)  ::  solsym(*), fixsym(*), pcesym(*)
+      character(len=*), intent(in)  ::  rxtsym(rxtnt_lim), prdsym(prd_lim)
+      character(len=*), intent(in)  ::  solsym(:), fixsym(:), pcesym(:)
 
 !-----------------------------------------------------------------------
 !        ... Local variables
 !-----------------------------------------------------------------------
       integer  ::  k, l, photo = 0
       logical  ::  local_flag
-      
+
       nf = 0
       nsp = 0
       nsr = 0
@@ -1104,10 +1104,10 @@ rxtnt_scan : &
 
       integer, intent(in) ::      nr, np, irxn, lout
       real, intent(in)    ::      rate(:)
-      character(len=16), intent(in) :: rxparms(prd_lim)
-      character(len=16), intent(in) :: sym_rate(5)
+      character(len=*), intent(in) :: rxparms(prd_lim)
+      character(len=*), intent(in) :: sym_rate(5)
       character(len=*), intent(in)  :: loc_rxt_tag
-      character(len=8), intent(in)  :: rxtsym(rxtnt_lim), prdsym(prd_lim)
+      character(len=*), intent(in)  :: rxtsym(rxtnt_lim), prdsym(prd_lim)
 
 !-----------------------------------------------------------------------
 !	... Local variables

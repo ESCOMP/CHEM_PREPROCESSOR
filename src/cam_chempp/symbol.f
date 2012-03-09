@@ -19,7 +19,7 @@ subroutine SYMBOL( iout )
   !-----------------------------------------------------------------------
   !	... Local variables
   !-----------------------------------------------------------------------
-  integer, parameter :: symlen = 8
+  integer, parameter :: symlen = 16
 
   integer  ::  retcod, parsw(6), nchar
   integer  ::  spclim(5)
@@ -44,7 +44,7 @@ subroutine SYMBOL( iout )
                                        'ENDGROUPS           ', &
                                        'ENDCOL-INT          ', &
                                        'ENDNOT-TRANSPORTED  '  /)
-  character(len=8)  ::  upname
+  character(len=16)  ::  upname
   character(len=1)  ::  char
 
   logical  :: found
@@ -77,7 +77,7 @@ subroutine SYMBOL( iout )
         end if
      end do
      if( .not. found ) then
-        call ERRMES( '# is an invalid species header@', lout, buff(:8), 8, buff )
+        call ERRMES( '# is an invalid species header@', lout, buff(:16), 16, buff )
      else if( parsw(kpar) /= 0 ) then
         call ERRMES( '# species class already declared@', lout, spchdr(kpar), LEN_TRIM(spchdr(kpar)), buff )
      else if( kpar >= 4 .and. MAXVAL( spccnt(1:3) ) == 0 ) then

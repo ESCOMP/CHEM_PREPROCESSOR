@@ -35,8 +35,8 @@
       real, intent(in)    ::      rate(:)
       character(len=16), intent(in) :: rxparms(prd_lim)
       character(len=16), intent(in) :: sym_rate(5)
-      character(len=8), intent(in)  :: loc_rxt_alias
-      character(len=8), intent(in)  :: rxtsym(rxtnt_lim), prdsym(prd_lim)
+      character(len=16), intent(in)  :: loc_rxt_alias
+      character(len=16), intent(in)  :: rxtsym(rxtnt_lim), prdsym(prd_lim)
 
 !-----------------------------------------------------------------------
 !	... Local variables
@@ -149,7 +149,7 @@
       real, intent(in)    :: rate(:)
       character(len=320), intent(inout) :: buff
       character(len=16), intent(in)     :: sym_rate(:)
-      character(len=8), intent(in)      :: loc_rxt_alias
+      character(len=16), intent(in)      :: loc_rxt_alias
 
 !-----------------------------------------------------------------------
 !        ... Local variables

@@ -20,7 +20,7 @@
                                  new_nq              ! species count
       integer, intent(inout) ::  bc_cnt(:)           ! count of species with fixed bc
       logical, intent(inout) ::  bc_is_fixed(:,:)    ! fixed bndy condition matrix
-      character(len=8), intent(in) ::  new_solsym(:) ! species names
+      character(len=16), intent(in) ::  new_solsym(:) ! species names
 
 !-----------------------------------------------------------------------
 !       ... Local variables
@@ -34,7 +34,7 @@
 
       character(len=320) ::  buff
       character(len=320) ::  buffh
-      character(len=8)  ::  tokens(20)
+      character(len=16)  ::  tokens(20)
 
       logical  ::  found
 

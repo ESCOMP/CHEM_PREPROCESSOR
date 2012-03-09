@@ -118,9 +118,9 @@
       e_table(64) = ELEMENT( 'Pt',195.08_dp )
       e_table(65) = ELEMENT( 'Au',196.96654_dp )
       e_table(66) = ELEMENT( 'Hg',200.59_dp )
-      e_table(67) = ELEMENT( 'Tl',204.3833 )
-      e_table(68) = ELEMENT( 'Pb',207.2 )
-      e_table(69) = ELEMENT( 'Bi',208.98037 )
+      e_table(67) = ELEMENT( 'Tl',204.3833_dp )
+      e_table(68) = ELEMENT( 'Pb',207.2_dp )
+      e_table(69) = ELEMENT( 'Bi',208.98037_dp )
       e_table(70) = ELEMENT( 'Po',209._dp )
       e_table(71) = ELEMENT( 'At',210._dp )
       e_table(72) = ELEMENT( 'Rn',222._dp )
@@ -146,7 +146,7 @@
 
       end subroutine iniele
 
-      real function com_mass( compound )
+      real(dp) function com_mass( compound, carbmass )
 !-----------------------------------------------------------
 !	... Compute the mass of input compound
 !-----------------------------------------------------------
@@ -157,6 +157,7 @@
 !	... Dummy args
 !-----------------------------------------------------------
       character(len=*), intent(in) :: compound
+      logical, optional,intent(in) :: carbmass
 
 !-----------------------------------------------------------
 !	... Local variables
@@ -164,6 +165,12 @@
       integer  :: beg, end, pos, nump, index
       integer  :: ios, el_cnt
       real(dp) :: sum
+      logical :: carbon_only
+      
+      carbon_only = .false.
+      if (present(carbmass)) then
+         carbon_only = carbmass
+      endif
 
       end = len_trim( compound )
       sum = 0._dp
@@ -192,7 +199,13 @@
 !           COM_MASS = 0.
 !           exit
 !        end if
-	 sum = sum + e_table(index)%wght * real( el_cnt,dp )
+         if (carbon_only) then
+           if( trim(e_table(index)%sym) == 'C') then
+	     sum = sum + e_table(index)%wght * real( el_cnt,dp )
+           endif
+         else
+	   sum = sum + e_table(index)%wght * real( el_cnt,dp )
+         endif
 	 end = pos - 1
 	 if( end <= 0 ) then
 	    exit
@@ -234,6 +247,8 @@
 !-----------------------------------------------------------------------
 
       implicit none
+ 
+      integer, parameter   :: dp = selected_real_kind( 12 )
 
       integer :: var_lim
       integer :: hst_file_lim
@@ -280,13 +295,16 @@
 
       real, allocatable :: &
                    colub(:), &                      ! upper boundary column integral
-                   grpcof(:,:), &                   ! multiplier for group members
-                   mass(:), &
-		   temp_mass(:)                     ! original species masses and temp space
+                   grpcof(:,:)                      ! multiplier for group members
+
+      real(dp), allocatable :: &
+                   mass(:), &                       ! molecular mass of the mechanism compound
+                   c_mass(:), &                     ! carbon mass of the mechanism compound
+                   temp_mass(:)                     ! original species masses and temp space
 
       character(len=64), allocatable :: aliases(:)
-      character(len=8), target, allocatable  ::  spcsym(:,:)
-      character(len=8), pointer ::  pcesym(:), &
+      character(len=16), target, allocatable  ::  spcsym(:,:)
+      character(len=16), pointer ::  pcesym(:), &
                                      solsym(:), &
                                      fixsym(:), &
                                      grpsym(:), &
@@ -297,7 +315,7 @@
 
       integer :: nslvd
 
-      character(len=8), allocatable :: &
+      character(len=16), allocatable :: &
                    user_hst_names(:,:)
 
       integer, allocatable :: permute(:,:)         ! permutation vector
@@ -422,6 +440,12 @@
 	 stop
       end if
       mass(:) = 0.
+      allocate( c_mass(var_lim),stat=astat )
+      if( astat /= 0 ) then
+	 write(*,*) 'VAR_INI: Failed to allocate c_mass'
+	 stop
+      end if
+      c_mass(:) = 0.
       allocate( temp_mass(var_lim),stat=astat )
       if( astat /= 0 ) then
 	 write(*,*) 'VAR_INI: Failed to allocate temp_mass'
@@ -547,7 +571,7 @@
                    pht_alias(:,:), &
                    pht_alias_mult(:,:), &
                    rxt_tag(:)
-      character(len=8), allocatable :: &
+      character(len=16), allocatable :: &
                    phtsym(:)
       logical, allocatable :: &
                    rxt_has_tag(:), &

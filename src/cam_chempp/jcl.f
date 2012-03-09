@@ -28,7 +28,7 @@
       character(len=64), intent(in) ::   histout(6)    ! "history" tape output parms
       character(len=64), intent(in) ::   wrk_dir       ! working directory on target machine
       character(len=64), intent(inout) ::   subfile    ! submission filespec
-      character(len=8), intent(in)  ::   machine       ! target machine "name"
+      character(len=16), intent(in)  ::   machine       ! target machine "name"
 
       logical, intent(in), target   ::   options(*)    ! run options
 

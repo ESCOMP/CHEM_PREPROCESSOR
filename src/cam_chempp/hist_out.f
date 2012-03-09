@@ -47,8 +47,8 @@
       real    ::   time
       character (len=23) :: parkeyend(maxparms)
       character (len=20) :: parkey(maxparms), keywrd
-      character (len=8)  :: tokens(20)
-      character (len=8)  :: temp
+      character (len=16)  :: tokens(20)
+      character (len=16)  :: temp
       logical ::   found, doing_file
 
 !-----------------------------------------------------------------------

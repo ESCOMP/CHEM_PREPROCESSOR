@@ -19,7 +19,7 @@
       character(len=63) :: legal = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' &
 				// 'abcdefghijklmnopqrstuvwxyz' &
 				// '0123456789_'
-      character(len=8)  :: name
+      character(len=16)  :: name
       logical :: lexist
 
       inquire( file = trim( temp_path ) // 'spc_names.mod', exist = lexist )

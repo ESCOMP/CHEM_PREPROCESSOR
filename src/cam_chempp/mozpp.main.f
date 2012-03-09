@@ -23,6 +23,7 @@
       use mo_chem,     only : chem
       use sp_mods,     only : sparsity
       use mo_ver_opts, only : ver_opts
+      use rxt_equations_mod
 
       implicit none
 
@@ -64,7 +65,7 @@
       character(len=16)  :: jobctl(8)
       character(len=16)  :: wrk_rxt(10)
       character(len=10)  :: clshdr(5)
-      character(len=8)   :: wrk_chr(10)
+      character(len=16)   :: wrk_chr(10)
       character(len=580) :: command, cpp_command
       character(len=256) :: errcom, filout, filin
       character(len=64)  :: oper_flpth
@@ -78,11 +79,11 @@
       character(len=16)  :: hostname
       character(len=16)  :: jobname
     
-      character(len=8) ::  machine   = 'IBM'
-      character(len=8) ::  march     = 'SCALAR'
-      character(len=8) ::  model     = 'CAM'
-      character(len=8) ::  arch_type = 'HYBRID'
-      character(len=8) ::  char
+      character(len=16) ::  machine   = 'IBM'
+      character(len=16) ::  march     = 'SCALAR'
+      character(len=16) ::  model     = 'CAM'
+      character(len=16) ::  arch_type = 'HYBRID'
+      character(len=16) ::  char
       character(len=4) ::  ftunit = 'ft'
       character(len=1) ::  errflg
 
@@ -115,6 +116,7 @@
       logical ::  longnames = .false.           ! do not use long names
 
       integer :: rxt_tag_cnt
+      character(len=32) :: rxt_rates_conv_file =  'mo_rxt_rates_conv.F90'
 
       type(SPARSITY) :: sparse(2)
 
@@ -557,15 +559,19 @@
       do i = 1,spccnt(1)
 	 if( aliases(i) /= ' ' ) then
 	    mass(i) = com_mass( aliases(i) )
+	    c_mass(i) = com_mass( aliases(i),carbmass=.true. )
 	 else
 	    mass(i) = com_mass( solsym(i) )
+	    c_mass(i) = com_mass( solsym(i),carbmass=.true. )
 	 end if
       end do
       do i = spccnt(1)+1, spccnt(1)+spccnt(3)
 	 if( aliases(i) /= ' ' ) then
 	    mass(i) = com_mass( aliases(i) )
+	    c_mass(i) = com_mass( aliases(i),carbmass=.true. )
 	 else
 	    mass(i) = com_mass( fixsym(i-spccnt(1)) )
+	    c_mass(i) = com_mass( fixsym(i-spccnt(1)),carbmass=.true. )
 	 end if
       end do
 
@@ -625,7 +631,7 @@
 	 if( aliases(j) == ' ' ) then
             write(lout,231) j, solsym(j)
 	 else
-            write(lout,'(6x,''('',i3,'')'',2x,a8,3x,''('',a,'')'')') j, solsym(j), trim( aliases(j) )
+            write(lout,'(6x,''('',i3,'')'',2x,a16,3x,''('',a,'')'')') j, solsym(j), trim( aliases(j) )
 	 end if
       end do
       if( relcnt /= 0 ) then
@@ -815,7 +821,7 @@
 		  if( options(18) ) then
                      call make_name_mod
                      call make_rxt_name_mod
-                     call make_het_name_mod
+                     !call make_het_name_mod
                   end if
                end if
             else if( buff == 'EXECUTIONOPTIONS' ) then
@@ -1428,6 +1434,19 @@ sparse_matrix_loop : &
          call equation_rep( new_nq, new_solsym, nfs, fixsym, prdcnt, &
                             prdmap, rxntot, rxmcnt, rxmap, pcoeff_cnt, &
                             pcoeff_ind, pcoeff, fixcnt, fixmap, phtcnt )
+
+         call write_rxt_out_code ( &
+              rxmcnt, &
+              rxmap, &
+              fixmap, &
+              solsym, &
+              fixsym, &
+              prdcnt, &
+              prdmap, &
+              rxntot, &
+              phtcnt, & 
+              rxt_rates_conv_file )
+
       end if Has_chemistry
 
 !=======================================================================
@@ -1478,13 +1497,13 @@ sparse_matrix_loop : &
             write(20,*) temp_mass(:grp_mem_cnt)
          end if
          if( new_nq > 0 ) then
-            write(20,'(10a8)') new_solsym(:new_nq)
+            write(20,'(10a16)') new_solsym(:new_nq)
          end if
          if( grp_mem_cnt > 0 ) then
             write(20,'(i4)') ngrp
             write(20,'(20i4)') grpcnt(:ngrp)
-            write(20,'(10a8)') grpsym(:ngrp)
-            write(20,'(10a8)') grp_mem_sym(:grp_mem_cnt)
+            write(20,'(10a16)') grpsym(:ngrp)
+            write(20,'(10a16)') grp_mem_sym(:grp_mem_cnt)
          end if
          write(20,'(i4)') srf_flx_cnt
          if( srf_flx_cnt > 0 ) then
@@ -1495,7 +1514,7 @@ sparse_matrix_loop : &
 	       do i = il,iu
 	          wrk_chr(i-il+1) = new_solsym(srf_flx_map(i))
 	       end do
-               write(20,'(10a8)') wrk_chr
+               write(20,'(10a16)') wrk_chr
 	    end do
          end if
          write(20,'(i4)') dvel_cnt
@@ -1507,7 +1526,7 @@ sparse_matrix_loop : &
 	       do i = il,iu
 	          wrk_chr(i-il+1) = new_solsym(dvel_map(i))
 	       end do
-               write(20,'(10a8)') wrk_chr
+               write(20,'(10a16)') wrk_chr
 	    end do
          end if
 !-----------------------------------------------------------------------
@@ -1521,7 +1540,7 @@ sparse_matrix_loop : &
 	       do i = il,iu
 	          wrk_chr(i-il+1) = new_solsym(hetmap(i,1))
 	       end do
-               write(20,'(10a8)') wrk_chr
+               write(20,'(10a16)') wrk_chr
 	    end do
          end if
 !-----------------------------------------------------------------------
@@ -1535,7 +1554,7 @@ sparse_matrix_loop : &
 	       do i = il,iu
 	          wrk_chr(i-il+1) = new_solsym(usrmap(i))
 	       end do
-               write(20,'(10a8)') wrk_chr
+               write(20,'(10a16)') wrk_chr
 	    end do
          end if
 !-----------------------------------------------------------------------
@@ -1595,7 +1614,7 @@ sparse_matrix_loop : &
             write(20,*) temp_mass(:new_nq)
          end if
          if( new_nq > 0 ) then
-            write(20,'(10a8)') new_solsym(:new_nq)
+            write(20,'(10a16)') new_solsym(:new_nq)
          end if
          do class = 2,5
             if( clscnt(class) > 0 ) then
@@ -1622,8 +1641,8 @@ sparse_matrix_loop : &
 !-----------------------------------------------------------------------
 !        ... Write the resolution header file
 !-----------------------------------------------------------------------
-      call res_hdr( plon, plonl, plat, plev, jintmx, &
-                    nxpt, arch_type, cpucnt )
+!      call res_hdr( plon, plonl, plat, plev, jintmx, &
+!                    nxpt, arch_type, cpucnt )
 
 !-----------------------------------------------------------------------
 !        ... Write the version header file
@@ -1677,7 +1696,7 @@ sparse_matrix_loop : &
 	       do i = il,iu
 	          wrk_chr(i-il+1) = fixsym(i)
 	       end do
-               write(20,'(10a8)') wrk_chr
+               write(20,'(10a16)') wrk_chr
 	    end do
          end if
          close( 20 )
@@ -1704,7 +1723,7 @@ sparse_matrix_loop : &
 	 stop
       end if
       write(3,'(''# include <version.h>'')') 
-      write(3,'(''# include <res.h>'')') 
+!!$      write(3,'(''# include <res.h>'')') 
       write(3,'(''# include <slt.h>'')') 
       write(3,'(''# include <chem.h>'')')
       write(3,'(''# include <hist.h>'')') 
@@ -1788,10 +1807,10 @@ sparse_matrix_loop : &
 !!$         mod_paths(k) = './'
 	 mod_paths(k) = ' '
          mod_names(k) = trim( temp_path ) // 'rxt_names.mod'
-         k = 3
+!!$         k = 3
 !!$         mod_paths(k) = './'
-	 mod_paths(k) = ' '
-         mod_names(k) = trim( temp_path ) // 'het_names.mod'
+!!$	 mod_paths(k) = ' '
+!!$         mod_names(k) = trim( temp_path ) // 'het_names.mod'
       else
 	 k = 0
       end if
@@ -2040,7 +2059,7 @@ sparse_matrix_loop : &
             do i = 1,filelines(1)
 	       il = index( lib_src(i), '/', back = .true. ) + 1
 	       iu = index( lib_src(i), '.F', back = .true. ) - 1
-               if( lib_src(i)(il:iu) /= 'mo_setrxt' ) then
+               if( lib_src(i)(il:iu) /= 'mo_setrxt' .and. lib_src(i)(il:iu) /= 'mo_sim_dat' ) then
                   call system( 'cat ' // trim( temp_path ) // 'wrk.stub.F > wrk.F' )
 !                 write(*,*) 'cpp file ',trim(lib_src(i))
                end if
@@ -2052,7 +2071,7 @@ sparse_matrix_loop : &
                else
                   filenm = lib_src(i)(il:iu) // '.F90'
                end if
-               if( lib_src(i)(il:iu) /= 'mo_setrxt' ) then
+               if( lib_src(i)(il:iu) /= 'mo_setrxt' .and. lib_src(i)(il:iu) /= 'mo_sim_dat' ) then
                   call system( trim( cpp_command ) // ' wrk.F > '// trim(filenm) )
                else
                   call system( 'cp wrk.F ' // trim(filenm) )
@@ -2169,9 +2188,15 @@ sparse_matrix_loop : &
                call system( 'rm -f wrk.F' )
                call system( 'rm -f ' // trim(filenm) )
             end do
+
+            call system( 'cp '// trim(temp_path) // trim(rxt_rates_conv_file) // ' .' )
+            call system( 'tar -rf ' // trim(temp_path) // trim(tar_flnm) // ' ' // trim(rxt_rates_conv_file) )
+            call system( 'rm -f ' // trim(rxt_rates_conv_file) )
+
             call system( 'mv ' // trim(temp_path) // trim(tar_flnm) // ' ' // trim(output_path) // '.' )
          end if
       end if
+
 
 !-----------------------------------------------------------------------
 !       ... Write the params.h file
@@ -2212,12 +2237,12 @@ sparse_matrix_loop : &
 219   format('0     the linear prod map for pces'/6x,'pcn',2x,'rxn',2x,'rsn',2x,'ind')
 221   format('0     the quadratic prod map for pces'/6x,'pcn',2x,'rxn',2x,'rsn',2x,'rsn',2x,'ind')
 230   format(5x,'Solution species')
-231   format(6x,'(',i3,')',2x,a8)
+231   format(6x,'(',i3,')',2x,a16)
 232   format(5x,'Invariant species')
 235   format(5x,'Relationships')
 236   format(5x,'Column integrals')
 237   format(5x,'Groups')
-238   format(3x,'(',i2,')',2x,a8,' - ',1pe10.3)
+238   format(3x,'(',i2,')',2x,a16,' - ',1pe10.3)
 
 502   format(10i4)
 504   format(2i4)
@@ -2231,10 +2256,10 @@ sparse_matrix_loop : &
 522   format(20i4)
 
 600   format('0  upper bndy conds'/2x,'species  d  n')
-602   format(1x,a8,2i3)
+602   format(1x,a16,2i3)
 604   format('0  lower bndy conds'/2x,'species  d  n')
 606   format('0  upper bndy flux'/2x,'species     day        night   ')
-608   format(1x,a8,1p,2e12.4)
+608   format(1x,a16,1p,2e12.4)
 610   format('0  lower bndy flux'/2x,'species     day        night   ')
 612   format('0  upper bndy dir constants'/2x,'species',5x,'day',8x,'night   ')
 614   format('0  lower bndy dir constants'/2x,'species',5x,'day',8x,'night   ')
@@ -2254,8 +2279,8 @@ sparse_matrix_loop : &
       '_____ ________',6x,'_____ ________'/'  species',5x,'day',6x, &
       'night',6x,'day',6x,'night'/'+ _______',5x,'___',6x,'_____', &
       6x,'___',6x,'_____')
-2508  format(1x,10a8)
-2270  format('0',10a8)
+2508  format(1x,10a16)
+2270  format('0',10a16)
 
 4000  format('0*** group table ***')
 4002  format('0   group no',i4)

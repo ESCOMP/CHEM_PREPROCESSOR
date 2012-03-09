@@ -20,7 +20,7 @@
       integer, intent(in) ::    jintmx
       integer, intent(in) ::    nxpt
       integer, intent(in) ::    cpucnt
-      character(len=8), intent(in) :: arch_type
+      character(len=16), intent(in) :: arch_type
 
 !-----------------------------------------------------------------------
 !        ... The local variables

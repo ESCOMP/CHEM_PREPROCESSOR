@@ -25,8 +25,8 @@
       integer, intent(in) :: n                       ! species in class count
       integer, intent(in) :: class                   ! class number
       integer, intent(in) :: sp_map(n,n)             ! sparsity matrix map
-      character(len=8), intent(in) :: march          ! target architecture
-      character(len=8), intent(in) :: model          ! target model
+      character(len=16), intent(in) :: march          ! target architecture
+      character(len=16), intent(in) :: model          ! target model
       logical, intent(in), dimension(n,n) :: lu_sp_pat, mat_sp_pat
       
 !-----------------------------------------------------------------------
@@ -278,8 +278,8 @@ Column_loop : &
 !        ... Dummy args
 !-----------------------------------------------------------------------
       integer, intent(in)          :: sub_cnt
-      character(len=8), intent(in) :: march
-      character(len=8), intent(in) :: model
+      character(len=16), intent(in) :: march
+      character(len=16), intent(in) :: model
       
 !-----------------------------------------------------------------------
 !        ... Local variables

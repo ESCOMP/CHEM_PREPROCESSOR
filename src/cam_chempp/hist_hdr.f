@@ -34,8 +34,8 @@
       integer, intent(in)  ::      usrmap(*)        ! ext frc map
       integer, intent(out) ::      ptplen           ! total hist tape fields
       character(len=64), intent(in) :: hist_type         ! type of dyn hist tape ( short/long )
-      character(len=8), intent(in)  :: user_hst_names(var_lim,4)
-      character(len=8), intent(in)  :: spcsym(var_lim,*)     ! list of symbols
+      character(len=16), intent(in)  :: user_hst_names(var_lim,4)
+      character(len=16), intent(in)  :: spcsym(var_lim,*)     ! list of symbols
       character(len=*), intent(in)  :: filename              ! path/name of simulation data file
       character(len=*), intent(in)  :: model                 ! model name
 
@@ -50,7 +50,7 @@
       integer  ::  class, classno
       integer  ::  summ(2), sums(2)
       character(len=32) :: fld_name(4)
-      character(len=8)  :: namtag(1000)
+      character(len=16)  :: namtag(1000)
       character(len=4)  :: numa
       character(len=4)  :: oper_tag(2) = (/ 'inst', 'avrg' /)
       character(len=3)  :: num

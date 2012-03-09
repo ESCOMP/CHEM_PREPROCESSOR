@@ -56,7 +56,7 @@
 !           Euler scheme
 !-----------------------------------------------------------------------
 
-      use chem_mods,     only : rxntot, extcnt, nzcnt, clsze, diag_map, permute, hetcnt, cls_rxt_cnt
+      use chem_mods,     only : rxntot, extcnt, nzcnt, clsze, diag_map, permute, cls_rxt_cnt
       use mo_tracname,   only : solsym
       use ppgrid,        only : pver
       use pmgrid,        only : iam
@@ -78,7 +78,7 @@
       real(r8), intent(in)  ::   delt                                    ! time step (s)
       real(r8), intent(in)  ::   reaction_rates(ncol,pver,rxntot), &     ! rxt rates (1/cm^3/s)
                                  extfrc(ncol,pver,extcnt), &             ! external in-situ forcing (1/cm^3/s)
-                                 het_rates(ncol,pver,max(1,hetcnt))      ! washout rates (1/s)
+                                 het_rates(ncol,pver,max(1,gas_pcnst))      ! washout rates (1/s)
       real(r8), intent(inout) :: base_sol(ncol,pver,gas_pcnst)           ! species mixing ratios (vmr)
 
 !-----------------------------------------------------------------------
@@ -105,7 +105,7 @@
                    prod, &
                    loss
       real(r8) :: lrxt(clsze,rxntot)
-      real(r8) :: lhet(clsze,max(1,hetcnt))
+      real(r8) :: lhet(clsze,max(1,gas_pcnst))
       real(r8) :: lsol(clsze,gas_pcnst)
       real(r8), dimension(clsze) :: &
                    wrk
@@ -147,7 +147,7 @@ Column_loop : &
             do m = 1,rxntot
 	       lrxt(:cols,m) = reaction_rates(ofl:ofu,lev,m) 
 	    end do
-            do m = 1,hetcnt
+            do m = 1,gas_pcnst
 	       lhet(:cols,m) = het_rates(ofl:ofu,lev,m) 
 	    end do
 !           do_diag = lev == 5 .and. isec == 2 .and. lchnk == 290
