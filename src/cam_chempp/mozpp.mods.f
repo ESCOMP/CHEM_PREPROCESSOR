@@ -250,7 +250,7 @@
  
       integer, parameter   :: dp = selected_real_kind( 12 )
 
-      integer :: var_lim
+      integer, parameter :: var_lim = 1000
       integer :: hst_file_lim
       integer :: hst_map_lim
       integer, pointer :: nq, relcnt, nfs, ngrp, &
@@ -335,7 +335,6 @@
 !-----------------------------------------------------------------------
       integer :: astat
 
-      var_lim      = 300
       hst_file_lim = 10
       hst_map_lim  = 1000
       allocate( grpflg(var_lim),stat=astat )
