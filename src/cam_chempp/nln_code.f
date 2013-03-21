@@ -134,7 +134,7 @@
 	 sub_cnt = 1
       end if
       call make_nln_hdr( sub_cnt, march, model )
-      hdr_made = .true.
+      if (sub_cnt>0) hdr_made = .true.
 
       select case ( march )
          case( 'SCALAR' )
