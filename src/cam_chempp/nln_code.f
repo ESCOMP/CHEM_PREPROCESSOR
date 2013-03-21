@@ -70,6 +70,7 @@
       logical  ::  beg_line
       logical  ::  lexist
       logical, allocatable  ::  nln_mat_pat(:)
+      logical :: hdr_made = .false.
 
       allocate( nln_mat_pat(nzcnt),stat=pindx )
       if( pindx /= 0 ) then
@@ -133,6 +134,7 @@
 	 sub_cnt = 1
       end if
       call make_nln_hdr( sub_cnt, march, model )
+      hdr_made = .true.
 
       select case ( march )
          case( 'SCALAR' )
@@ -148,7 +150,7 @@
       base = sum( cls_rxt_cnt(:2) )
 Species_loop : &
       do species = 1,clscnt
-         target = clsmap(species,class,2)
+        target = clsmap(species,class,2)
 	 line   = ' '
 !-----------------------------------------------------------------------
 !       ... Write code for nonlinear loss entries
@@ -564,15 +566,16 @@ Rates_loop : &
             write(num,'(i3)') 100+sub_cnt
             write(line,'(''      end subroutine '',a,''nlnmat'',a)') up_hdr,num(2:3)
             write(30,100) trim(line)
+            hdr_made = .false.
 	    line_cnt = 0
 	    if( species /= clscnt ) then
 	       sub_cnt  = sub_cnt + 1
                call make_nln_hdr( sub_cnt, march, model )
+               hdr_made = .true.
 	    end if
 	 end if
       end do Species_loop
-
-      if( line_cnt /= 0 ) then
+     if ( hdr_made ) then
          if( march /= 'SCALAR' ) then
             line = '      end do'
             write(30,100) trim(line)
