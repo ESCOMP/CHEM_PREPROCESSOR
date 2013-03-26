@@ -183,6 +183,9 @@ contains
           if( ox_l9_ndx < 1 ) then
              ox_l9_ndx = get_rxt_ndx( 'soa1' )
           end if
+          if( ox_l9_ndx < 1 ) then
+             ox_l9_ndx = get_rxt_ndx( 'C10H16_O3' )
+          end if
           usr4_ndx = get_rxt_ndx( 'usr4' )
           if (usr4_ndx < 1) then
              usr4_ndx = get_rxt_ndx( 'tag_NO2_OH' )
