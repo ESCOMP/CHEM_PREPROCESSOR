@@ -1,9 +1,13 @@
 
 
+
+
+
+
 module mo_imp_sol
   use shr_kind_mod, only : r8 => shr_kind_r8
-  use chem_mods,    only : clscnt4, gas_pcnst, clsmap
-  use cam_logfile,  only : iulog
+  use chem_mods, only : clscnt4, gas_pcnst, clsmap
+  use cam_logfile, only : iulog
   implicit none
   private
   public :: imp_slv_inti, imp_sol
@@ -299,6 +303,8 @@ contains
        call addfld( trim(solsym(j))//'_CHMP', '/cm3/s ', pver, 'I', 'chemical production rate', phys_decomp )
        call addfld( trim(solsym(j))//'_CHML', '/cm3/s ', pver, 'I', 'chemical loss rate',       phys_decomp )
     enddo
+    call addfld('H_PEROX_CHMP', '/cm3/s ', pver, 'I', 'total ROOH production rate', phys_decomp )   !PJY changed "RO2" to "ROOH"
+
   end subroutine imp_slv_inti
   subroutine imp_sol( base_sol, reaction_rates, het_rates, extfrc, delt, &
        xhnm, ncol, lchnk, ltrop )
@@ -362,8 +368,11 @@ contains
     logical :: frc_mask, iter_conv
     logical :: converged(max(1,clscnt4))
     real(r8), dimension(ncol,pver,max(1,clscnt4)) :: prod_out, loss_out
+    real(r8), dimension(ncol,pver) :: prod_hydrogen_peroxides_out
+
     prod_out(:,:,:) = 0._r8
     loss_out(:,:,:) = 0._r8
+    prod_hydrogen_peroxides_out(:,:) = 0._r8
     solution(:) = 0._r8
     !-----------------------------------------------------------------------
     ! ... class independent forcing
@@ -659,6 +668,34 @@ contains
        loss_out(:,:,i) = loss_out(:,:,i)*xhnm
        call outfld( trim(solsym(j))//'_CHMP', prod_out(:,:,i), ncol, lchnk )
        call outfld( trim(solsym(j))//'_CHML', loss_out(:,:,i), ncol, lchnk )
+!
+! added code for ROOH production !PJY not "RO2 production"
+!
+       if ( trim(solsym(j)) == 'ALKOOH'    &
+        .or.trim(solsym(j)) == 'C2H5OOH'   &
+        .or.trim(solsym(j)) == 'CH3OOH'    &      !PJY added this
+        .or.trim(solsym(j)) == 'CH3COOH'   &
+        .or.trim(solsym(j)) == 'CH3COOOH'  &
+        .or.trim(solsym(j)) == 'C3H7OOH'   &      !PJY corrected this (from CH3H7OOH)
+        .or.trim(solsym(j)) == 'EOOH'      &
+!        .or.trim(solsym(j)) == 'H2O2'      &      !PJY removed as H2O2 production asked for separately (as I read 4.2.3, point 7)
+!        .or.trim(solsym(j)) == 'HCOOH'     &      !PJY removed this as this is formic acid HC(O)OH - i.e. not H-C-O-O-H
+        .or.trim(solsym(j)) == 'ISOPOOH'   &
+        .or.trim(solsym(j)) == 'MACROOH'   &
+        .or.trim(solsym(j)) == 'MEKOOH'    &
+        .or.trim(solsym(j)) == 'POOH'      &
+        .or.trim(solsym(j)) == 'ROOH'      &
+        .or.trim(solsym(j)) == 'TERPOOH'   &
+        .or.trim(solsym(j)) == 'TOLOOH'    &
+        .or.trim(solsym(j)) == 'XOOH'      ) then
+!
+          prod_hydrogen_peroxides_out(:,:) = prod_hydrogen_peroxides_out(:,:) + prod_out(:,:,i)
+!
+       end if
+!
     enddo
+!
+     call outfld( 'H_PEROX_CHMP', prod_hydrogen_peroxides_out(:,:), ncol, lchnk )
+!
   end subroutine imp_sol
 end module mo_imp_sol
