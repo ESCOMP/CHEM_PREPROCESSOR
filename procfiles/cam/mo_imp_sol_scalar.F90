@@ -307,7 +307,7 @@ contains
 
   end subroutine imp_slv_inti
   subroutine imp_sol( base_sol, reaction_rates, het_rates, extfrc, delt, &
-       xhnm, ncol, lchnk, ltrop )
+       xhnm, ncol, lchnk, ltrop, o3s_loss )
     !-----------------------------------------------------------------------
     ! ... imp_sol advances the volumetric mixing ratio
     ! forward one time step via the fully implicit euler scheme.
@@ -338,6 +338,9 @@ contains
     real(r8), intent(inout) :: base_sol(ncol,pver,gas_pcnst) ! species mixing ratios (vmr)
     real(r8), intent(in) :: xhnm(ncol,pver)
     integer, intent(in) :: ltrop(ncol) ! chemistry troposphere boundary (index)
+
+    real(r8), optional, intent(out) :: o3s_loss(ncol,pver)
+
     !-----------------------------------------------------------------------
     ! ... local variables
     !-----------------------------------------------------------------------
@@ -370,6 +373,7 @@ contains
     real(r8), dimension(ncol,pver,max(1,clscnt4)) :: prod_out, loss_out
     real(r8), dimension(ncol,pver) :: prod_hydrogen_peroxides_out
 
+    o3s_loss(:,:) = 0._r8
     prod_out(:,:,:) = 0._r8
     loss_out(:,:,:) = 0._r8
     prod_hydrogen_peroxides_out(:,:) = 0._r8
@@ -643,6 +647,9 @@ contains
                         + 3._r8 * reaction_rates(i,lev,usr16_ndx) * base_sol(i,lev,n2o5_ndx) &
                         + 2._r8 * reaction_rates(i,lev,usr17_ndx) * base_sol(i,lev,no3_ndx) ) &
                         / max( base_sol(i,lev,ox_ndx),1.e-20_r8 )
+
+                   o3s_loss(i,lev) = loss_out(i,lev,k)
+
                    loss_out(i,lev,k) = loss_out(i,lev,k) * base_sol(i,lev,ox_ndx)
                    prod_out(i,lev,k) = prod_out(i,lev,k) * base_sol(i,lev,no_ndx)
                 else if (j == o3a_ndx) then
