@@ -39,6 +39,7 @@ module mo_imp_sol
   integer :: ox_p17_ndx,ox_p12_ndx,ox_p13_ndx,ox_p14_ndx,ox_p15_ndx,ox_p16_ndx
   integer :: lt_cnt
   logical :: full_ozone_chem = .false.
+  logical :: middle_atm_chem = .false.
   logical :: reduced_ozone_chem = .false.
   ! for xnox ozone chemistry diagnostics
   integer :: o3a_ndx, xno2_ndx, no2xno3_ndx, xno2no3_ndx, xno3_ndx, o1da_ndx, xno_ndx
@@ -173,8 +174,23 @@ contains
           if( all( wrk(1:4) > 0 ) ) then
              reduced_ozone_chem = .true.
           end if
+          if ( .not. reduced_ozone_chem ) then
+             if ( ox_p1_ndx < 0 ) then
+                ox_p1_ndx = get_rxt_ndx( 'NO_HO2' )
+             end if
+             if ( ox_p1_ndx < 0 ) then
+                ox_p1_ndx = get_rxt_ndx( 'cph_NO_HO2' )
+             end if
+             if ( ox_p2_ndx < 0 ) then
+                ox_p2_ndx = get_rxt_ndx( 'CH3O2_NO' )
+             end if
+             wrk(1:2) = (/ ox_p1_ndx, ox_p2_ndx/)
+             if( all( wrk(1:2) > 0 ) ) then
+                middle_atm_chem = .true.
+             end if
+          end if
        endif
-       if( full_ozone_chem .or. reduced_ozone_chem ) then
+       if( full_ozone_chem .or. reduced_ozone_chem .or. middle_atm_chem ) then
           ox_l1_ndx = get_rxt_ndx( 'ox_l1' )
           ox_l2_ndx = get_rxt_ndx( 'ox_l2' )
           ox_l3_ndx = get_rxt_ndx( 'ox_l3' )
@@ -234,8 +250,28 @@ contains
                 reduced_ozone_chem = .false.
              end if
           endif
-       end if
-       if( full_ozone_chem .or. reduced_ozone_chem ) then
+          if ( middle_atm_chem ) then
+             if ( ox_l1_ndx < 0 ) then
+                ox_l1_ndx = get_rxt_ndx( 'O1D_H2O' )
+             end if
+             if ( ox_l2_ndx < 0 ) then
+                ox_l2_ndx = get_rxt_ndx( 'OH_O3' )
+             end if
+             if ( ox_l2_ndx < 0 ) then
+                ox_l2_ndx = get_rxt_ndx( 'cph_OH_O3' )
+             end if
+             if ( ox_l3_ndx < 0 ) then
+                ox_l3_ndx = get_rxt_ndx( 'HO2_O3' )
+             end if
+             if ( ox_l3_ndx < 0 ) then
+                ox_l3_ndx = get_rxt_ndx( 'cph_HO2_O3' )
+             end if
+             wrk(1:3) = (/ ox_l1_ndx, ox_l2_ndx, ox_l3_ndx /)
+             if( any( wrk(1:3) < 1 ) ) then
+                middle_atm_chem = .false.
+             end if
+          endif
+
           oh_ndx = get_spc_ndx( 'OH' )
           ho2_ndx = get_spc_ndx( 'HO2' )
           ch3o2_ndx = get_spc_ndx( 'CH3O2' )
@@ -303,8 +339,7 @@ contains
        call addfld( trim(solsym(j))//'_CHMP', '/cm3/s ', pver, 'I', 'chemical production rate', phys_decomp )
        call addfld( trim(solsym(j))//'_CHML', '/cm3/s ', pver, 'I', 'chemical loss rate',       phys_decomp )
     enddo
-    call addfld('H_PEROX_CHMP', '/cm3/s ', pver, 'I', 'total ROOH production rate', phys_decomp )   !PJY changed "RO2" to "ROOH"
-
+    call addfld('H_PEROX_CHMP', '/cm3/s ', pver, 'I', 'total ROOH production rate', phys_decomp ) !PJY changed "RO2" to "ROOH"
   end subroutine imp_slv_inti
   subroutine imp_sol( base_sol, reaction_rates, het_rates, extfrc, delt, &
        xhnm, ncol, lchnk, ltrop, o3s_loss )
@@ -338,9 +373,7 @@ contains
     real(r8), intent(inout) :: base_sol(ncol,pver,gas_pcnst) ! species mixing ratios (vmr)
     real(r8), intent(in) :: xhnm(ncol,pver)
     integer, intent(in) :: ltrop(ncol) ! chemistry troposphere boundary (index)
-
     real(r8), optional, intent(out) :: o3s_loss(ncol,pver)
-
     !-----------------------------------------------------------------------
     ! ... local variables
     !-----------------------------------------------------------------------
@@ -372,8 +405,9 @@ contains
     logical :: converged(max(1,clscnt4))
     real(r8), dimension(ncol,pver,max(1,clscnt4)) :: prod_out, loss_out
     real(r8), dimension(ncol,pver) :: prod_hydrogen_peroxides_out
-
-    o3s_loss(:,:) = 0._r8
+    if (present(o3s_loss)) then
+       o3s_loss(:,:) = 0._r8
+    endif
     prod_out(:,:,:) = 0._r8
     loss_out(:,:,:) = 0._r8
     prod_hydrogen_peroxides_out(:,:) = 0._r8
@@ -591,7 +625,7 @@ contains
           cls_loop2: do k = 1,clscnt4
              j = clsmap(k,4)
              m = permute(k,4)
-             has_o3_chem: if( ( full_ozone_chem .or. reduced_ozone_chem ) .and. (j == ox_ndx .or. j == o3a_ndx )) then
+             has_o3_chem: if( ( full_ozone_chem .or. reduced_ozone_chem .or. middle_atm_chem ) .and. (j == ox_ndx .or. j == o3a_ndx )) then
                 if( o1d_ndx < 1 ) then
                    loss_out(i,lev,k) = reaction_rates(i,lev,ox_l1_ndx)
                 else
@@ -640,16 +674,22 @@ contains
                         + .9_r8* reaction_rates(i,lev,ox_l5_ndx) * base_sol(i,lev,isop_ndx) &
                         + reaction_rates(i,lev,ox_l6_ndx) * base_sol(i,lev,c2h4_ndx) &
                         + reaction_rates(i,lev,ox_l7_ndx) * base_sol(i,lev,ole_ndx)
+                else if ( middle_atm_chem ) then
+                   loss_out(i,lev,k) = loss_out(i,lev,k) &
+                        + reaction_rates(i,lev,ox_l2_ndx) * base_sol(i,lev,oh_ndx) &
+                        + reaction_rates(i,lev,ox_l3_ndx) * base_sol(i,lev,ho2_ndx)
                 endif
                 if (j == ox_ndx) then
-                   loss_out(i,lev,k) = loss_out(i,lev,k) &
-                        + ( reaction_rates(i,lev,usr4_ndx) * base_sol(i,lev,no2_ndx) * base_sol(i,lev,oh_ndx) &
-                        + 3._r8 * reaction_rates(i,lev,usr16_ndx) * base_sol(i,lev,n2o5_ndx) &
-                        + 2._r8 * reaction_rates(i,lev,usr17_ndx) * base_sol(i,lev,no3_ndx) ) &
-                        / max( base_sol(i,lev,ox_ndx),1.e-20_r8 )
-
-                   o3s_loss(i,lev) = loss_out(i,lev,k)
-
+                   if ( .not. middle_atm_chem ) then
+                      loss_out(i,lev,k) = loss_out(i,lev,k) &
+                           + ( reaction_rates(i,lev,usr4_ndx) * base_sol(i,lev,no2_ndx) * base_sol(i,lev,oh_ndx) &
+                           + 3._r8 * reaction_rates(i,lev,usr16_ndx) * base_sol(i,lev,n2o5_ndx) &
+                           + 2._r8 * reaction_rates(i,lev,usr17_ndx) * base_sol(i,lev,no3_ndx) ) &
+                           / max( base_sol(i,lev,ox_ndx),1.e-20_r8 )
+                   end if
+                   if (present(o3s_loss)) then
+                      o3s_loss(i,lev) = loss_out(i,lev,k)
+                   endif
                    loss_out(i,lev,k) = loss_out(i,lev,k) * base_sol(i,lev,ox_ndx)
                    prod_out(i,lev,k) = prod_out(i,lev,k) * base_sol(i,lev,no_ndx)
                 else if (j == o3a_ndx) then
