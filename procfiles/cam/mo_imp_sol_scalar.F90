@@ -34,7 +34,7 @@ module mo_imp_sol
   integer :: ox_p11_ndx
   integer :: ox_l1_ndx, ox_l2_ndx, ox_l3_ndx, ox_l4_ndx, ox_l5_ndx
   integer :: ox_l6_ndx, ox_l7_ndx, ox_l8_ndx, ox_l9_ndx, usr4_ndx
-  integer :: usr16_ndx, usr17_ndx, r63_ndx,c2o3_ndx,ole_ndx
+  integer :: usr16_ndx, usr17_ndx, c2o3_ndx,ole_ndx
   integer :: tolo2_ndx, terpo2_ndx, alko2_ndx, eneo2_ndx, eo2_ndx, meko2_ndx
   integer :: ox_p17_ndx,ox_p12_ndx,ox_p13_ndx,ox_p14_ndx,ox_p15_ndx,ox_p16_ndx
   integer :: lt_cnt
@@ -146,22 +146,118 @@ contains
     end do
     has_o3_chem: if( ox_ndx > 0 ) then
        ox_p1_ndx = get_rxt_ndx( 'ox_p1' )
+       if ( ox_p1_ndx < 0 ) then
+          ox_p1_ndx = get_rxt_ndx( 'NO_HO2' )
+       end if
+       if ( ox_p1_ndx < 0 ) then
+          ox_p1_ndx = get_rxt_ndx( 'cph_NO_HO2' )
+       end if
        ox_p2_ndx = get_rxt_ndx( 'ox_p2' )
+       if ( ox_p2_ndx < 0 ) then
+          ox_p2_ndx = get_rxt_ndx( 'CH3O2_NO' )
+       end if
        ox_p3_ndx = get_rxt_ndx( 'ox_p3' )
+       if ( ox_p3_ndx < 0 ) then
+          ox_p3_ndx = get_rxt_ndx( 'PO2_NO' )
+       end if
        ox_p4_ndx = get_rxt_ndx( 'ox_p4' )
+       if ( ox_p4_ndx < 0 ) then
+          ox_p4_ndx = get_rxt_ndx( 'CH3CO3_NO' )
+       end if
        ox_p5_ndx = get_rxt_ndx( 'ox_p5' )
+       if ( ox_p5_ndx < 0 ) then
+          ox_p5_ndx = get_rxt_ndx( 'C2H5O2_NO' )
+       end if
        ox_p6_ndx = get_rxt_ndx( 'ox_p6' )
+       if ( ox_p6_ndx < 0 ) then
+          ox_p6_ndx = get_rxt_ndx( 'ISOPO2_NO' )
+       end if
        ox_p7_ndx = get_rxt_ndx( 'ox_p7' )
+       if ( ox_p7_ndx < 0 ) then
+          ox_p7_ndx = get_rxt_ndx( 'MACRO2_NO' )
+       end if
+       if ( ox_p7_ndx < 0 ) then
+          ox_p7_ndx = get_rxt_ndx( 'MACRO2_NOa' )
+       end if
        ox_p8_ndx = get_rxt_ndx( 'ox_p8' )
+       if ( ox_p8_ndx < 0 ) then
+          ox_p8_ndx = get_rxt_ndx( 'MCO3_NO' )
+       end if
        ox_p9_ndx = get_rxt_ndx( 'ox_p9' )
+       if ( ox_p9_ndx < 0 ) then
+          ox_p9_ndx = get_rxt_ndx( 'C3H7O2_NO' )
+       end if
        ox_p10_ndx = get_rxt_ndx( 'ox_p10' )
+       if ( ox_p10_ndx < 0 ) then
+          ox_p10_ndx = get_rxt_ndx( 'RO2_NO' )
+       end if
        ox_p11_ndx = get_rxt_ndx( 'ox_p11' )
+       if ( ox_p11_ndx < 0 ) then
+          ox_p11_ndx = get_rxt_ndx( 'XO2_NO' )
+       end if
+       if ( ox_p11_ndx < 0 ) then
+          ox_p11_ndx = get_rxt_ndx( 'tag_XO2_NO' )
+       end if
+       if ( ox_p11_ndx < 0 ) then
+          ox_p11_ndx = get_rxt_ndx( 'r63' )
+       end if
        ox_p12_ndx = get_rxt_ndx( 'ox_p12' )
+       if ( ox_p12_ndx < 0 ) then
+          ox_p12_ndx = get_rxt_ndx( 'TOLO2_NO' )
+       end if
        ox_p13_ndx = get_rxt_ndx( 'ox_p13' )
+       if ( ox_p13_ndx < 0 ) then
+          ox_p13_ndx = get_rxt_ndx( 'TERPO2_NO' )
+       end if
        ox_p14_ndx = get_rxt_ndx( 'ox_p14' )
+       if ( ox_p14_ndx < 0 ) then
+          ox_p14_ndx = get_rxt_ndx( 'ALKO2_NO' )
+       end if
        ox_p15_ndx = get_rxt_ndx( 'ox_p15' )
+       if ( ox_p15_ndx < 0 ) then
+          ox_p15_ndx = get_rxt_ndx( 'ENEO2_NO' )
+       end if
        ox_p16_ndx = get_rxt_ndx( 'ox_p16' )
+       if ( ox_p16_ndx < 0 ) then
+          ox_p16_ndx = get_rxt_ndx( 'EO2_NO' )
+       end if
        ox_p17_ndx = get_rxt_ndx( 'ox_p17' )
+       if ( ox_p17_ndx < 0 ) then
+          ox_p17_ndx = get_rxt_ndx( 'MEKO2_NO' )
+       end if
+       wrk(1:17) = (/ ox_p1_ndx, ox_p2_ndx, ox_p3_ndx, ox_p4_ndx, ox_p5_ndx, &
+            ox_p6_ndx, ox_p7_ndx, ox_p8_ndx, ox_p9_ndx, ox_p10_ndx, ox_p11_ndx, &
+            ox_p12_ndx, ox_p13_ndx, ox_p14_ndx, ox_p15_ndx, ox_p16_ndx, ox_p17_ndx /)
+       if( all( wrk(1:17) > 0 ) ) then
+          full_ozone_chem = .true.
+       end if
+       if ( ox_p11_ndx < 0 ) then
+          ox_p11_ndx = get_rxt_ndx( 'tag_XO2_NO' )
+       end if
+       ox_p12_ndx = get_rxt_ndx( 'ox_p12' )
+       if ( ox_p12_ndx < 0 ) then
+          ox_p12_ndx = get_rxt_ndx( 'TOLO2_NO' )
+       end if
+       ox_p13_ndx = get_rxt_ndx( 'ox_p13' )
+       if ( ox_p13_ndx < 0 ) then
+          ox_p13_ndx = get_rxt_ndx( 'TERPO2_NO' )
+       end if
+       ox_p14_ndx = get_rxt_ndx( 'ox_p14' )
+       if ( ox_p14_ndx < 0 ) then
+          ox_p14_ndx = get_rxt_ndx( 'ALKO2_NO' )
+       end if
+       ox_p15_ndx = get_rxt_ndx( 'ox_p15' )
+       if ( ox_p15_ndx < 0 ) then
+          ox_p15_ndx = get_rxt_ndx( 'ENEO2_NO' )
+       end if
+       ox_p16_ndx = get_rxt_ndx( 'ox_p16' )
+       if ( ox_p16_ndx < 0 ) then
+          ox_p16_ndx = get_rxt_ndx( 'EO2_NO' )
+       end if
+       ox_p17_ndx = get_rxt_ndx( 'ox_p17' )
+       if ( ox_p17_ndx < 0 ) then
+          ox_p17_ndx = get_rxt_ndx( 'MEKO2_NO' )
+       end if
        wrk(1:17) = (/ ox_p1_ndx, ox_p2_ndx, ox_p3_ndx, ox_p4_ndx, ox_p5_ndx, &
             ox_p6_ndx, ox_p7_ndx, ox_p8_ndx, ox_p9_ndx, ox_p10_ndx, ox_p11_ndx, &
             ox_p12_ndx, ox_p13_ndx, ox_p14_ndx, ox_p15_ndx, ox_p16_ndx, ox_p17_ndx /)
@@ -169,21 +265,11 @@ contains
           full_ozone_chem = .true.
        end if
        if ( .not. full_ozone_chem ) then
-          r63_ndx = get_rxt_ndx( 'r63' )
-          wrk(1:4) = (/ ox_p1_ndx, ox_p2_ndx, ox_p3_ndx, r63_ndx/)
+          wrk(1:4) = (/ ox_p1_ndx, ox_p2_ndx, ox_p3_ndx, ox_p11_ndx/)
           if( all( wrk(1:4) > 0 ) ) then
              reduced_ozone_chem = .true.
           end if
           if ( .not. reduced_ozone_chem ) then
-             if ( ox_p1_ndx < 0 ) then
-                ox_p1_ndx = get_rxt_ndx( 'NO_HO2' )
-             end if
-             if ( ox_p1_ndx < 0 ) then
-                ox_p1_ndx = get_rxt_ndx( 'cph_NO_HO2' )
-             end if
-             if ( ox_p2_ndx < 0 ) then
-                ox_p2_ndx = get_rxt_ndx( 'CH3O2_NO' )
-             end if
              wrk(1:2) = (/ ox_p1_ndx, ox_p2_ndx/)
              if( all( wrk(1:2) > 0 ) ) then
                 middle_atm_chem = .true.
@@ -192,13 +278,43 @@ contains
        endif
        if( full_ozone_chem .or. reduced_ozone_chem .or. middle_atm_chem ) then
           ox_l1_ndx = get_rxt_ndx( 'ox_l1' )
+          if ( ox_l1_ndx < 0 ) then
+            ox_l1_ndx = get_rxt_ndx( 'O1D_H2O' )
+          end if
           ox_l2_ndx = get_rxt_ndx( 'ox_l2' )
+          if ( ox_l2_ndx < 0 ) then
+            ox_l2_ndx = get_rxt_ndx( 'OH_O3' )
+          end if
+          if ( ox_l2_ndx < 0 ) then
+            ox_l2_ndx = get_rxt_ndx( 'cph_OH_O3' )
+          end if
           ox_l3_ndx = get_rxt_ndx( 'ox_l3' )
+          if ( ox_l3_ndx < 0 ) then
+            ox_l3_ndx = get_rxt_ndx( 'HO2_O3' )
+          end if
+          if ( ox_l3_ndx < 0 ) then
+            ox_l3_ndx = get_rxt_ndx( 'cph_HO2_O3' )
+          end if
           ox_l4_ndx = get_rxt_ndx( 'ox_l4' )
+          if ( ox_l4_ndx < 0 ) then
+            ox_l4_ndx = get_rxt_ndx( 'C3H6_O3' )
+          end if
           ox_l5_ndx = get_rxt_ndx( 'ox_l5' )
+          if ( ox_l5_ndx < 0 ) then
+            ox_l5_ndx = get_rxt_ndx( 'ISOP_O3' )
+          end if
           ox_l6_ndx = get_rxt_ndx( 'ox_l6' )
+          if ( ox_l6_ndx < 0 ) then
+            ox_l6_ndx = get_rxt_ndx( 'C2H4_O3' )
+          end if
           ox_l7_ndx = get_rxt_ndx( 'ox_l7' )
+          if ( ox_l7_ndx < 0 ) then
+            ox_l7_ndx = get_rxt_ndx( 'MVK_O3' )
+          end if
           ox_l8_ndx = get_rxt_ndx( 'ox_l8' )
+          if ( ox_l8_ndx < 0 ) then
+            ox_l8_ndx = get_rxt_ndx( 'MACR_O3' )
+          end if
           ox_l9_ndx = get_rxt_ndx( 'ox_l9' )
           if( ox_l9_ndx < 1 ) then
              ox_l9_ndx = get_rxt_ndx( 'soa1' )
@@ -251,27 +367,11 @@ contains
              end if
           endif
           if ( middle_atm_chem ) then
-             if ( ox_l1_ndx < 0 ) then
-                ox_l1_ndx = get_rxt_ndx( 'O1D_H2O' )
-             end if
-             if ( ox_l2_ndx < 0 ) then
-                ox_l2_ndx = get_rxt_ndx( 'OH_O3' )
-             end if
-             if ( ox_l2_ndx < 0 ) then
-                ox_l2_ndx = get_rxt_ndx( 'cph_OH_O3' )
-             end if
-             if ( ox_l3_ndx < 0 ) then
-                ox_l3_ndx = get_rxt_ndx( 'HO2_O3' )
-             end if
-             if ( ox_l3_ndx < 0 ) then
-                ox_l3_ndx = get_rxt_ndx( 'cph_HO2_O3' )
-             end if
              wrk(1:3) = (/ ox_l1_ndx, ox_l2_ndx, ox_l3_ndx /)
              if( any( wrk(1:3) < 1 ) ) then
                 middle_atm_chem = .false.
              end if
           endif
-
           oh_ndx = get_spc_ndx( 'OH' )
           ho2_ndx = get_spc_ndx( 'HO2' )
           ch3o2_ndx = get_spc_ndx( 'CH3O2' )
@@ -667,7 +767,7 @@ contains
                    prod_out(i,lev,k) = reaction_rates(i,lev,ox_p1_ndx ) * base_sol(i,lev,ho2_ndx) &
                         + reaction_rates(i,lev,ox_p2_ndx ) * base_sol(i,lev,ch3o2_ndx) &
                         + reaction_rates(i,lev,ox_p3_ndx ) * base_sol(i,lev,c2o3_ndx) &
-                        + reaction_rates(i,lev,r63_ndx ) * base_sol(i,lev,xo2_ndx)
+                        + reaction_rates(i,lev,ox_p11_ndx ) * base_sol(i,lev,xo2_ndx)
                    loss_out(i,lev,k) = loss_out(i,lev,k) &
                         + reaction_rates(i,lev,ox_l2_ndx) * base_sol(i,lev,oh_ndx) &
                         + reaction_rates(i,lev,ox_l3_ndx) * base_sol(i,lev,ho2_ndx) &
@@ -718,23 +818,23 @@ contains
 !
 ! added code for ROOH production !PJY not "RO2 production"
 !
-       if ( trim(solsym(j)) == 'ALKOOH'    &
-        .or.trim(solsym(j)) == 'C2H5OOH'   &
-        .or.trim(solsym(j)) == 'CH3OOH'    &      !PJY added this
-        .or.trim(solsym(j)) == 'CH3COOH'   &
-        .or.trim(solsym(j)) == 'CH3COOOH'  &
-        .or.trim(solsym(j)) == 'C3H7OOH'   &      !PJY corrected this (from CH3H7OOH)
-        .or.trim(solsym(j)) == 'EOOH'      &
-!        .or.trim(solsym(j)) == 'H2O2'      &      !PJY removed as H2O2 production asked for separately (as I read 4.2.3, point 7)
-!        .or.trim(solsym(j)) == 'HCOOH'     &      !PJY removed this as this is formic acid HC(O)OH - i.e. not H-C-O-O-H
-        .or.trim(solsym(j)) == 'ISOPOOH'   &
-        .or.trim(solsym(j)) == 'MACROOH'   &
-        .or.trim(solsym(j)) == 'MEKOOH'    &
-        .or.trim(solsym(j)) == 'POOH'      &
-        .or.trim(solsym(j)) == 'ROOH'      &
-        .or.trim(solsym(j)) == 'TERPOOH'   &
-        .or.trim(solsym(j)) == 'TOLOOH'    &
-        .or.trim(solsym(j)) == 'XOOH'      ) then
+       if ( trim(solsym(j)) == 'ALKOOH' &
+        .or.trim(solsym(j)) == 'C2H5OOH' &
+        .or.trim(solsym(j)) == 'CH3OOH' & !PJY added this
+        .or.trim(solsym(j)) == 'CH3COOH' &
+        .or.trim(solsym(j)) == 'CH3COOOH' &
+        .or.trim(solsym(j)) == 'C3H7OOH' & !PJY corrected this (from CH3H7OOH)
+        .or.trim(solsym(j)) == 'EOOH' &
+! .or.trim(solsym(j)) == 'H2O2' & !PJY removed as H2O2 production asked for separately (as I read 4.2.3, point 7)
+! .or.trim(solsym(j)) == 'HCOOH' & !PJY removed this as this is formic acid HC(O)OH - i.e. not H-C-O-O-H
+        .or.trim(solsym(j)) == 'ISOPOOH' &
+        .or.trim(solsym(j)) == 'MACROOH' &
+        .or.trim(solsym(j)) == 'MEKOOH' &
+        .or.trim(solsym(j)) == 'POOH' &
+        .or.trim(solsym(j)) == 'ROOH' &
+        .or.trim(solsym(j)) == 'TERPOOH' &
+        .or.trim(solsym(j)) == 'TOLOOH' &
+        .or.trim(solsym(j)) == 'XOOH' ) then
 !
           prod_hydrogen_peroxides_out(:,:) = prod_hydrogen_peroxides_out(:,:) + prod_out(:,:,i)
 !
