@@ -45,7 +45,7 @@
       integer, parameter :: heterogeneous = 3, extraneous = 4
 
       character(len=16) :: param
-      character(len=16) :: rxparms(prd_lim)
+      character(len=32) :: rxparms(prd_lim)
       character(len=16) :: sym_rate(5)
       character(len=16) :: keywords(4) = (/ 'PHOTOLYSIS      ', &
 	                                    'REACTIONS       ', &
@@ -698,10 +698,10 @@ ext_tok_loop :    do j = 1,tokcnt
       integer, intent(in)  ::     nchar
       integer, intent(out) ::     rxtcnt, prdcnt
       real, intent(out)    ::     rate(*), pcoeffs(prd_lim)
-      character(len=*), intent(out)  ::  loc_rxt_tag
-      character(len=16), intent(out) ::  rxtsym(rxtnt_lim), prdsym(prd_lim)
-      character(len=16), intent(out) :: prdprms(prd_lim)
-      character(len=16), intent(out) :: sym_rate(*)
+      character(len=*), intent(out) ::  loc_rxt_tag
+      character(len=*), intent(out) ::  rxtsym(rxtnt_lim), prdsym(prd_lim)
+      character(len=*), intent(out) :: prdprms(prd_lim)
+      character(len=*), intent(out) :: sym_rate(*)
       logical, intent(in)  ::     is_photorate
       logical, intent(out) ::     coeff_flg
       logical, intent(out) ::     cph_flg
@@ -801,7 +801,7 @@ ext_tok_loop :    do j = 1,tokcnt
          call gettokens( buff(start:), &
                          length, &
                          '+', &
-                         16, &
+                         len(prdprms(1)), &
                          prdprms, &
                          slen, &
                          prd_lim, &
@@ -843,7 +843,7 @@ ext_tok_loop :    do j = 1,tokcnt
          call gettokens( buff(start:), &
                          ncharl-start+1, &
                          ',', &
-                         16, &
+                         len(rxparms(1)), &
                          rxparms, &
                          slen, &
                          5, &
@@ -871,6 +871,7 @@ ext_tok_loop :    do j = 1,tokcnt
 !-----------------------------------------------------------------------
       do
          call cardin( lin, buffl, ncharl )
+
          buffhl = buffl
          call upcase( buffhl )
          if( .not. is_photorate .and. buffhl == 'ENDREACTIONS' ) then
@@ -901,7 +902,7 @@ ext_tok_loop :    do j = 1,tokcnt
          call gettokens( buffl(2:), &
                          ncharl-1, &
                          '+', &
-                         16, &
+                         len(prdprms(prdcnt+1)), &
                          prdprms(prdcnt+1), &
                          slen(prdcnt+1), &
                          prd_lim-prdcnt, &
@@ -1236,9 +1237,9 @@ rxtnt_scan : &
 !-----------------------------------------------------------------------
       integer, intent(in) :: line_cnt, irxn
       real, intent(in)    :: rate(:)
-      character(len=320), intent(inout) :: buff
-      character(len=16), intent(in)     :: sym_rate(:)
-      character(len=*), intent(in)      :: loc_rxt_tag
+      character(len=*), intent(inout) :: buff
+      character(len=*), intent(in)    :: sym_rate(:)
+      character(len=*), intent(in)    :: loc_rxt_tag
 
 !-----------------------------------------------------------------------
 !        ... Local variables
