@@ -29,6 +29,7 @@
                             indexh2o  = INDEXH2O, &  ! index of water vapor density
                             clsze     = CLSZE, &     ! loop length for implicit chemistry
                             rxt_tag_cnt = RXTTAGCNT, &
+                            enthalpy_cnt = ENTHALPYCNT, &
                             nslvd     = NSLVD
 
       integer   :: clscnt(5)            = 0
@@ -46,6 +47,8 @@
 # if GRPCNT != 0
       real(r8)  :: nadv_mass(grpcnt)    = 0._r8
 # endif
+      real(r8), allocatable :: cph_enthalpy(:)
+      integer,  allocatable :: cph_rid(:)
 
       integer, allocatable :: rxt_tag_map(:)
       real(r8), allocatable :: pht_alias_mult(:,:)

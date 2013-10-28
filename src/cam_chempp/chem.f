@@ -3,11 +3,13 @@
 
       implicit none
 
+      private
+      public :: chem
+
       character(len=256) :: buff
       character(len=256) :: buffh
 
-      private
-      public :: chem
+      integer, private,parameter   :: dp = selected_real_kind( 12 )
 
       contains
 
@@ -28,7 +30,7 @@
 			  pcoeff_cnt, pcoeff_ind, pcoeff, sym_rates, &
 			  phtsym, phtcnt, pht_alias, pht_alias_mult, rxt_lim, rxt_tag, &
                           prd_lim, rxtnt_lim
-      use rxt_mod, only : has_cph => cph_flg
+      use rxt_mod, only : has_cph => cph_flg, enthalpy
       use rxt_mod, only : frc_from_dataset
 
       implicit none
@@ -81,6 +83,7 @@
       real  ::     rate(5), pcoeffs(prd_lim)
 
       logical  ::  cph_flg
+      real(dp) ::  cph_val
       logical  ::  coeff_flg
       logical  ::  found
        
@@ -176,7 +179,7 @@ photolysis_loop : &
 !-----------------------------------------------------------------------
                   call rxtprs( nchar, nr, np, rxtsym, prdsym, &
                                rate, pcoeffs, coeff_flg, rxparms, sym_rate, &
-                               loc_rxt_tag, cph_flg, .true. )
+                               loc_rxt_tag, cph_flg, cph_val, .true. )
 !-----------------------------------------------------------------------
 !        ... Check for reaction string errors from parsing routine
 !-----------------------------------------------------------------------
@@ -388,7 +391,7 @@ gas_phase_rxt_loop : &
 		  sym_rate = ' '
                   call rxtprs( nchar, nr, np, rxtsym, prdsym, &
                                rate, pcoeffs, coeff_flg, rxparms, sym_rate, &
-                               loc_rxt_tag, cph_flg, .false. )
+                               loc_rxt_tag, cph_flg, cph_val, .false. )
 
                   if( nr < 0 ) then
                      call errmes ( 'there are no reactants@', lout, char, 1, buff )
@@ -446,7 +449,8 @@ gas_phase_rxt_loop : &
 		     end if
 		  end do
 		  rxt_tag(rxno) = loc_rxt_tag
-                  has_cph(rxno)   = cph_flg
+                  has_cph(rxno) = cph_flg
+                  if (cph_flg) enthalpy(rxno) = cph_val
                   call outp( rxparms, nr, np, rxtsym, prdsym, sym_rate, rxno-phtcnt, rate, loc_rxt_tag, lout )
 
                   if( nf /= 0 ) then
@@ -671,7 +675,7 @@ ext_tok_loop :    do j = 1,tokcnt
                          prdprms, &
                          sym_rate, &
                          loc_rxt_tag, &
-                         cph_flg, &
+                         cph_flg, cph_val, &
 			 is_photorate )
 
       use io, only : lin, lout
@@ -705,7 +709,7 @@ ext_tok_loop :    do j = 1,tokcnt
       logical, intent(in)  ::     is_photorate
       logical, intent(out) ::     coeff_flg
       logical, intent(out) ::     cph_flg
-      
+      real(dp), intent(out) ::    cph_val
       
 !-----------------------------------------------------------------------
 !	... Local variables
@@ -713,11 +717,14 @@ ext_tok_loop :    do j = 1,tokcnt
       integer  ::   retcod
       integer  ::   ncharl, tprdcnt
       integer  ::   comma
+      integer  ::   cphndx, eqlndx
       integer  ::   k, j, length, ratcnt, start, position
       integer, allocatable  ::   slen(:)
       character(len=320) :: buffl, buffhl
       character(len=16), allocatable  :: rxparms(:)
+      character(len=320) :: cph_val_str
 
+      cph_val = -999.
       rxtcnt = 0
       prdcnt = 0
       coeff_flg = .false.
@@ -737,7 +744,15 @@ ext_tok_loop :    do j = 1,tokcnt
          loc_rxt_tag = buff(j:k)
          comma = index( buff(j:k), ',' )
          if( comma /= 0 ) then
-            if( buff(j+comma:k) == 'cph' ) then
+            cphndx = index( buff(j+comma:k),'cph' )
+            if (cphndx>0) then
+               eqlndx = index( buff(j+comma+cphndx:k),'=' )
+               if (eqlndx>0) then
+                  cph_val_str = buff(j+comma+cphndx+eqlndx:k)
+                  read(cph_val_str,fmt=*) cph_val
+               else
+                  cph_val = 0
+               endif
                cph_flg = .true.
                loc_rxt_tag = buff(j:j+comma-2)
             end if
