@@ -82,6 +82,8 @@
       write(30,100) trim(line)
       line(7:)   = 'use chem_mods,   only : extfrc_lst, inv_lst, slvd_lst'
       write(30,100) trim(line)
+      line(7:)   = 'use chem_mods,   only : enthalpy_cnt, cph_enthalpy, cph_rid'
+      write(30,100) trim(line)
       line(7:)   = 'use abortutils,  only : endrun'
       write(30,100) trim(line)
       line(7:)   = 'use mo_tracname, only : solsym'
@@ -749,7 +751,7 @@
          do n = 1,i,5
             n1 = min( n+4,i )
             if( n1 /= i ) then
-               write(line(m:),'(10(i15,",")," &")') ndx(n:n1)
+               write(line(m:),'(5(i15,",")," &")') ndx(n:n1)
             else
                if( n1 > n ) then
                   write(frmt,'("(",i2)') n1 - n
@@ -769,7 +771,7 @@
          do n = 1,i,5
             n1 = min( n+4,i )
             if( n1 /= i ) then
-               write(line(m:),'(10(f12.6,"_r8,")," &")') enthalpy(ndx(n:n1))
+               write(line(m:),'(5(f12.6,"_r8,")," &")') enthalpy(ndx(n:n1))
             else
                if( n1 > n ) then
                   write(frmt,'("(",i2)') n1 - n
