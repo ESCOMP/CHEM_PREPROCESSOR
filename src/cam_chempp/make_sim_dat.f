@@ -777,7 +777,7 @@
                   write(frmt,'("(",i2)') n1 - n
                   frmt(len_trim(frmt)+1:) = '(f12.6,"_r8,"),f12.6,"_r8 /)")'
                else
-                  frmt = '(f12.6," /)")'
+                  frmt = '(f12.6,"_r8 /)")'
                end if
                write(line(m:),trim(frmt)) enthalpy(ndx(n:n1))
             end if
