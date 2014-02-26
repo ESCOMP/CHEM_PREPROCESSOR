@@ -1,5 +1,5 @@
 
-      subroutine chm_hdr( rxt_tag_cnt, hetcnt, usrcnt, cls_rxt_cnt, radj_flag, phtcnt, &
+      subroutine chm_hdr( rxt_tag_cnt, enthalpy_cnt, hetcnt, usrcnt, cls_rxt_cnt, radj_flag, phtcnt, &
                           rxpcnt, rxparm, rxntot, ncol, nfs, nslvd, &
                           indexm, indexh2o, spcno, relcnt, grpcnt, &
                           clscnt, iter_counts, nzcnt, vec_ftns, machine, chemistry )
@@ -13,6 +13,7 @@
 !        ... Dummy arguments
 !-----------------------------------------------------------------------
       integer, intent(in) ::    rxt_tag_cnt
+      integer, intent(in) ::    enthalpy_cnt
       integer, intent(in) ::    hetcnt                ! count of washout processes
       integer, intent(in) ::    usrcnt                ! count of extraneous forcing
       integer, intent(in) ::    phtcnt                ! count of photorates
@@ -51,6 +52,7 @@
       open( unit = 30, file = 'chem.h' )
 
       write(30,'(''# define RXTTAGCNT '',i5)') rxt_tag_cnt
+      write(30,'(''# define ENTHALPYCNT '',i5)') enthalpy_cnt
       write(30,'(''# define HETCNT '',i5)') hetcnt
       write(30,'(''# define EXTCNT '',i5)') usrcnt
       gascnt = sum( cls_rxt_cnt(1,1:5) )

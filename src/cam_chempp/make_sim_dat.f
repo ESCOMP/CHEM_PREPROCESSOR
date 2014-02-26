@@ -14,6 +14,7 @@
       use rxt_mod, only : rxt_has_tag, rxt_tag
       use rxt_mod, only : phtcnt, pht_alias, pht_alias_mult
       use rxt_mod, only : usrcnt, usrmap, frc_from_dataset
+      use rxt_mod, only : cph_flg, enthalpy
 
       implicit none
 
@@ -41,6 +42,7 @@
       logical  ::  flush
       logical  ::  lexist
       integer  ::  numlen
+      integer  ::  enthalpy_cnt
 
       inquire( file = trim( temp_path ) // 'mo_sim_dat.F', exist = lexist )
       if( lexist ) then
@@ -79,6 +81,8 @@
       line(7:)   = 'use chem_mods,   only : pht_alias_lst, pht_alias_mult'
       write(30,100) trim(line)
       line(7:)   = 'use chem_mods,   only : extfrc_lst, inv_lst, slvd_lst'
+      write(30,100) trim(line)
+      line(7:)   = 'use chem_mods,   only : enthalpy_cnt, cph_enthalpy, cph_rid'
       write(30,100) trim(line)
       line(7:)   = 'use abortutils,  only : endrun'
       write(30,100) trim(line)
@@ -697,6 +701,91 @@
             end do
          end do
       end if
+
+!-------------------------------------------------------------------
+!	... Enthalpy / Chem potential heating
+!-------------------------------------------------------------------
+      enthalpy_cnt = count( cph_flg )
+
+      i = enthalpy_cnt
+      has_cph: if (i>0) then
+
+         allocate( ndx(i) )
+         l = 0
+         do m = 1,rxntot
+            if( cph_flg(m) ) then
+               l = l + 1
+               ndx(l) = m
+            end if
+         end do
+         line = ' '
+
+         line(7:) = 'allocate( cph_enthalpy(enthalpy_cnt),stat=ios )'
+         write(30,100) trim(line)
+         line(7:) = 'if( ios /= 0 ) then'
+         write(30,100) trim(line)
+         line = ' '
+         line(10:) = 'write(iulog,*) ''set_sim_dat: failed to allocate cph_enthalpy; error = '',ios'
+         write(30,100) trim(line)
+         line(10:) = 'call endrun'
+         write(30,100) trim(line)
+         line(7:) = 'end if'
+         write(30,100) trim(line)
+
+
+         line(7:) = 'allocate( cph_rid(enthalpy_cnt),stat=ios )'
+         write(30,100) trim(line)
+         line(7:) = 'if( ios /= 0 ) then'
+         write(30,100) trim(line)
+         line = ' '
+         line(10:) = 'write(iulog,*) ''set_sim_dat: failed to allocate cph_rid; error = '',ios'
+         write(30,100) trim(line)
+         line(10:) = 'call endrun'
+         write(30,100) trim(line)
+         line(7:) = 'end if'
+         write(30,100) trim(line)
+
+
+         line = '      cph_rid(:)      = (/'
+         m = len_trim(line) + 2
+         do n = 1,i,5
+            n1 = min( n+4,i )
+            if( n1 /= i ) then
+               write(line(m:),'(5(i15,",")," &")') ndx(n:n1)
+            else
+               if( n1 > n ) then
+                  write(frmt,'("(",i2)') n1 - n
+                  frmt(len_trim(frmt)+1:) = '(i15,","),i15," /)")'
+               else
+                  frmt = '(i15," /)")'
+               end if
+               write(line(m:),trim(frmt)) ndx(n:n1)
+            end if
+            write(30,'(a)') trim(line)
+            line = ' '
+         end do
+
+
+         line = '      cph_enthalpy(:) = (/'
+         m = len_trim(line) + 2
+         do n = 1,i,5
+            n1 = min( n+4,i )
+            if( n1 /= i ) then
+               write(line(m:),'(5(f12.6,"_r8,")," &")') enthalpy(ndx(n:n1))
+            else
+               if( n1 > n ) then
+                  write(frmt,'("(",i2)') n1 - n
+                  frmt(len_trim(frmt)+1:) = '(f12.6,"_r8,"),f12.6,"_r8 /)")'
+               else
+                  frmt = '(f12.6,"_r8 /)")'
+               end if
+               write(line(m:),trim(frmt)) enthalpy(ndx(n:n1))
+            end if
+            write(30,'(a)') trim(line)
+            line = ' '
+         end do
+
+      endif has_cph
 
       line = ' '
       write(30,100) trim(line)

@@ -144,16 +144,15 @@
       if( trim(model) == 'MOZART' ) then
          line = '      real    ::  im(plnplv)'
       else if( trim(model) == 'CAM' ) then
-         line = '      integer  :: k'
-         write(30,100) trim(line)
          if( march /= 'VECTOR' ) then
-            line = '      real(r8) :: im(ncol)'
+            line = '      real(r8) :: im(ncol,pver)'
          else
             line = '      real(r8) :: im(chnkpnts)'
          end if
       end if
       write(30,100) trim(line)
       line = ' '
+      write(30,100) trim(line)
       write(30,100) trim(line)
       
       first  = .true.
@@ -171,12 +170,6 @@
                   first  = .false.
                   doloop = .true.
                   if( trim(model) == 'CAM' ) then
-                     if( trim(march) /= 'VECTOR' ) then
-                        line(7:) = 'do k = 1,pver'
-                     else
-                        line(7:) = 'do k = 1,chnkpnts'
-                     end if
-                     write(30,100) trim(line)
                      line = ' '
                   end if
                end if
@@ -184,7 +177,7 @@
                   if( trim(model) /= 'CAM' ) then
                      line(10:) = 'im(:) = 1. / m(:)'
                   else if( trim(march) /= 'VECTOR' ) then
-                     line(10:) = 'im(:) = 1._r8 / m(:,k)'
+                     line(10:) = 'im(:,:) = 1._r8 / m(:,:)'
                   else
                      line(10:) = 'im(k) = 1._r8 / m(k)'
                   end if
@@ -204,13 +197,13 @@
                   end do
                else
                   if( trim(march) /= 'VECTOR' ) then
-                     line(10:) = 'rate(:,k,'
+                     line(10:) = 'rate(:,:,'
                      write(line(len_trim(line)+1:),'(i3)') rxno 
-                     line(len_trim(line)+1:) = ') = rate(:,k,'
+                     line(len_trim(line)+1:) = ') = rate(:,:,'
                      write(line(len_trim(line)+1:),'(i3)') rxno 
                      line(len_trim(line)+1:) = ')'
                      do l = 2,j+1
-                        line(strlen(line)+1:) = ' * inv(:,k,'
+                        line(strlen(line)+1:) = ' * inv(:,:,'
                         write(line(strlen(line)+1:),'(i2)') fixmap(k,l,j)
                         line(strlen(line)+1:) = ')'
                      end do
@@ -232,7 +225,7 @@
                      line(strlen(line)+1:) = ' * im(:)'
                   else
                      if( trim(march) /= 'VECTOR' ) then
-                        line(strlen(line)+1:) = ' * im(:)'
+                        line(strlen(line)+1:) = ' * im(:,:)'
                      else
                         line(strlen(line)+1:) = ' * im(k)'
                      end if
@@ -258,11 +251,11 @@
             line(len_trim(line)+1:) = ') * m(:)'
          else
             if( march /= 'VECTOR' ) then
-               line(10:) = 'rate(:,k,'
+               line(10:) = 'rate(:,:,'
                write(line(len_trim(line)+1:),'(i3)') rxno 
-               line(len_trim(line)+1:) = ') = rate(:,k,'
+               line(len_trim(line)+1:) = ') = rate(:,:,'
                write(line(len_trim(line)+1:),'(i3)') rxno 
-               line(len_trim(line)+1:) = ') * m(:,k)'
+               line(len_trim(line)+1:) = ') * m(:,:)'
             else
                line(10:) = 'rate(k,'
                write(line(len_trim(line)+1:),'(i3)') rxno 
@@ -276,8 +269,6 @@
 
       if( model == 'CAM' ) then
          if ( rxmcnt > 0 .or. fixcnt(1) > 0 .or. fixcnt(2) > 0 ) then
-            line(7:) = 'end do'
-            write(30,100) trim(line)
          endif
       end if
       line = ' '

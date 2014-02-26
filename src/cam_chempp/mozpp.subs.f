@@ -225,6 +225,17 @@
 	 if( card(chars:chars) == '*' ) then
 	    cycle
 	 end if
+!-----------------------------------------------------------------------
+!       ... strip all characters following a '#' or '!' character
+!-----------------------------------------------------------------------
+         i = index( card, '#' )
+         if( i == 0 ) then
+           i = index( card, '!' )
+         endif
+         if( i > 0 ) then
+           card(i:) = ' '
+         endif
+
          chars = 0
          do i = 1,slen
             if( compress ) then

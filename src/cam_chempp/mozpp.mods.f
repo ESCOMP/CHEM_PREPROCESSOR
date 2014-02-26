@@ -516,6 +516,8 @@
 
       implicit none
 
+      integer, private,parameter   :: dp = selected_real_kind( 12 )
+
       integer :: rxt_lim
       integer :: rxtnt_lim
       integer :: prd_lim, prd_limp1
@@ -577,6 +579,8 @@
                    rxt_has_alias(:) 
       logical, allocatable :: &
                    cph_flg(:) 
+      real(dp), allocatable :: &
+                   enthalpy(:) 
       logical, allocatable :: &
                    frc_from_dataset(:)
 
@@ -748,6 +752,12 @@
 	 stop
       end if
       cph_flg(:) = .false.
+      allocate( enthalpy(rxt_lim),stat=astat )
+      if( astat /= 0 ) then
+	 write(*,*) 'RXT_INI: Failed to allocate enthalpy'
+	 stop
+      end if
+      enthalpy(:) = 0
       allocate( pht_alias(rxt_lim,2),pht_alias_mult(rxt_lim,2),stat=astat )
       if( astat /= 0 ) then
 	 write(*,*) 'RXT_INI: Failed to allocate pht_alias,pht_alias_mult'

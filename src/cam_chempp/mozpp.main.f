@@ -24,6 +24,7 @@
       use sp_mods,     only : sparsity
       use mo_ver_opts, only : ver_opts
       use rxt_equations_mod
+      use rxt_mod, only : cph_flg
 
       implicit none
 
@@ -116,6 +117,7 @@
       logical ::  longnames = .false.           ! do not use long names
 
       integer :: rxt_tag_cnt
+      integer :: enthalpy_cnt
       character(len=32) :: rxt_rates_conv_file =  'mo_rxt_rates_conv.F90'
 
       type(SPARSITY) :: sparse(2)
@@ -1629,11 +1631,12 @@ sparse_matrix_loop : &
       close( 20)
 
      rxt_tag_cnt = count( rxt_has_tag )
+     enthalpy_cnt = count( cph_flg )
 
 !-----------------------------------------------------------------------
 !        ... Write the chemistry header file
 !-----------------------------------------------------------------------
-      call chm_hdr( rxt_tag_cnt, hetcnt, usrcnt, cls_rxt_cnt, radj_flag, phtcnt, &
+      call chm_hdr( rxt_tag_cnt, enthalpy_cnt, hetcnt, usrcnt, cls_rxt_cnt, radj_flag, phtcnt, &
                     rxpcnt, rxparm, rxntot, ncol, nfs, nslvd, &
                     indexm, indexh2o, new_nq, relcnt, grp_mem_cnt, &
                     clscnt, iter_counts, nzcnt, vec_ftns, machine, options(1) )
