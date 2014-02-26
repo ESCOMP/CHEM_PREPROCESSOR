@@ -725,14 +725,17 @@ contains
           cls_loop2: do k = 1,clscnt4
              j = clsmap(k,4)
              m = permute(k,4)
-             has_o3_chem: if( ( full_ozone_chem .or. reduced_ozone_chem .or. middle_atm_chem ) .and. (j == ox_ndx .or. j == o3a_ndx )) then
+             has_o3_chem: if( ( full_ozone_chem .or. reduced_ozone_chem .or. middle_atm_chem ) .and. &
+                              (j == ox_ndx .or. j == o3a_ndx )) then
                 if( o1d_ndx < 1 ) then
                    loss_out(i,lev,k) = reaction_rates(i,lev,ox_l1_ndx)
                 else
                    if (j == ox_ndx) &
-                      loss_out(i,lev,k) = reaction_rates(i,lev,ox_l1_ndx) * base_sol(i,lev,o1d_ndx)/base_sol(i,lev,ox_ndx)
+                      loss_out(i,lev,k) = reaction_rates(i,lev,ox_l1_ndx) * base_sol(i,lev,o1d_ndx) &
+                                          / base_sol(i,lev,ox_ndx)
                    if (j == o3a_ndx) &
-                      loss_out(i,lev,k) = reaction_rates(i,lev,ox_l1_ndx) * base_sol(i,lev,o1da_ndx)/base_sol(i,lev,o3a_ndx)
+                      loss_out(i,lev,k) = reaction_rates(i,lev,ox_l1_ndx) * base_sol(i,lev,o1da_ndx)&
+                                          / base_sol(i,lev,o3a_ndx)
                    if ( h2o_ndx > 0 ) &
                       loss_out(i,lev,k) = loss_out(i,lev,k) * base_sol(i,lev,h2o_ndx)
                 end if
