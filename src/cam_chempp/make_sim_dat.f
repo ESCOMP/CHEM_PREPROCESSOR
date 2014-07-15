@@ -70,29 +70,29 @@
       write(30,100) trim(line)
       line = ' '
       write(30,100) trim(line)
-      line(7:)   = 'use chem_mods,   only : clscnt, cls_rxt_cnt, clsmap, permute, adv_mass, fix_mass, crb_mass'
+      line(7:)   = 'use chem_mods,     only : clscnt, cls_rxt_cnt, clsmap, permute, adv_mass, fix_mass, crb_mass'
       write(30,100) trim(line)
       if( clscnt(4) > 0 ) then
-        line(7:) = 'use chem_mods,   only : diag_map'
+        line(7:) = 'use chem_mods,     only : diag_map'
         write(30,100) trim(line)
       endif
-      line(7:)   = 'use chem_mods,   only : phtcnt, rxt_tag_cnt, rxt_tag_lst, rxt_tag_map'
+      line(7:)   = 'use chem_mods,     only : phtcnt, rxt_tag_cnt, rxt_tag_lst, rxt_tag_map'
       write(30,100) trim(line)
-      line(7:)   = 'use chem_mods,   only : pht_alias_lst, pht_alias_mult'
+      line(7:)   = 'use chem_mods,     only : pht_alias_lst, pht_alias_mult'
       write(30,100) trim(line)
-      line(7:)   = 'use chem_mods,   only : extfrc_lst, inv_lst, slvd_lst'
+      line(7:)   = 'use chem_mods,     only : extfrc_lst, inv_lst, slvd_lst'
       write(30,100) trim(line)
-      line(7:)   = 'use chem_mods,   only : enthalpy_cnt, cph_enthalpy, cph_rid'
+      line(7:)   = 'use chem_mods,     only : enthalpy_cnt, cph_enthalpy, cph_rid'
       write(30,100) trim(line)
-      line(7:)   = 'use abortutils,  only : endrun'
+      line(7:)   = 'use cam_abortutils,only : endrun'
       write(30,100) trim(line)
-      line(7:)   = 'use mo_tracname, only : solsym'
+      line(7:)   = 'use mo_tracname,   only : solsym'
       write(30,100) trim(line)
-      line(7:)   = 'use chem_mods,   only : frc_from_dataset'
+      line(7:)   = 'use chem_mods,     only : frc_from_dataset'
       write(30,100) trim(line)
-      line(7:)   = 'use shr_kind_mod,only : r8 => shr_kind_r8'
+      line(7:)   = 'use shr_kind_mod,  only : r8 => shr_kind_r8'
       write(30,100) trim(line)
-      line(7:)   = 'use cam_logfile, only : iulog'
+      line(7:)   = 'use cam_logfile,   only : iulog'
       write(30,100) trim(line)
       line = ' '
       write(30,100) trim(line)
