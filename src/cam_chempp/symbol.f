@@ -27,7 +27,7 @@ subroutine SYMBOL( iout )
   integer  ::  symbol_len
 
   integer, allocatable ::      toklen(:)
-  integer  ::  j, k, jl, l, ic, m, count,acount
+  integer  ::  j,jj, k, jl, l, ic, m, count,acount
   integer  ::  jeq, no_tokens, relcnt
 
   character(len=80), allocatable ::  tokens(:)
@@ -335,6 +335,7 @@ subroutine SYMBOL( iout )
         !-----------------------------------------------------------------------
         !     ... The Short Lived Species
         !-----------------------------------------------------------------------
+        jj=0
         do
 
            call CARDIN( lin, buff, nchar )
@@ -363,12 +364,11 @@ subroutine SYMBOL( iout )
               if( .not. found ) then
                  call ERRMES( 'Short Lived Species # not in sol,pce lists@', lout, tokens(j), toklen(j), buff )
               end if
-
-              slvdsym(j) = trim(tokens(j))
+              jj=jj+1
+              slvdsym(jj) = trim(tokens(j))
            enddo
 
-           nslvd = no_tokens
-
+           nslvd = jj
 
         end do
      

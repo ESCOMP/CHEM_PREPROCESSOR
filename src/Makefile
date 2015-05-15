@@ -56,43 +56,43 @@ all: $(MODEL_EXEDIR)/$(EXENAME)
 #------------------------------------------------------------------------
 
 # guess default compiler 
-ifeq ($(COMPILER),$(null))
+ifeq ($(USER_FC),$(null))
 
 #------------------------------------------------------------------------
 # Linux -- including pleiades
 #------------------------------------------------------------------------
 ifeq ($(UNAMES),Linux)
-  COMPILER := pgf95
+  USER_FC := pgf95
 endif
 #------------------------------------------------------------------------
 # Altix (columbia)
 #------------------------------------------------------------------------
 ifeq ($(UNAMEM),ia64)
-  COMPILER := ifort
+  USER_FC := ifort
 endif
 #------------------------------------------------------------------------
 # Alpha
 #------------------------------------------------------------------------
 ifeq ($(UNAMEM),alpha)
-  COMPILER := f95
+  USER_FC := f95
 endif
 #------------------------------------------------------------------------
 # AIX ?
 #------------------------------------------------------------------------
 ifeq ($(UNAMES),AIX)
-  COMPILER := xlf95
+  USER_FC := xlf95
 endif
 #------------------------------------------------------------------------
 # BG/L, BG/P
 #------------------------------------------------------------------------
 ifeq ($(UNAMEM),ppc64)
-  COMPILER := xlf95
+  USER_FC := xlf95
 endif
 #------------------------------------------------------------------------
 # SGI
 #------------------------------------------------------------------------
 ifeq ($(UNAMES),IRIX64)
-  COMPILER := f90
+  USER_FC := f90
   MACHFLGS := -OPT:Olimit=8200
 endif
 
@@ -105,44 +105,44 @@ endif
 #------------------------------------------------------------------------
 # set compiler flags ...
 #------------------------------------------------------------------------
-ifeq ($(COMPILER),ifort)
+ifeq ($(USER_FC),ifort)
   FFLAGS      :=  -O2 -c -132 -ftz -g -FR  -I $(OBJ_DIR)
   ifeq ($(DEBUG),TRUE)
     FFLAGS    += -CB
   endif
 endif
-ifeq ($(COMPILER),lf95)
+ifeq ($(USER_FC),lf95)
   ifeq ($(DEBUG),TRUE)
     FFLAGS    := --nfix --nap --chk --g --npca --nsav --trace --trap -c --mod $(OBJ_DIR) -O
   else
     FFLAGS    := --nfix --nap --nchk --ng --npca --nsav --ntrace -c --mod $(OBJ_DIR) -O2
   endif
 endif
-ifeq ($(COMPILER),pgf90)
+ifeq ($(USER_FC),pgf90)
   FFLAGS      := -O2 -c -g -Mfree -module $(OBJ_DIR)
   ifeq ($(DEBUG),TRUE)
     FFLAGS    += -C
   endif
 endif
-ifeq ($(COMPILER),pgf95)
+ifeq ($(USER_FC),pgf95)
   FFLAGS      := -O2 -c -g -Mfree -module $(OBJ_DIR)
   ifeq ($(DEBUG),TRUE)
     FFLAGS    += -C
   endif
 endif
-ifeq ($(COMPILER),f90)
+ifeq ($(USER_FC),f90)
   FFLAGS      := -c -freeform -I $(OBJ_DIR) -O2 $(MACHFLGS)
 endif
-ifeq ($(COMPILER),f95)
+ifeq ($(USER_FC),f95)
   FFLAGS      := -O4 -c -tune host -arch host -free -module $(OBJ_DIR) -I $(OBJ_DIR)
 endif
-ifeq ($(COMPILER),xlf95)
+ifeq ($(USER_FC),xlf95)
   FFLAGS      := -g -c -qarch=auto -qnosave -qfree=f90 -qmoddir=$(OBJ_DIR) -I $(OBJ_DIR) -qstrict -O3
 endif
-ifeq ($(COMPILER),gfortran)
+ifeq ($(USER_FC),gfortran)
   FFLAGS      := -g -c -ffree-form
 endif
-ifeq ($(COMPILER),g95)
+ifeq ($(USER_FC),g95)
   FFLAGS      := -g -c -ffree-form
 endif
 
@@ -150,7 +150,7 @@ endif
 #------------------------------------------------------------------------
 #------------------------------------------------------------------------
 
-FC := $(COMPILER)
+FC := $(USER_FC)
 
 #------------------------------------------------------------------------
 # Default rules
