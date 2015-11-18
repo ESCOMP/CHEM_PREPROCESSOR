@@ -25,6 +25,7 @@
       use mo_ver_opts, only : ver_opts
       use rxt_equations_mod
       use rxt_mod, only : cph_flg
+      use utils
 
       implicit none
 

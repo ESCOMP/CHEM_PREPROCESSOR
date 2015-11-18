@@ -1,6 +1,7 @@
 module rxt_equations_mod
   use VAR_MOD, only : var_lim
   use RXT_MOD, only : rxt_lim, prd_lim, prd_limp1
+  use utils, only: get_index
 
   implicit none
 
@@ -251,7 +252,6 @@ contains
     character(len=16) :: symbol
     character(len=6) :: num
 
-    integer  :: GET_INDEX
     integer  :: irx
 
     doc_piece = ' '
@@ -261,7 +261,7 @@ contains
        irx = - rxno
     end if
     do j = 1,2
-       index = GET_INDEX( fixmap(1,1,j), var_lim, 3, 1, irx )
+       index = get_index( fixmap(1,1,j), var_lim, 3, 1, irx )
        if( index /= 0 ) then
           do l = 2,3
 

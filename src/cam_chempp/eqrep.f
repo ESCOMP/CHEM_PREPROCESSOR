@@ -1,4 +1,6 @@
+module utils
 
+ contains
       subroutine EQUATION_REP(  &
                    nq, &
                    solsym, &
@@ -162,15 +164,24 @@
                   end if
                   production = .true.
                   rxno = rxmap(j,1,i)
-                  if( coeff_ind(rxno) /= 0 .and. coeffs(k-(i+1),coeff_ind(rxno)) /= 1.e0 ) then
-                     call NUMCON( eq_piece(buf_pos:), coeffs(k-(i+1),coeff_ind(rxno)), 'l' )
-                     buf_pos = LEN_TRIM( eq_piece ) + 1
-                     if( rxno > phtcnt ) then
-                        eq_piece(buf_pos:) = '*r'
+                  if( coeff_ind(rxno) /= 0 ) then
+                     if ( coeffs(k-(i+1),coeff_ind(rxno)) /= 1.e0 ) then
+                        call NUMCON( eq_piece(buf_pos:), coeffs(k-(i+1),coeff_ind(rxno)), 'l' )
+                        buf_pos = LEN_TRIM( eq_piece ) + 1
+                        if( rxno > phtcnt ) then
+                           eq_piece(buf_pos:) = '*r'
+                        else
+                           eq_piece(buf_pos:) = '*j'
+                        end if
+                        buf_pos = buf_pos + 2
                      else
-                        eq_piece(buf_pos:) = '*j'
+                        if( rxno > phtcnt ) then
+                           eq_piece(buf_pos:) = 'r'
+                        else
+                           eq_piece(buf_pos:) = 'j'
+                        end if
+                        buf_pos = buf_pos + 1
                      end if
-                     buf_pos = buf_pos + 2
                   else
                      if( rxno > phtcnt ) then
                         eq_piece(buf_pos:) = 'r'
@@ -179,6 +190,7 @@
                      end if
                      buf_pos = buf_pos + 1
                   end if
+
                   if( rxno > phtcnt ) then
                      call NUMCON( eq_piece(buf_pos:), REAL(rxno-phtcnt), 'l' )
                   else
@@ -406,3 +418,5 @@
 
 
       end subroutine SET_FIXED_REACTANTS
+
+end module utils
