@@ -394,8 +394,6 @@ module utils
       integer  ::  j, l, index, length
       character(len=16) ::  symbol
 
-      integer  ::  GET_INDEX
-
       if( rxno < phtcnt ) then
          rxno = - rxno
       end if
