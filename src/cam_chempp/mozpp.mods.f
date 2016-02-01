@@ -127,7 +127,7 @@
       e_table(73) = ELEMENT( 'Fr',223._dp )
       e_table(74) = ELEMENT( 'Ra',226.025_dp )
       e_table(75) = ELEMENT( 'Ac',227.028_dp )
-      e_table(75) = ELEMENT( 'e',.000548567_dp )
+      e_table(76) = ELEMENT( 'E ',.000548567_dp )
 
       do i = 1,100
 	 if( e_table(i)%sym == '  ' ) then
