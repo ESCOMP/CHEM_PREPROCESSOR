@@ -364,7 +364,8 @@ Species_loop : &
          write(num,'(i4)') 1000+m
          select case( march )
             case ( 'VECTOR' )
-               write(line,'(''      call '',a,''linmat'',a,''( ofl, ofu, mat, y, rxt, het_rates )'')') trim(up_hdr),num(3:4)
+               write(line,'(''      call '',a,''linmat'',a,''( ofl, ofu, chnkpnts, mat, y, rxt, het_rates )'')') &
+                   trim(up_hdr),num(3:4)
             case ( 'SCALAR' )
                write(line,'(''      call '',a,''linmat'',a,''( mat, y, rxt, het_rates )'')') trim(up_hdr),num(3:4)
             case default
@@ -433,9 +434,11 @@ Species_loop : &
             end if
          case ( 'VECTOR' )
             if( sub_cnt /= 0 ) then
-               write(line,'(''      subroutine '',a,''linmat'',a,''( ofl, ofu, mat, y, rxt, het_rates )'')') trim(up_hdr),num(2:3)
+               write(line,'(''      subroutine '',a,''linmat'',a,''( ofl, ofu, chnkpnts, mat, y, rxt, het_rates )'')') &
+                          trim(up_hdr),num(2:3)
             else
-               write(line,'(''      subroutine '',a,''linmat( ofl, ofu, mat, y, rxt, het_rates )'')') trim(up_hdr)
+               write(line,'(''      subroutine '',a,''linmat( ofl, ofu, chnkpnts, mat, y, rxt, het_rates )'')') &
+                          trim(up_hdr)
             end if
          case default
             if( sub_cnt /= 0 ) then
@@ -487,11 +490,7 @@ Species_loop : &
             case( 'SCALAR' )
                line = '      use chem_mods, only : gas_pcnst, rxntot, nzcnt'
             case ( 'VECTOR' )
-               if( model /= 'CAM' ) then
-                  line = '      use chem_mods, only : gas_pcnst, rxntot, nzcnt'
-               else
-                  line = ' '
-               end if
+               line = '      use chem_mods, only : gas_pcnst, rxntot, nzcnt'
             case default
                line = '      use chem_mods, only : gas_pcnst, rxntot, nzcnt, clsze'
          end select
@@ -536,6 +535,8 @@ Species_loop : &
             line = '      integer, intent(in) ::  ofl'
             write(30,100) trim(line)
             line = '      integer, intent(in) ::  ofu'
+            write(30,100) trim(line)
+            line = '      integer, intent(in) ::  chnkpnts'
             write(30,100) trim(line)
             line = '      real, intent(in)    ::  y(:,:)'
             write(30,100) trim(line)
@@ -607,15 +608,15 @@ Species_loop : &
             line = '      real(r8), intent(inout) ::  mat(nzcnt)'
             write(30,100) trim(line)
          case ( 'VECTOR' )
-            line = '      integer,  intent(in)    ::  ofl, ofu'
+            line = '      integer,  intent(in)    ::  ofl, ofu, chnkpnts'
             write(30,100) trim(line)
-            line = '      real(r8), intent(in)    ::  y(:,:)'
+            line = '      real(r8), intent(in)    ::  y(chnkpnts,gas_pcnst)'
             write(30,100) trim(line)
-            line = '      real(r8), intent(in)    ::  rxt(:,:)'
+            line = '      real(r8), intent(in)    ::  rxt(chnkpnts,rxntot)'
             write(30,100) trim(line)
-            line = '      real(r8), intent(in)    ::  het_rates(:,:)'
+            line = '      real(r8), intent(in)    ::  het_rates(chnkpnts,gas_pcnst)'
             write(30,100) trim(line)
-            line = '      real(r8), intent(inout) ::  mat(:,:)'
+            line = '      real(r8), intent(inout) ::  mat(chnkpnts,nzcnt)'
             write(30,100) trim(line)
 	    if( sub_cnt /= 0 ) then
                line = ' '

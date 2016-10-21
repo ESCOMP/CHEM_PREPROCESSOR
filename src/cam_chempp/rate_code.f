@@ -106,9 +106,16 @@ contains
        write(30,100) trim(line)
        if( march == 'VECTOR' ) then
           if( subs == 1 ) then
-             line(7:) = 'subroutine setrxt( rate, temp, m, ' // trim(vec_dim) // ' )'
+!            line(7:) = 'subroutine setrxt( rate, temp, m, ' // trim(vec_dim) // ' )'
+             line(7:) = 'subroutine setrxt( rate, temp, m, ncol )'
+             write(30,100) trim(line)
+             write(30,100) ' '
+             line(7:) = 'use ppgrid, only : pcols, pver'
           else
-             line(7:) = 'subroutine setrxt_hrates( rate, temp, m, ' // trim(vec_dim) // ' )'
+             line(7:) = 'subroutine setrxt_hrates( rate, temp, m, ncol, kbot )'
+             write(30,100) trim(line)
+             write(30,100) ' '
+             line(7:) = 'use ppgrid, only : pcols, pver'
           end if
           write(30,100) trim(line)
           line = ' '
@@ -163,13 +170,27 @@ contains
        line = '!-------------------------------------------------------'
        write(30,100) trim(line)
        if( machine == 'NEC' .or. machine == 'FUJITSU' ) then
-          line = '      integer, intent(in) :: ' // trim(vec_dim)
+!         if( subs == 1 ) then
+!           line = '      integer, intent(in) :: ' // trim(vec_dim)
+!         else
+            line = '      integer, intent(in) :: ncol'
+!         endif
           write(30,100) trim(line)
-          line = '      real' // trim(dec_suffix) // ', intent(in)    :: temp(' // trim(vec_dim) // ')'
-          write(30,100) trim(line)
-          line = '      real' // trim(dec_suffix) // ', intent(in)    :: m(' // trim(vec_dim) // ')'
-          write(30,100) trim(line)
-          line = '      real' // trim(dec_suffix) // ', intent(inout) :: rate(' // trim(vec_dim) // ',max(1,rxntot))'
+          if( subs == 1 ) then
+            line = '      real' // trim(dec_suffix) // ', intent(in)    :: temp(pcols,pver)'
+            write(30,100) trim(line)
+            line = '      real' // trim(dec_suffix) // ', intent(in)    :: m(ncol*pver)'
+            write(30,100) trim(line)
+            line = '      real' // trim(dec_suffix) // ', intent(inout) :: rate(ncol*pver,max(1,rxntot))'
+          else
+            line = '      integer, intent(in) :: kbot'
+            write(30,100) trim(line)
+            line = '      real' // trim(dec_suffix) // ', intent(in)    :: temp(pcols,pver)'
+            write(30,100) trim(line)
+            line = '      real' // trim(dec_suffix) // ', intent(in)    :: m(ncol*pver)'
+            write(30,100) trim(line)
+            line = '      real' // trim(dec_suffix) // ', intent(inout) :: rate(ncol*pver,max(1,rxntot))'
+          endif
        else
           select case( model )
           case( 'MOZART' )
@@ -239,13 +260,27 @@ contains
           write(30,100) trim(line)
           line = ' '
           if( model /= 'WRF' ) then
-             line(7:) = 'integer  ::  n'
+             line(7:) = 'integer   ::  n'
              write(30,100) trim(line)
+             if( model == 'CAM' .and. march == 'VECTOR' ) then
+               line(7:) = 'integer   ::  offset'
+               write(30,100) trim(line)
+               if( subs > 1 ) then
+                 line(7:) = 'integer   ::  k'
+                 write(30,100) trim(line)
+               endif
+             endif
           end if
           if( machine == 'NEC' .or. machine == 'FUJITSU' ) then
-             line(7:) = 'real' // trim(dec_suffix) // '  ::  itemp(' // trim(vec_dim) // ')'
-             write(30,100) trim(line)
-             line(7:) = 'real' // trim(dec_suffix) // '  ::  exp_fac(' // trim(vec_dim) // ')'
+             if( subs == 1 ) then
+               line(7:) = 'real' // trim(dec_suffix) // '  :: itemp(ncol*pver)'
+               write(30,100) trim(line)
+               line(7:) = 'real' // trim(dec_suffix) // '  :: exp_fac(ncol*pver)'
+             else
+               line(7:) = 'real' // trim(dec_suffix) // '  :: itemp(ncol*kbot)'
+               write(30,100) trim(line)
+               line(7:) = 'real' // trim(dec_suffix) // '  :: exp_fac(ncol*kbot)'
+             endif
           else
              select case( model )
              case( 'MOZART' )
@@ -272,9 +307,23 @@ contains
        end if temp_dep_rxts
        troe_rxts : if( troecnt /= 0 ) then
           if( machine == 'NEC' .or. machine == 'FUJITSU' ) then
-             line(7:) = 'real' // trim(dec_suffix) // '  :: ko(' // trim(vec_dim) // ')'
-             write(30,100) trim(line)
-             line(7:) = 'real' // trim(dec_suffix) // '  :: kinf(' // trim(vec_dim) // ')'
+            if( subs == 1 ) then
+              line(7:) = 'real' // trim(dec_suffix) // '  :: ko(ncol*pver)'
+              write(30,100) trim(line)
+              line(7:) = 'real' // trim(dec_suffix) // '  :: kinf(ncol*pver)'
+              if( subs > 1 ) then
+                write(30,100) trim(line)
+                line(7:) = 'real' // trim(dec_suffix) // '  :: wrk(ncol*pver)'
+              endif
+            else
+               line(7:) = 'real' // trim(dec_suffix) // '  :: ko(ncol*kbot)'
+               write(30,100) trim(line)
+               line(7:) = 'real' // trim(dec_suffix) // '  :: kinf(ncol*kbot)'
+               if( subs > 1 ) then
+                 write(30,100) trim(line)
+                 line(7:) = 'real' // trim(dec_suffix) // '  :: wrk(ncol*kbot)'
+               endif
+            endif
           else
              select case( model )
              case( 'MOZART' )
@@ -301,6 +350,12 @@ contains
           end if
           write(30,100) trim(line)
        end if troe_rxts
+
+       if( model == 'CAM' .and. march == 'VECTOR' .and. subs > 1 ) then
+          write(30,100) ' '
+          line(7:) = 'n = ncol*kbot'
+          write(30,100) trim(line)
+       endif
        line = ' '
        write(30,100) trim(line)
 
@@ -317,7 +372,11 @@ contains
                    end if
                 end if
                 if( model == 'WRF' .or. machine == 'NEC' .or. machine == 'FUJITSU' ) then
-                   line(7:) = 'rate(:,'
+                   if( subs == 1 ) then
+                     line(7:) = 'rate(:,'
+                   else
+                     line(7:) = 'rate(:n,'
+                   endif
                 else
                    if( subs == 1 ) then
                       line(7:) = 'rate(:,:,'
@@ -347,7 +406,26 @@ contains
        do_tmp = cnt /= 0 .and. (subs == 1 .or. cph_cnt > 0)
        any_temp_dep :  if( do_tmp ) then
           if( model == 'WRF' .or. machine == 'NEC' .or. machine == 'FUJITSU' ) then
-             line(7:) = 'itemp(:) = 1.' // trim(num_suffix)// ' / temp(:)'
+             if( subs == 1 ) then
+               write(30,100) ' '
+               line(7:) = 'do n = 1,pver'
+               write(30,100) trim(line)
+               line(7:) = '  offset = (n-1)*ncol'
+               write(30,100) trim(line)
+               line(7:) = '  itemp(offset+1:offset+ncol) = 1.' // trim(num_suffix)// ' / temp(:ncol,n)'
+               write(30,100) trim(line)
+               line(7:) = 'end do'
+             else
+!              line(7:) = 'itemp(:) = 1.' // trim(num_suffix)// ' / temp(:n)'
+               write(30,100) ' '
+               line(7:) = 'do k = 1,kbot'
+               write(30,100) trim(line)
+               line(7:) = '  offset = (k-1)*ncol'
+               write(30,100) trim(line)
+               line(7:) = '  itemp(offset+1:offset+ncol) = 1.' // trim(num_suffix)// ' / temp(:ncol,k)'
+               write(30,100) trim(line)
+               line(7:) = 'end do'
+             endif
           else if( model == 'MOZART' ) then
              line(7:) = 'itemp(:,:) = 1.' // trim(num_suffix)// ' / temp(:,:)'
           else if( model == 'CAM' ) then
@@ -381,7 +459,8 @@ contains
                    line(7:) = 'n = ncol*kbot'
                 end if
              else
-                line(7:) = 'n = ' // trim(vec_dim)
+!               line(7:) = 'n = ' // trim(vec_dim)
+                line(7:) = ' '
              end if
              write(30,100) trim(line)
           end if
@@ -460,7 +539,11 @@ contains
                       write(30,100) trim(line)
                       do m = 1,match_cnt
                          if( model == 'WRF' .or. machine == 'NEC' .or. machine == 'FUJITSU' ) then
-                            line(7:) = 'rate(:,'
+                            if( subs == 1 ) then
+                              line(7:) = 'rate(:,'
+                            else
+                              line(7:) = 'rate(:n,'
+                            endif
                          else
                             if( subs == 1 ) then
                                line(7:) = 'rate(:,:,'
@@ -490,7 +573,11 @@ contains
                       end do
                    else multiple_matches
                       if( model == 'WRF' .or. machine == 'NEC' .or. machine == 'FUJITSU' ) then
-                         line(7:) = 'rate(:,'
+                         if( subs == 1 ) then
+                           line(7:) = 'rate(:,'
+                         else
+                           line(7:) = 'rate(:n,'
+                         endif
                       else if( .not. vftns ) then
                          if( subs == 1 ) then
                             line(7:) = 'rate(:,:,'
@@ -559,10 +646,15 @@ contains
           line = ' '
           write(30,100) trim(line)
           if( model == 'WRF' .or. machine == 'NEC' .or. machine == 'FUJITSU' ) then
-             line(7:) = 'itemp(:) = 300.' // trim(num_suffix) // ' * itemp(:)'
+            line(7:) = 'itemp(:) = 300.' // trim(num_suffix) // ' * itemp(:)'
           else
-             line(7:) = 'itemp(:,:) = 300.' // trim(num_suffix) // ' * itemp(:,:)'
+            line(7:) = 'itemp(:,:) = 300.' // trim(num_suffix) // ' * itemp(:,:)'
           end if
+          if( subs == 1 .and. model == 'CAM' .and. march == 'VECTOR' ) then
+            write(30,100) trim(line)
+            write(30,100) ' '
+            line(7:) = 'n = ncol*pver'
+          endif
           write(30,100) trim(line)
           troe_rxt_loop : do i = 1,troecnt
              if( subs == 2 ) then
@@ -669,7 +761,15 @@ contains
                 end if
                 write(30,100) trim(line)
                 if( model == 'WRF' .or. machine == 'NEC' .or. machine == 'FUJITSU' ) then
-                   line(7:) = 'call jpl( rate(1,'
+                  if( march /= 'VECTOR' ) then
+                    line(7:) = 'call jpl( rate(1,'
+                  else
+                    if( subs == 1 ) then
+                      line(7:) = 'call jpl( rate(:,'
+                    else
+                      line(7:) = 'call jpl( wrk'
+                    endif
+                  end if
                 else
                    if( subs == 1 ) then
                       line(7:) = 'call jpl( rate(1,1,'
@@ -704,7 +804,12 @@ contains
                       line(len_trim(line)+1:) = num(:len_trim(num)) // ', m, ' // wrk(:l) // &
                                                 trim(num_suffix) // ', ko, kinf, n )'
                       write(30,100) trim(line)
-                      line = '      rate(:,:kbot,' // numa(:len_trim(numa)) // ') = wrk(:,:)'
+                      if( march /= 'VECTOR' ) then
+                        line = '      rate(:,:kbot,' // numa(:len_trim(numa)) // ') = wrk(:,:)'
+                      else
+!                       line = '      rate(:,:kbot,' // numa(:len_trim(numa)) // ') = wrk(:)'
+                        line = '      rate(:n,' // numa(:len_trim(numa)) // ') = wrk(:)'
+                      endif
                    end if
                 case( 'WRF' )
                    line(len_trim(line)+1:) = num(:len_trim(num)) // '), m, ' // wrk(:l) // &

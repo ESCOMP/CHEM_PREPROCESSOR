@@ -12,7 +12,7 @@
                           diagprnt, &
                           tavgprnt, &
                           srf_flx_cnt, &
-		          hetcnt, rxntot, clscnt, nzcnt, spcno, &
+                          hetcnt, rxntot, clscnt, nzcnt, spcno, &
                           dvel_cnt )
 
       implicit none
@@ -117,7 +117,8 @@
             write(30,'(''# define CLSZE '',i3)') plon
             write(30,'(''# define MACHINE CRAY'')')
          case( 'NEC', 'FUJITSU' )
-            write(30,'(''# define CLSZE '',i5)') plon*plev
+!           write(30,'(''# define CLSZE '',i5)') plon*plev
+            write(30,'(''# define CLSZE    1'')')
 	    if( machine == 'NEC' ) then
                write(30,'(''# define MACHINE_NEC'')')
 	    else

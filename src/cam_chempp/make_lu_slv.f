@@ -268,7 +268,7 @@ Backward_loop : &
 	    case( 'SCALAR' )
                write(code,'(''      call '',a,''lu_slv'',a,''( lu, b )'')') trim(up_hdr),num(2:3)
 	    case( 'VECTOR' )
-	       write(code,'(''      call '',a,''lu_slv'',a,''( ofl, ofu, lu, b )'')') trim(up_hdr),num(2:3)
+	       write(code,'(''      call '',a,''lu_slv'',a,''( ofl, ofu, chnkpnts, lu, b )'')') trim(up_hdr),num(2:3)
 	    case default
                if( model /= 'CAM' ) then
                   write(code,'(''      call '',a,''lu_slv'',a,''( lu, b )'')') trim(up_hdr),num(2:3)
@@ -340,9 +340,9 @@ Backward_loop : &
             end if
          case( 'VECTOR' )
             if( sub_cnt /= 0 ) then
-               write(code,'(''      subroutine '',a,''lu_slv'',a,''( ofl, ofu, lu, b )'')') trim(up_hdr),num(2:3)
+               write(code,'(''      subroutine '',a,''lu_slv'',a,''( ofl, ofu, chnkpnts, lu, b )'')') trim(up_hdr),num(2:3)
             else
-               write(code,'(''      subroutine '',a,''lu_slv( ofl, ofu, lu, b )'')') trim(up_hdr)
+               write(code,'(''      subroutine '',a,''lu_slv( ofl, ofu, chnkpnts, lu, b )'')') trim(up_hdr)
             end if
          case default
             if( sub_cnt /= 0 ) then
@@ -382,6 +382,8 @@ Backward_loop : &
       if( model == 'CAM' ) then
          code(7:) = 'use shr_kind_mod, only : r8 => shr_kind_r8'
          write(30,100) trim(code)
+         code(7:) = 'use chem_mods, only : clscnt4, nzcnt'
+         write(30,100) trim(code)
       end if
       write(30,100) blank
       code(7:) = 'implicit none '
@@ -409,10 +411,12 @@ Backward_loop : &
             write(30,100) trim(code)
             code(7:) = 'integer, intent(in) ::   ofu'
             write(30,100) trim(code)
+            code(7:) = 'integer, intent(in) ::   chnkpnts'
+            write(30,100) trim(code)
             if( model /= 'CAM' ) then
                code(7:) = 'real, intent(in)    ::   lu(plnplv,' // hdr // 'nzcnt)'
             else
-               code(7:) = 'real(r8), intent(in)    ::   lu(:,:)'
+               code(7:) = 'real(r8), intent(in)    ::   lu(chnkpnts,max(1,nzcnt))'
             end if
          else
             code(7:) = 'real, intent(in)    ::   lu(clsze,' // hdr // 'nzcnt)'
@@ -427,7 +431,7 @@ Backward_loop : &
          if( model /= 'CAM' ) then
             write(code(7:),'(''real' // trim(dec_suffix) // ', intent(inout) ::   b(plnplv,clscnt'',i1,'')'')') class
          else
-            write(code(7:),'(''real' // trim(dec_suffix) // ', intent(inout) ::   b(:,:)'')'')')
+            write(code(7:),'(''real' // trim(dec_suffix) // ', intent(inout) ::   b(chnkpnts,max(1,clscnt4))'')'')')
          end if
       else
          write(code(7:),'(''real' // trim(dec_suffix) // ', intent(inout) ::   b(clsze,clscnt'',i1,'')'')') class

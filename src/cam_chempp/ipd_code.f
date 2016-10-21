@@ -108,7 +108,8 @@
          if( .not. is_vector ) then
             line = '      subroutine indprd( class, prod, nprod, y, extfrc, rxt, ncol )'
          else
-            line = '      subroutine indprd( class, prod, y, extfrc, rxt )'
+            line = '      subroutine indprd( class, prod, nprod, y, extfrc, rxt, chnkpnts )'
+!           line = '      subroutine indprd( class, prod, y, extfrc, rxt )'
          end if
          write(30,100) trim(line)
          line = ' '
@@ -158,14 +159,26 @@
             line = '      real' // trim(dec_suffix) // ', intent(inout) :: prod(ncol,pver,nprod)'
             write(30,100) trim(line)
          else
-            line = '      real' // trim(dec_suffix) // ', intent(in)    :: y(:,:)'
+            line = '      integer, intent(in) :: chnkpnts'
             write(30,100) trim(line)
-            line = '      real' // trim(dec_suffix) // ', intent(in)    :: rxt(:,:)'
+            line = '      integer, intent(in) :: nprod'
             write(30,100) trim(line)
-            line = '      real' // trim(dec_suffix) // ', intent(in)    :: extfrc(:,:)'
+            line = '      real' // trim(dec_suffix) // ', intent(in)    :: y(chnkpnts,gas_pcnst)'
             write(30,100) trim(line)
-            line = '      real' // trim(dec_suffix) // ', intent(inout) :: prod(:,:)'
+            line = '      real' // trim(dec_suffix) // ', intent(in)    :: rxt(chnkpnts,rxntot)'
             write(30,100) trim(line)
+            line = '      real' // trim(dec_suffix) // ', intent(in)    :: extfrc(chnkpnts,extcnt)'
+            write(30,100) trim(line)
+            line = '      real' // trim(dec_suffix) // ', intent(inout) :: prod(chnkpnts,nprod)'
+            write(30,100) trim(line)
+!           line = '      real' // trim(dec_suffix) // ', intent(in)    :: y(:,:)'
+!           write(30,100) trim(line)
+!           line = '      real' // trim(dec_suffix) // ', intent(in)    :: rxt(:,:)'
+!           write(30,100) trim(line)
+!           line = '      real' // trim(dec_suffix) // ', intent(in)    :: extfrc(:,:)'
+!           write(30,100) trim(line)
+!           line = '      real' // trim(dec_suffix) // ', intent(inout) :: prod(:,:)'
+!           write(30,100) trim(line)
          end if
       end if
       line = ' '

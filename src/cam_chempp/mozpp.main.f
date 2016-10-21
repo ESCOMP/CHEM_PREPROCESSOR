@@ -176,7 +176,7 @@
       sim_dat_filename = 'sim.dat'
       sim_dat_filespec = trim(sim_dat_path) // 'sim.dat'
       cpp_dir  = ' '
-      cpp_opts = '-P -C -I.'
+      cpp_opts = '-nostdinc -P -C -I.'
 
 !-----------------------------------------------------------------------
 !        ... Assign default input, output units
@@ -429,7 +429,7 @@
 !-----------------------------------------------------------------------
 !        ... Find cpp preprocessor
 !-----------------------------------------------------------------------
-      command = 'whereis cpp > ' // trim(temp_path) // 'cpp.path'
+      command = 'which cpp > ' // trim(temp_path) // 'cpp.path'
       call system( trim( command ) )
       open( unit=20, file=trim(temp_path)//'cpp.path', iostat=ios )
       if( ios /= 0 ) then
@@ -441,11 +441,9 @@
 	 write(*,*) ' Failed to read cpp path'
 	 stop
       end if
-      if( iout(1)(1:4) == 'cpp:' ) then
-	 nbeg(1) = index( trim(iout(1)), ' ' ) + 1
-	 nend(1) = index( trim(iout(1)(nbeg(1):)), ' ' )
-	 nend(1) = nbeg(1) + nend(1) - 1
-	 cpp_dir = iout(1)(nbeg(1):nend(1))
+      nend(1) = index( trim(iout(1)), 'cpp' )
+      if( nend(1) > 0 ) then
+	 cpp_dir = iout(1)(:nend(1)+2)
 	 close( 20 )
       else
 	 write(*,*) ' Failed to locate cpp path'
@@ -1627,7 +1625,7 @@ sparse_matrix_loop : &
                end if
             end if
          end do
-         call make_sim_dat( model, sparse )
+         call make_sim_dat( model, march, sparse )
       end if
       close( 20)
 
@@ -2005,12 +2003,18 @@ sparse_matrix_loop : &
          if( model == 'CAM' ) then
             if( march == 'SCALAR' ) then
                lib_src(file_cnt)   = trim(procfiles_path) // 'mo_imp_sol_scalar.F90'
+	       file_cnt = file_cnt + 1
+               filelines(1) = filelines(1) + 1
+               lib_src(file_cnt)   = trim(procfiles_path) // 'mo_exp_sol_scalar.F90'
             else if( march == 'CACHE' ) then
                lib_src(file_cnt)   = trim(procfiles_path) // 'mo_imp_sol_cache.F90'
             else if( march == 'VECTOR' ) then
                lib_src(file_cnt)   = trim(procfiles_path) // 'mo_imp_sol_vector.F90'
+               file_cnt = file_cnt + 1
+               filelines(1) = filelines(1) + 1
+               lib_src(file_cnt)   = trim(procfiles_path) // 'mo_exp_sol_vector.F90'
             end if
-	    file_cnt = file_cnt + 1
+            file_cnt = file_cnt + 1
             filelines(1) = filelines(1) + 1
          end if
 !-----------------------------------------------------------------------
@@ -2072,6 +2076,10 @@ sparse_matrix_loop : &
                    lib_src(i)(il:iu) == 'mo_imp_sol_cache' .or. &
                    lib_src(i)(il:iu) == 'mo_imp_sol_vector' ) then
                    filenm = 'mo_imp_sol.F90'
+               elseif( lib_src(i)(il:iu) == 'mo_exp_sol_scalar' .or. &
+                       lib_src(i)(il:iu) == 'mo_exp_sol_cache' .or. &
+                       lib_src(i)(il:iu) == 'mo_exp_sol_vector' ) then
+                   filenm = 'mo_exp_sol.F90'
                else
                   filenm = lib_src(i)(il:iu) // '.F90'
                end if

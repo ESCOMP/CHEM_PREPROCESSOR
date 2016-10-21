@@ -229,7 +229,7 @@ Column_loop : &
 	    case( 'SCALAR' )
                write(code,'(''      call '',a,''lu_fac'',a,''( lu )'')') trim(up_hdr),num(2:3)
 	    case( 'VECTOR' )
-               write(code,'(''      call '',a,''lu_fac'',a,''( ofl, ofu, lu )'')') trim(up_hdr),num(2:3)
+               write(code,'(''      call '',a,''lu_fac'',a,''( ofl, ofu, chnkpnts, lu )'')') trim(up_hdr),num(2:3)
 	    case default
                if( model /= 'CAM' ) then
                   write(code,'(''      call '',a,''lu_fac'',a,''( lu )'')') trim(up_hdr),num(2:3)
@@ -303,9 +303,9 @@ Column_loop : &
             end if
          case( 'VECTOR' )
             if( sub_cnt /= 0 ) then
-               write(code,'(''      subroutine '',a,''lu_fac'',a,''( ofl, ofu, lu )'')') trim(up_hdr),num(2:3)
+               write(code,'(''      subroutine '',a,''lu_fac'',a,''( ofl, ofu, chnkpnts, lu )'')') trim(up_hdr),num(2:3)
             else
-               write(code,'(''      subroutine '',a,''lu_fac( ofl, ofu, lu )'')') trim(up_hdr)
+               write(code,'(''      subroutine '',a,''lu_fac( ofl, ofu, chnkpnts, lu )'')') trim(up_hdr)
             end if
          case default
             if( sub_cnt /= 0 ) then
@@ -332,7 +332,7 @@ Column_loop : &
             write(30,100) trim(code)
             code(7:) = 'use chem_mods, only : ' // hdr // 'nzcnt'
          else
-            code(:) = ' '
+            code(7:) = 'use chem_mods, only : nzcnt'
          end if
       else
          if( model /= 'WRF' ) then
@@ -367,10 +367,12 @@ Column_loop : &
             write(30,100) trim(code)
             code(7:) = 'integer, intent(in) ::   ofu'
             write(30,100) trim(code)
+            code(7:) = 'integer, intent(in) ::   chnkpnts'
+            write(30,100) trim(code)
             if( model /= 'CAM' ) then
                code(7:) = 'real' // trim(dec_suffix) // ', intent(inout) ::   lu(plnplv,' // hdr // 'nzcnt)'
             else
-               code(7:) = 'real' // trim(dec_suffix) // ', intent(inout) ::   lu(:,:)'
+               code(7:) = 'real' // trim(dec_suffix) // ', intent(inout) ::   lu(chnkpnts,nzcnt)'
             end if
          case default
             code(7:) = 'real' // trim(dec_suffix) // ', intent(inout) ::   lu(clsze,' // hdr // 'nzcnt)'

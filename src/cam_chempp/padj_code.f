@@ -53,11 +53,7 @@
          case( 'MOZART' )
             line(7:) = 'subroutine phtadj( p_rate, inv, m, plnplv )'
          case ( 'CAM' )
-            if( march /= 'VECTOR' ) then
-               line(7:) = 'subroutine phtadj( p_rate, inv, m, ncol )'
-            else
-               line(7:) = 'subroutine phtadj( p_rate, inv, m, chnkpnts )'
-            end if
+            line(7:) = 'subroutine phtadj( p_rate, inv, m, ncol, nlev )'
          case ( 'WRF' )
             line(7:) = 'subroutine phtadj( p_rate, inv, m, n )'
       end select
@@ -71,10 +67,6 @@
       if( model == 'CAM' ) then
          line(7:) = 'use shr_kind_mod, only : r8 => shr_kind_r8'
          write(30,100) trim(line)
-         if( march /= 'VECTOR' ) then
-            line(7:) = 'use ppgrid,       only : pver'
-            write(30,100) trim(line)
-         end if
       end if
       line = ' '
       write(30,100) trim(line)
@@ -92,11 +84,7 @@
          case( 'MOZART' )
             line = '      integer, intent(in) :: plnplv'
          case ( 'CAM' )
-            if( march /= 'VECTOR' ) then
-               line = '      integer, intent(in)     :: ncol'
-            else
-               line = '      integer, intent(in) :: chnkpnts'
-            end if
+            line = '      integer, intent(in) :: ncol, nlev'
          case ( 'WRF' )
             line = '      integer, intent(in) :: n'
       end select
@@ -109,19 +97,11 @@
          write(30,100) trim(line)
          line = '      real, intent(inout) :: p_rate(plnplv,phtcnt)'
       case( 'CAM' )
-         if( march /= 'VECTOR' ) then
-            line = '      real(r8), intent(in)    :: inv(:,:,:)'
-            write(30,100) trim(line)
-            line = '      real(r8), intent(in)    :: m(:,:)'
-            write(30,100) trim(line)
-            line = '      real(r8), intent(inout) :: p_rate(:,:,:)'
-         else
-            line = '      real(r8), intent(in)    :: inv(chnkpnts,max(1,nfs))'
-            write(30,100) trim(line)
-            line = '      real(r8), intent(in)    :: m(chnkpnts)'
-            write(30,100) trim(line)
-            line = '      real(r8), intent(inout) :: p_rate(chnkpnts,max(1,phtcnt))'
-         end if
+         line = '      real(r8), intent(in)    :: inv(ncol,nlev,max(1,nfs))'
+         write(30,100) trim(line)
+         line = '      real(r8), intent(in)    :: m(ncol,nlev)'
+         write(30,100) trim(line)
+         line = '      real(r8), intent(inout) :: p_rate(ncol,nlev,max(1,phtcnt))'
       case( 'WRF' )
          line = '      real, intent(in)    :: inv(:,:)'
          write(30,100) trim(line)
@@ -142,13 +122,9 @@
       case( 'MOZART' )
          line = '      real    ::  im(plnplv)'
       case( 'CAM' )
-         if( march /= 'VECTOR' ) then
-            line = '      integer  ::  k'
-            write(30,100) trim(line)
-            line = '      real(r8) ::  im(ncol)'
-         else
-            line = '      real(r8) ::  im(chnkpnts)'
-         end if
+         line = '      integer  ::  k'
+         write(30,100) trim(line)
+         line = '      real(r8) ::  im(ncol,nlev)'
       case( 'WRF' )
          line = '      real ::  im(n)'
       end select
@@ -156,8 +132,8 @@
       line = ' '
       write(30,100) trim(line)
 
-      if( model == 'CAM' .and. march /= 'VECTOR' ) then
-         line = '      do k = 1,pver'
+      if( model == 'CAM' ) then
+         line = '      do k = 1,nlev'
          write(30,100) trim(line)
       end if
       
@@ -168,11 +144,7 @@
             if( first ) then
                select case( model )
                case( 'CAM' )
-                  if( march /= 'VECTOR' ) then
-                     line(7:) = '   im(:ncol) = 1._r8 / m(:ncol,k)'
-                  else
-                     line(7:) = 'im(:) = 1._r8 / m(:)'
-                  end if
+                  line(7:) = '   im(:ncol,k) = 1._r8 / m(:ncol,k)'
                case default
                   line(7:) = 'im(:) = 1. / m(:)'
                end select
@@ -182,17 +154,10 @@
             end if
             select case( model )
             case( 'CAM' )
-               if( march /= 'VECTOR' ) then
-                  write(line(7:),'(''   p_rate(:,k,'',i3,'') = p_rate(:,k,'',i3,'')'')') rxno,rxno
-                  line(len_trim(line)+2:) = ' * inv(:,k,'
-               else
-                  line(7:) = 'p_rate(:,   ) = p_rate(:,   )'
-                  write(line(16:18),'(i3)') rxno
-                  write(line(32:34),'(i3)') rxno
-                  line(len_trim(line)+2:) = ' * inv(:,'
-               end if
+               write(line(7:),'(''   p_rate(:,k,'',i3,'') = p_rate(:,k,'',i3,'')'')') rxno,rxno
+               line(len_trim(line)+2:) = ' * inv(:,k,'
                write(line(len_trim(line)+1:),'(i2)') fixmap(k,2)
-               line(len_trim(line)+1:) = ') * im(:)'
+               line(len_trim(line)+1:) = ') * im(:,k)'
             case default
                line(7:) = 'p_rate(:,   ) = p_rate(:,   )'
                write(line(16:18),'(i3)') rxno
@@ -205,7 +170,7 @@
          end if
       end do
 
-      if( model == 'CAM' .and. march /= 'VECTOR' ) then
+      if( model == 'CAM') then
          line = '      end do'
          write(30,100) trim(line)
       end if

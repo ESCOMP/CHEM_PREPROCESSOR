@@ -1,5 +1,5 @@
     
-      subroutine make_sim_dat( model, sparse )
+      subroutine make_sim_dat( model, march, sparse )
 !-------------------------------------------------------------------
 !	... write the simulation data routine; only for CAM
 !-------------------------------------------------------------------
@@ -22,6 +22,7 @@
 !	... dummy arguments
 !-------------------------------------------------------------------
       character(len=16), intent(in) :: model
+      character(len=16), intent(in) :: march
       type(sparsity), intent(in)   :: sparse(2)
 
 !-------------------------------------------------------------------
@@ -90,6 +91,8 @@
       write(30,100) trim(line)
       line(7:)   = 'use chem_mods,     only : frc_from_dataset'
       write(30,100) trim(line)
+      line(7:)   = 'use chem_mods,     only : is_scalar, is_vector'
+      write(30,100) trim(line)
       line(7:)   = 'use shr_kind_mod,  only : r8 => shr_kind_r8'
       write(30,100) trim(line)
       line(7:)   = 'use cam_logfile,   only : iulog'
@@ -108,6 +111,21 @@
       write(30,100) trim(line)
       line = '      integer :: ios'
       write(30,100) trim(line)
+      line = ' '
+      write(30,100) trim(line)
+!-------------------------------------------------------------------
+!	... Scalar or vector code?
+!-------------------------------------------------------------------
+      if( march == 'VECTOR' ) then
+        line = '      is_scalar = .false.'
+        write(30,'(a)') trim(line)
+        line = '      is_vector = .true.'
+      elseif( march == 'SCALAR' ) then
+        line = '      is_scalar = .true.'
+        write(30,'(a)') trim(line)
+        line = '      is_vector = .false.'
+      endif
+      write(30,'(a)') trim(line)
       line = ' '
       write(30,100) trim(line)
 !-------------------------------------------------------------------
@@ -401,7 +419,9 @@
          line = ' '
       end do
       
-      ! frc_from_dataset
+!-----------------------------------------------------------------------
+!     frc_from_dataset
+!-----------------------------------------------------------------------
       line = ' '
       write(30,100) trim(line)
       write(line,'("      frc_from_dataset(:",i3,") = (/")') usrcnt

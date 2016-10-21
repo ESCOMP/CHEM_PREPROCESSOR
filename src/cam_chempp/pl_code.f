@@ -145,14 +145,14 @@ Class_loop : &
                   else
                      line = '      subroutine exp_prod_loss( ofl, ofu, prod, loss, y, &'
                      write(30,100) trim(line)
-                     line = '                                rxt, het_rates )'
+                     line = '                                rxt, het_rates, chnkpnts )'
                   end if
 	       case( ebi )
                   line = '      subroutine ebi_prod_loss( prod, loss, y, rxt, het_rates )'
 	       case( hov )
                   line = '      subroutine hov_prod_loss( prod, loss, y, rxt, het_rates )'
 	       case( implicit )
-                  line = '      subroutine imp_prod_loss( ofl, ofu, prod, loss, y, &'
+                  line = '      subroutine imp_prod_loss( ofl, ofu, chnkpnts, prod, loss, y, &'
                   write(30,100) trim(line)
                   line = '                                rxt, het_rates )'
 	       case( rodas )
@@ -208,8 +208,12 @@ Class_loop : &
          if( model == 'CAM' ) then
             if( march /= 'VECTOR' ) then
                line = '      use ppgrid,       only : pver'
-               write(30,100) trim(line)
+            elseif( class == explicit ) then
+               line = '      use chem_mods,    only : gas_pcnst,rxntot,clscnt1'
+            elseif( class == implicit ) then
+               line = '      use chem_mods,    only : gas_pcnst,rxntot,clscnt4'
             end if
+            write(30,100) trim(line)
          end if
          line = ' '
          write(30,100) trim(line)
@@ -228,13 +232,22 @@ Class_loop : &
                if( march == 'CACHE' ) then
                   line = '      integer :: cols'
                   write(30,100) trim(line)
-               end if
-               line = '      real' // trim(dec_suffix) // ', dimension(:,:), intent(out) :: &'
+               elseif( march == 'VECTOR' ) then
+                 line = '      integer, intent(in) :: ofl, ofu, chnkpnts'
+                 write(30,100) trim(line)
+                 line = '      real' // trim(dec_suffix) // ', dimension(chnkpnts,clscnt4), intent(out) :: &'
+               else
+                 line = '      real' // trim(dec_suffix) // ', dimension(:,:), intent(out) :: &'
+               endif
             else
                if( march /= 'VECTOR' ) then
-                  line = '      real' // trim(dec_suffix) // ', dimension(:,:,:), intent(out) :: &'
+                 line = '      real' // trim(dec_suffix) // ', dimension(:,:,:), intent(out) :: &'
+               elseif( class == explicit ) then
+                 line = '      integer, intent(in) :: ofl, ofu, chnkpnts'
+                 write(30,100) trim(line)
+                 line = '      real' // trim(dec_suffix) // ', dimension(chnkpnts,max(1,clscnt1)), intent(out) :: &'
                else
-                  line = '      real' // trim(dec_suffix) // ', dimension(:,:), intent(out) :: &'
+                 line = '      real' // trim(dec_suffix) // ', dimension(:,:), intent(out) :: &'
                end if
             end if
          else
@@ -293,13 +306,11 @@ Class_loop : &
                   write(30,100) trim(line)
                   line = '      real' // trim(dec_suffix) // ', intent(in)    ::  het_rates(:,:,:)'
                else
-                  line = '      integer, intent(in) :: ofl, ofu'
+                  line = '      real' // trim(dec_suffix) // ', intent(in)    ::  y(chnkpnts,gas_pcnst)'
                   write(30,100) trim(line)
-                  line = '      real' // trim(dec_suffix) // ', intent(in)    ::  y(:,:)'
+                  line = '      real' // trim(dec_suffix) // ', intent(in)    ::  rxt(chnkpnts,rxntot)'
                   write(30,100) trim(line)
-                  line = '      real' // trim(dec_suffix) // ', intent(in)    ::  rxt(:,:)'
-                  write(30,100) trim(line)
-                  line = '      real' // trim(dec_suffix) // ', intent(in)    ::  het_rates(:,:)'
+                  line = '      real' // trim(dec_suffix) // ', intent(in)    ::  het_rates(chnkpnts,gas_pcnst)'
                end if
                write(30,100) trim(line)
 	    end if
@@ -313,17 +324,19 @@ Class_loop : &
                   line = '      real' // trim(dec_suffix) // ', intent(in)    ::  het_rates(:)'
                end if
 	    else if( march == 'VECTOR' ) then
-                     line = '      integer, intent(in)    ::  ofl'
-                     write(30,100) trim(line)
-                     line = '      integer, intent(in)    ::  ofu'
-                     write(30,100) trim(line)
-                     line = '      real' // trim(dec_suffix) // ', intent(in)       ::  y(:,:)'
-                     write(30,100) trim(line)
-                     line = '      real' // trim(dec_suffix) // ', intent(in)       ::  rxt(:,:)'
-                     write(30,100) trim(line)
-                     if( model /= 'WRF' ) then
-                        line = '      real' // trim(dec_suffix) // ', intent(in)       ::  het_rates(:,:)'
-                     end if
+!              line = '      integer, intent(in)    ::  ofl'
+!              write(30,100) trim(line)
+!              line = '      integer, intent(in)    ::  ofu'
+!              write(30,100) trim(line)
+!              line = '      integer, intent(in)    ::  chnkpnts'
+!              write(30,100) trim(line)
+               line = '      real' // trim(dec_suffix) // ', intent(in)       ::  y(chnkpnts,gas_pcnst)'
+               write(30,100) trim(line)
+               line = '      real' // trim(dec_suffix) // ', intent(in)       ::  rxt(chnkpnts,rxntot)'
+               write(30,100) trim(line)
+               if( model /= 'WRF' ) then
+                 line = '      real' // trim(dec_suffix) // ', intent(in)       ::  het_rates(chnkpnts,gas_pcnst)'
+               end if
             else
 	       if( model /= 'CAM' ) then
                         line = '      real' // trim(dec_suffix) // ', intent(in)    ::  y(:,:)'
@@ -858,7 +871,7 @@ Species_loop : &
 	 line(len_trim(line)+1:) = ' &'
 	 write(30,'(a)') trim(line)
 	 line = ' '
-	 line(18:) = buff(:length)
+	 line(18:) = buff(:blen)
       end if
       buff = ' '
 
