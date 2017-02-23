@@ -2,7 +2,7 @@
       subroutine chm_hdr( rxt_tag_cnt, enthalpy_cnt, hetcnt, usrcnt, cls_rxt_cnt, radj_flag, phtcnt, &
                           rxpcnt, rxparm, rxntot, ncol, nfs, nslvd, &
                           indexm, indexh2o, spcno, relcnt, grpcnt, &
-                          clscnt, iter_counts, nzcnt, vec_ftns, machine, chemistry )
+                          clscnt, iter_counts, nzcnt, vec_ftns, machine, chemistry, veclen )
 !-----------------------------------------------------------------------
 !        ... Write the chemistry "header" file
 !-----------------------------------------------------------------------
@@ -37,7 +37,8 @@
       logical, intent(in) ::    vec_ftns              ! vector function flag
       logical, intent(in) ::    chemistry             ! chemistry flag
 
-      character(len=16), intent(in)  :: machine        ! target machine
+      character(len=16), intent(in)  :: machine       ! target machine
+      integer, intent(in) ::    veclen                ! vector length in vectorized solver
 
 !-----------------------------------------------------------------------
 !        ... Local variables
@@ -85,6 +86,7 @@
       write(30,'(''# define NCOL '',i5)') ncol
       write(30,'(''# define NFS '',i5)') nfs
       write(30,'(''# define NSLVD '',i5)') nslvd
+      write(30,'(''# define VECLEN '',i5)') veclen
       write(30,'(''# define INDEXM '',i5)') indexm
       write(30,'(''# define INDEXH2O '',i5)') indexh2o
       write(30,'(''# define PCNST '',i5)') spcno

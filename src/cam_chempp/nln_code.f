@@ -119,8 +119,10 @@
          write(30,100) trim(line)
          line = ' '
          write(30,100) trim(line)
-         line = 'USE ppgrid, ONLY: veclen'
-         write(30,100) trim(line)
+         if ( march == 'VECTOR' ) then
+            line = '      use chem_mods, only: veclen'
+            write(30,100) trim(line)
+         end if
       end if
       line = '      private'
       write(30,100) trim(line)

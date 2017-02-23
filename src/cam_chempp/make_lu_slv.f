@@ -95,8 +95,10 @@
       write(30,100) trim(code)
       code = ' '
       write(30,100) trim(code)
-      code = 'USE ppgrid, ONLY: veclen'
-      write(30,100) trim(code)
+      if (march=='VECTOR') then
+         code = '      use chem_mods, only: veclen'
+         write(30,100) trim(code)
+      endif
       code = '      private'
       write(30,100) trim(code)
       code = '      public :: lu_slv'
