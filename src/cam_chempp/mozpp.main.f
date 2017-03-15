@@ -815,7 +815,7 @@
                   entry(2) = 1
                   call ver_opts( options(2:), model, machine, march, arch_type, &
                                  wrk_dir, cpp_dir, cpp_opts, subfile, diagprnt, &
-                                 tavgprnt, cpucnt, vec_ftns )
+                                 tavgprnt, cpucnt, vec_ftns, veclen )
 !-----------------------------------------------------------------------
 !        ... Write out the species and reaction id files
 !-----------------------------------------------------------------------
@@ -1631,12 +1631,6 @@ sparse_matrix_loop : &
 
      rxt_tag_cnt = count( rxt_has_tag )
      enthalpy_cnt = count( cph_flg )
-
-      if( model == 'CAM' ) then
-         if( march == 'VECTOR' ) then
-            veclen = 64
-         endif
-      endif
 
 !-----------------------------------------------------------------------
 !        ... Write the chemistry header file
