@@ -6,5 +6,4 @@ set objdir=OBJ
 rm -f ../bin/$exenam
 rm -f $objdir/*
 
-gmake COMPILER=lf95 DEBUG=TRUE EXENAME=cam_chempp
-
+gmake USER_FC=pgf95 DEBUG=TRUE EXENAME=cam_chempp
