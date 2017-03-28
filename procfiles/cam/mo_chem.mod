@@ -52,7 +52,7 @@
 
       integer, allocatable :: rxt_tag_map(:)
       real(r8), allocatable :: pht_alias_mult(:,:)
-      character(len=16), allocatable :: rxt_tag_lst(:)
+      character(len=32), allocatable :: rxt_tag_lst(:)
       character(len=16), allocatable :: pht_alias_lst(:,:)
       character(len=16)              :: inv_lst(max(1,nfs))
       character(len=16)              :: extfrc_lst(max(1,extcnt))
