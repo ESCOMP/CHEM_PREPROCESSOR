@@ -38,7 +38,7 @@
       character(len=64)      :: frmt
       character(len=24)      :: number
       character(len=12)      :: num12
-      character(len=16)      :: rxt_string
+      character(len=32)      :: rxt_string
       character(len=16)       :: wrk_chr(5)
       logical  ::  flush
       logical  ::  lexist
@@ -568,8 +568,8 @@
          write(30,100) trim(line)
          line = '      rxt_tag_lst(:rxt_tag_cnt) = (/ '
          m1 = len_trim(line) + 2
-         do n = 1,i,4
-            n1 = min( n+3,i )
+         do n = 1,i,2
+            n1 = min( n+1,i )
             m = m1
             do l = n,n1
                rxt_string = rxt_tag(ndx(l))
@@ -579,12 +579,12 @@
                end if
                if( l /= i ) then
                   if( l /= n1 ) then
-                     write(line(m:),'("''",a16,"'',")') rxt_string
+                     write(line(m:),'("''",a32,"'',")') rxt_string
                   else
-                     write(line(m:),'("''",a16,"'', &")') rxt_string
+                     write(line(m:),'("''",a32,"'', &")') rxt_string
                   end if
                else
-                  write(line(m:),'("''",a16,"'' /)")') rxt_string
+                  write(line(m:),'("''",a32,"'' /)")') rxt_string
                end if
                m = len_trim(line) + 2
             end do
