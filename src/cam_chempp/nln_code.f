@@ -649,11 +649,19 @@ Rates_loop : &
 	    if( lin_mat_pat(l) .or. nln_mat_pat(l) ) then
                write(num,'(i4)') l
 	       m = len_trim( num )
-               line(10:) = trim( mat_piece ) // num(:m) // ') = ' // trim(mat_piece) // num(:m) // ') - dti'
+               if( model == 'CAM' .and. march == 'VECTOR' ) then
+                 line(10:) = trim( mat_piece ) // num(:m) // ') = ' // trim(mat_piece) // num(:m) // ') - dti(k)'
+               else
+                 line(10:) = trim( mat_piece ) // num(:m) // ') = ' // trim(mat_piece) // num(:m) // ') - dti'
+               endif
 	    else
                write(num,'(i4)') l
 	       m = len_trim( num )
-               line(10:) = trim( mat_piece ) // num(:m) // ') = -dti'
+               if( model == 'CAM' .and. march == 'VECTOR' ) then
+                 line(10:) = trim( mat_piece ) // num(:m) // ') = -dti(k)'
+               else
+                 line(10:) = trim( mat_piece ) // num(:m) // ') = -dti'
+               endif
 	    end if
             write(30,100) trim(line)
 	 end do
@@ -882,7 +890,7 @@ Rates_loop : &
                   write(30,100) trim(line)
                   line = '      real, intent(in)    ::  lmat(plnplv,' // trim(hdr) // 'nzcnt)'
                else
-                  line = '      real(r8), intent(in)    ::  dti'
+                  line = '      real(r8), intent(in)    ::  dti(veclen)'
                   write(30,100) trim(line)
                   line = '      real(r8), intent(in)    ::  lmat(veclen,nzcnt)'
                end if
