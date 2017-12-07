@@ -8,7 +8,7 @@
 
       subroutine ver_opts( options, model, machine, march, arch_type, &
                            wrk_dir, cpp_dir, cpp_opts, subfile, diagprnt, &
-                           tavgprnt, cpucnt, vec_ftns )
+                           tavgprnt, cpucnt, vec_ftns, vctr_len )
 !-----------------------------------------------------------------------
 !   	... Set the simulation options
 !-----------------------------------------------------------------------
@@ -32,11 +32,12 @@
       logical, intent(inout)           ::  tavgprnt
       logical, intent(inout)           ::  vec_ftns
       logical, intent(inout)           ::  options(:)
+      integer, intent(inout)           ::  vctr_len
 
 !-----------------------------------------------------------------------
 !   	... Local variables
 !-----------------------------------------------------------------------
-      integer, parameter :: maxparm = 26
+      integer, parameter :: maxparm = 27
 
       integer      :: kpar, nchar, k
       integer      :: err
@@ -75,6 +76,7 @@
       parkey(24) = 'CPP_OPTS'
       parkey(25) = 'MODEL'
       parkey(26) = 'MODEL_ARCHITECTURE'
+      parkey(27) = 'VECTOR_LENGTH'
 
       entered = .false.
 
@@ -184,6 +186,18 @@
 	    if( march /= 'SCALAR' .and. march /= 'CACHE' .and. march /= 'VECTOR' ) then
                call errmes( '# is not a valid model architecture type@', lout, buff(k+1:), nchar-k , ' ' )
 	    end if
+         else if( kpar == 27 ) then
+	    call intcon( buffh(k+1:), &
+                         nchar - k, &
+                         vctr_len, &
+                         err )
+	    if( err /= 0 ) then
+	       call errmes( ' # is not a valid number@', &
+                            lout, &
+                            buffh(k+1:), &
+                            nchar - k, &
+                            buff )
+            end if
 	 else
 	    if( buffh(k+1:nchar) == 'ON' .or. buffh(k+1:nchar) == 'YES' ) then
 	       if( kpar == 10) then

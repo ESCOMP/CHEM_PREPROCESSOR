@@ -119,13 +119,13 @@ ifeq ($(USER_FC),lf95)
   endif
 endif
 ifeq ($(USER_FC),pgf90)
-  FFLAGS      := -O2 -c -g -Mfree -module $(OBJ_DIR)
+  FFLAGS      := -O1 -c -g -Mfree -module $(OBJ_DIR)
   ifeq ($(DEBUG),TRUE)
     FFLAGS    += -C
   endif
 endif
 ifeq ($(USER_FC),pgf95)
-  FFLAGS      := -O2 -c -g -Mfree -module $(OBJ_DIR)
+  FFLAGS      := -O1 -c -g -Mfree -module $(OBJ_DIR)
   ifeq ($(DEBUG),TRUE)
     FFLAGS    += -C
   endif

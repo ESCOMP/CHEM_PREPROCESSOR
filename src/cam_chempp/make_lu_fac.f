@@ -98,6 +98,10 @@
       write(30,100) trim(code)
       code = ' '
       write(30,100) trim(code)
+      if (march=='VECTOR') then
+         code = '      use chem_mods, only: veclen'
+         write(30,100) trim(code)
+      endif
       code = '      private'
       write(30,100) trim(code)
       code = '      public :: lu_fac'
@@ -229,7 +233,7 @@ Column_loop : &
 	    case( 'SCALAR' )
                write(code,'(''      call '',a,''lu_fac'',a,''( lu )'')') trim(up_hdr),num(2:3)
 	    case( 'VECTOR' )
-               write(code,'(''      call '',a,''lu_fac'',a,''( ofl, ofu, chnkpnts, lu )'')') trim(up_hdr),num(2:3)
+               write(code,'(''      call '',a,''lu_fac'',a,''( avec_len, lu )'')') trim(up_hdr),num(2:3)
 	    case default
                if( model /= 'CAM' ) then
                   write(code,'(''      call '',a,''lu_fac'',a,''( lu )'')') trim(up_hdr),num(2:3)
@@ -303,9 +307,9 @@ Column_loop : &
             end if
          case( 'VECTOR' )
             if( sub_cnt /= 0 ) then
-               write(code,'(''      subroutine '',a,''lu_fac'',a,''( ofl, ofu, chnkpnts, lu )'')') trim(up_hdr),num(2:3)
+               write(code,'(''      subroutine '',a,''lu_fac'',a,''( avec_len, lu )'')') trim(up_hdr),num(2:3)
             else
-               write(code,'(''      subroutine '',a,''lu_fac( ofl, ofu, chnkpnts, lu )'')') trim(up_hdr)
+               write(code,'(''      subroutine '',a,''lu_fac( avec_len, lu )'')') trim(up_hdr)
             end if
          case default
             if( sub_cnt /= 0 ) then
@@ -363,16 +367,12 @@ Column_loop : &
          case( 'SCALAR' )
             code(7:) = 'real' // trim(dec_suffix) // ', intent(inout) ::   lu(:)'
          case( 'VECTOR' )
-            code(7:) = 'integer, intent(in) ::   ofl'
-            write(30,100) trim(code)
-            code(7:) = 'integer, intent(in) ::   ofu'
-            write(30,100) trim(code)
-            code(7:) = 'integer, intent(in) ::   chnkpnts'
+            code(7:) = 'integer, intent(in) ::   avec_len'
             write(30,100) trim(code)
             if( model /= 'CAM' ) then
                code(7:) = 'real' // trim(dec_suffix) // ', intent(inout) ::   lu(plnplv,' // hdr // 'nzcnt)'
             else
-               code(7:) = 'real' // trim(dec_suffix) // ', intent(inout) ::   lu(chnkpnts,nzcnt)'
+               code(7:) = 'real' // trim(dec_suffix) // ', intent(inout) ::   lu(veclen,nzcnt)'
             end if
          case default
             code(7:) = 'real' // trim(dec_suffix) // ', intent(inout) ::   lu(clsze,' // hdr // 'nzcnt)'
@@ -391,7 +391,7 @@ Column_loop : &
             write(30,100) blank
             code = ' '
             if( march == 'VECTOR' ) then
-               code(7:) = 'do k = ofl,ofu'
+               code(7:) = 'do k = 1,avec_len'
             else if( march == 'CACHE' ) then
                if( model == 'MOZART' ) then
                   code(7:) = 'do k = 1,clsze'

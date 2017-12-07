@@ -95,6 +95,10 @@
       write(30,100) trim(code)
       code = ' '
       write(30,100) trim(code)
+      if (march=='VECTOR') then
+         code = '      use chem_mods, only: veclen'
+         write(30,100) trim(code)
+      endif
       code = '      private'
       write(30,100) trim(code)
       code = '      public :: lu_slv'
@@ -268,7 +272,7 @@ Backward_loop : &
 	    case( 'SCALAR' )
                write(code,'(''      call '',a,''lu_slv'',a,''( lu, b )'')') trim(up_hdr),num(2:3)
 	    case( 'VECTOR' )
-	       write(code,'(''      call '',a,''lu_slv'',a,''( ofl, ofu, chnkpnts, lu, b )'')') trim(up_hdr),num(2:3)
+	       write(code,'(''      call '',a,''lu_slv'',a,''( avec_len, lu, b )'')') trim(up_hdr),num(2:3)
 	    case default
                if( model /= 'CAM' ) then
                   write(code,'(''      call '',a,''lu_slv'',a,''( lu, b )'')') trim(up_hdr),num(2:3)
@@ -340,9 +344,9 @@ Backward_loop : &
             end if
          case( 'VECTOR' )
             if( sub_cnt /= 0 ) then
-               write(code,'(''      subroutine '',a,''lu_slv'',a,''( ofl, ofu, chnkpnts, lu, b )'')') trim(up_hdr),num(2:3)
+               write(code,'(''      subroutine '',a,''lu_slv'',a,''( avec_len, lu, b )'')') trim(up_hdr),num(2:3)
             else
-               write(code,'(''      subroutine '',a,''lu_slv( ofl, ofu, chnkpnts, lu, b )'')') trim(up_hdr)
+               write(code,'(''      subroutine '',a,''lu_slv( avec_len, lu, b )'')') trim(up_hdr)
             end if
          case default
             if( sub_cnt /= 0 ) then
@@ -407,16 +411,12 @@ Backward_loop : &
          end if
       else
          if( march == 'VECTOR' ) then
-            code(7:) = 'integer, intent(in) ::   ofl'
-            write(30,100) trim(code)
-            code(7:) = 'integer, intent(in) ::   ofu'
-            write(30,100) trim(code)
-            code(7:) = 'integer, intent(in) ::   chnkpnts'
+            code(7:) = 'integer, intent(in) ::   avec_len'
             write(30,100) trim(code)
             if( model /= 'CAM' ) then
                code(7:) = 'real, intent(in)    ::   lu(plnplv,' // hdr // 'nzcnt)'
             else
-               code(7:) = 'real(r8), intent(in)    ::   lu(chnkpnts,max(1,nzcnt))'
+               code(7:) = 'real(r8), intent(in)    ::   lu(veclen,max(1,nzcnt))'
             end if
          else
             code(7:) = 'real, intent(in)    ::   lu(clsze,' // hdr // 'nzcnt)'
@@ -431,7 +431,7 @@ Backward_loop : &
          if( model /= 'CAM' ) then
             write(code(7:),'(''real' // trim(dec_suffix) // ', intent(inout) ::   b(plnplv,clscnt'',i1,'')'')') class
          else
-            write(code(7:),'(''real' // trim(dec_suffix) // ', intent(inout) ::   b(chnkpnts,max(1,clscnt4))'')'')')
+            write(code(7:),'(''real' // trim(dec_suffix) // ', intent(inout) ::   b(veclen,clscnt4)'')'')')
          end if
       else
          write(code(7:),'(''real' // trim(dec_suffix) // ', intent(inout) ::   b(clsze,clscnt'',i1,'')'')') class
@@ -456,7 +456,7 @@ Backward_loop : &
          if( march /= 'SCALAR' ) then
             code = ' '
             if( march == 'VECTOR' ) then
-               code(7:) = 'do k = ofl,ofu'
+               code(7:) = 'do k = 1,avec_len'
             else
                if( model == 'MOZART' ) then
                   code(7:) = 'do k = 1,clsze'

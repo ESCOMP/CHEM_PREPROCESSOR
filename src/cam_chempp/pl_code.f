@@ -97,6 +97,10 @@
          write(30,100) trim(line)
          line = ' '
          write(30,100) trim(line)
+         if( march == 'VECTOR' ) then
+           line = '      use chem_mods, only : veclen'
+           write(30,100) trim(line)
+         endif
          line = '      private'
          write(30,100) trim(line)
       end if
@@ -152,11 +156,11 @@ Class_loop : &
 	       case( hov )
                   line = '      subroutine hov_prod_loss( prod, loss, y, rxt, het_rates )'
 	       case( implicit )
-                  line = '      subroutine imp_prod_loss( ofl, ofu, chnkpnts, prod, loss, y, &'
+                  line = '      subroutine imp_prod_loss( avec_len, prod, loss, y, &'
                   write(30,100) trim(line)
                   line = '                                rxt, het_rates )'
 	       case( rodas )
-                  line = '      subroutine rodas_prod_loss( ofl, ofu, prod, loss, y, &'
+                  line = '      subroutine rodas_prod_loss( avec_len, prod, loss, y, &'
                   write(30,100) trim(line)
                   line = '                                  rxt, het_rates )'
 	    end select
@@ -233,9 +237,9 @@ Class_loop : &
                   line = '      integer :: cols'
                   write(30,100) trim(line)
                elseif( march == 'VECTOR' ) then
-                 line = '      integer, intent(in) :: ofl, ofu, chnkpnts'
+                 line = '      integer, intent(in) :: avec_len'
                  write(30,100) trim(line)
-                 line = '      real' // trim(dec_suffix) // ', dimension(chnkpnts,clscnt4), intent(out) :: &'
+                 line = '      real' // trim(dec_suffix) // ', dimension(veclen,clscnt4), intent(out) :: &'
                else
                  line = '      real' // trim(dec_suffix) // ', dimension(:,:), intent(out) :: &'
                endif
@@ -330,12 +334,12 @@ Class_loop : &
 !              write(30,100) trim(line)
 !              line = '      integer, intent(in)    ::  chnkpnts'
 !              write(30,100) trim(line)
-               line = '      real' // trim(dec_suffix) // ', intent(in)       ::  y(chnkpnts,gas_pcnst)'
+               line = '      real' // trim(dec_suffix) // ', intent(in)       ::  y(veclen,gas_pcnst)'
                write(30,100) trim(line)
-               line = '      real' // trim(dec_suffix) // ', intent(in)       ::  rxt(chnkpnts,rxntot)'
+               line = '      real' // trim(dec_suffix) // ', intent(in)       ::  rxt(veclen,rxntot)'
                write(30,100) trim(line)
                if( model /= 'WRF' ) then
-                 line = '      real' // trim(dec_suffix) // ', intent(in)       ::  het_rates(chnkpnts,gas_pcnst)'
+                 line = '      real' // trim(dec_suffix) // ', intent(in)       ::  het_rates(veclen,gas_pcnst)'
                end if
             else
 	       if( model /= 'CAM' ) then
@@ -460,7 +464,11 @@ Class_loop : &
 	       line = ' '
 	       if( march /= 'SCALAR' ) then
 	          if( march == 'VECTOR' ) then
-	             line(7:) = 'do k = ofl,ofu'
+                     if( class == implicit ) then
+	               line(7:) = 'do k = 1,avec_len'
+                     else
+                         line(7:) = 'do k = ofl,ofu'
+                     end if
 		  else
                      if( model == 'MOZART' ) then
 	                line(7:) = 'do k = 1,clsze'

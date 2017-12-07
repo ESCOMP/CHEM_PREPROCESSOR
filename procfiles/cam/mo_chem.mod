@@ -60,5 +60,8 @@
       logical                        :: is_vector
       logical                        :: is_scalar
       character(len=16)              :: slvd_lst(max(1,nslvd))
+# if VECLEN !=0
+      integer, parameter :: veclen = VECLEN
+# endif
 
       end module chem_mods

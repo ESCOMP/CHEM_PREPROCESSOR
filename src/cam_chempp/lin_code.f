@@ -98,6 +98,10 @@
       write(30,100) trim(line)
       line = ' '
       write(30,100) trim(line)
+      if (march=='VECTOR') then
+         line = '      use chem_mods, only: veclen'
+         write(30,100) trim(line)
+      endif
       line = '      private'
       write(30,100) trim(line)
       line = '      public :: linmat'
@@ -364,7 +368,7 @@ Species_loop : &
          write(num,'(i4)') 1000+m
          select case( march )
             case ( 'VECTOR' )
-               write(line,'(''      call '',a,''linmat'',a,''( ofl, ofu, chnkpnts, mat, y, rxt, het_rates )'')') &
+               write(line,'(''      call '',a,''linmat'',a,''( avec_len, mat, y, rxt, het_rates )'')') &
                    trim(up_hdr),num(3:4)
             case ( 'SCALAR' )
                write(line,'(''      call '',a,''linmat'',a,''( mat, y, rxt, het_rates )'')') trim(up_hdr),num(3:4)
@@ -434,10 +438,10 @@ Species_loop : &
             end if
          case ( 'VECTOR' )
             if( sub_cnt /= 0 ) then
-               write(line,'(''      subroutine '',a,''linmat'',a,''( ofl, ofu, chnkpnts, mat, y, rxt, het_rates )'')') &
+               write(line,'(''      subroutine '',a,''linmat'',a,''( avec_len, mat, y, rxt, het_rates )'')') &
                           trim(up_hdr),num(2:3)
             else
-               write(line,'(''      subroutine '',a,''linmat( ofl, ofu, chnkpnts, mat, y, rxt, het_rates )'')') &
+               write(line,'(''      subroutine '',a,''linmat( avec_len, mat, y, rxt, het_rates )'')') &
                           trim(up_hdr)
             end if
          case default
@@ -532,21 +536,17 @@ Species_loop : &
             end if
             write(30,100) trim(line)
 	 case ( 'VECTOR' )
-            line = '      integer, intent(in) ::  ofl'
+            line = '      integer, intent(in) ::  avec_len'
             write(30,100) trim(line)
-            line = '      integer, intent(in) ::  ofu'
+            line = '      real, intent(in)    ::  y(veclen,gas_pcnst)'
             write(30,100) trim(line)
-            line = '      integer, intent(in) ::  chnkpnts'
-            write(30,100) trim(line)
-            line = '      real, intent(in)    ::  y(:,:)'
-            write(30,100) trim(line)
-            line = '      real, intent(in)    ::  rxt(:,:)'
+            line = '      real, intent(in)    ::  rxt(veclen,rxntot)'
             write(30,100) trim(line)
             if( model /= 'WRF' ) then
-               line = '      real, intent(in)    ::  het_rates(:,:)'
+               line = '      real, intent(in)    ::  het_rates(veclen,gas_pcnst)'
                write(30,100) trim(line)
             end if
-            line = '      real, intent(inout) ::  mat(:,:)'
+            line = '      real, intent(inout) ::  mat(veclen,nzcnt)'
             write(30,100) trim(line)
             if( sub_cnt /= 0 ) then
                line = ' '
@@ -562,7 +562,7 @@ Species_loop : &
                write(30,100) trim(line)
                line = ' '
                write(30,100) trim(line)
-               line(7:) = 'do k = ofl,ofu'
+               line(7:) = 'do k = 1,avec_len'
                write(30,100) trim(line)
             end if
          case default
@@ -608,15 +608,15 @@ Species_loop : &
             line = '      real(r8), intent(inout) ::  mat(nzcnt)'
             write(30,100) trim(line)
          case ( 'VECTOR' )
-            line = '      integer,  intent(in)    ::  ofl, ofu, chnkpnts'
+            line = '      integer,  intent(in)    ::  avec_len'
             write(30,100) trim(line)
-            line = '      real(r8), intent(in)    ::  y(chnkpnts,gas_pcnst)'
+            line = '      real(r8), intent(in)    ::  y(veclen,gas_pcnst)'
             write(30,100) trim(line)
-            line = '      real(r8), intent(in)    ::  rxt(chnkpnts,rxntot)'
+            line = '      real(r8), intent(in)    ::  rxt(veclen,rxntot)'
             write(30,100) trim(line)
-            line = '      real(r8), intent(in)    ::  het_rates(chnkpnts,gas_pcnst)'
+            line = '      real(r8), intent(in)    ::  het_rates(veclen,gas_pcnst)'
             write(30,100) trim(line)
-            line = '      real(r8), intent(inout) ::  mat(chnkpnts,nzcnt)'
+            line = '      real(r8), intent(inout) ::  mat(veclen,nzcnt)'
             write(30,100) trim(line)
 	    if( sub_cnt /= 0 ) then
                line = ' '
@@ -634,7 +634,7 @@ Species_loop : &
                write(30,100) trim(line)
                if( clscnt /= 0 ) then
                   if( model == 'CAM' ) then
-                     line(7:) = 'do k = ofl,ofu'
+                     line(7:) = 'do k = 1,avec_len'
                   end if
                   write(30,100) trim(line)
                end if

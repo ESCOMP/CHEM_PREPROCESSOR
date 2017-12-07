@@ -116,7 +116,7 @@
       logical ::  diagprnt = .false.            ! chktrc or negtrc diagnostics printout
       logical ::  tavgprnt = .false.            ! time averaged printout
       logical ::  longnames = .false.           ! do not use long names
-
+      integer :: veclen = 0                     ! vector length in vectorized solver
       integer :: rxt_tag_cnt
       integer :: enthalpy_cnt
       character(len=32) :: rxt_rates_conv_file =  'mo_rxt_rates_conv.F90'
@@ -815,7 +815,7 @@
                   entry(2) = 1
                   call ver_opts( options(2:), model, machine, march, arch_type, &
                                  wrk_dir, cpp_dir, cpp_opts, subfile, diagprnt, &
-                                 tavgprnt, cpucnt, vec_ftns )
+                                 tavgprnt, cpucnt, vec_ftns, veclen )
 !-----------------------------------------------------------------------
 !        ... Write out the species and reaction id files
 !-----------------------------------------------------------------------
@@ -1638,7 +1638,7 @@ sparse_matrix_loop : &
       call chm_hdr( rxt_tag_cnt, enthalpy_cnt, hetcnt, usrcnt, cls_rxt_cnt, radj_flag, phtcnt, &
                     rxpcnt, rxparm, rxntot, ncol, nfs, nslvd, &
                     indexm, indexh2o, new_nq, relcnt, grp_mem_cnt, &
-                    clscnt, iter_counts, nzcnt, vec_ftns, machine, options(1) )
+                    clscnt, iter_counts, nzcnt, vec_ftns, machine, options(1), veclen )
 
 !-----------------------------------------------------------------------
 !        ... Write the resolution header file
@@ -2208,7 +2208,6 @@ sparse_matrix_loop : &
             call system( 'mv ' // trim(temp_path) // trim(tar_flnm) // ' ' // trim(output_path) // '.' )
          end if
       end if
-
 
 !-----------------------------------------------------------------------
 !       ... Write the params.h file
