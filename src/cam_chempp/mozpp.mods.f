@@ -250,7 +250,7 @@
  
       integer, parameter   :: dp = selected_real_kind( 12 )
 
-      integer, parameter :: var_lim = 1000
+      integer, parameter :: var_lim = 10000
       integer :: hst_file_lim
       integer :: hst_map_lim
       integer, pointer :: nq, relcnt, nfs, ngrp, &
@@ -587,6 +587,7 @@
       integer :: cls_rxt_cnt(4,5) = 0
       integer, allocatable :: &
                    cls_rxt_map(:,:,:)
+      integer, allocatable :: num_rnts(:) ! number of reactants
 
       contains
 
@@ -607,10 +608,9 @@
 !-----------------------------------------------------------------------
 !        ... Set reaction limits
 !-----------------------------------------------------------------------
-      rxt_lim   = 900
+      rxt_lim   = 5000
       rxtnt_lim = 3
-!     prd_lim   = 16
-      prd_lim   = 24
+      prd_lim   = 64
       prd_limp1 = prd_lim + 1
 
       allocate( fixmap(var_lim,3,2),stat=astat )
@@ -777,6 +777,13 @@
 	 stop
       end if
       cls_rxt_map(:,:,:) = 0
+
+      allocate( num_rnts(rxt_lim),stat=astat )
+      if( astat /= 0 ) then
+	 write(*,*) 'RXT_INI: Failed to allocate num_rnts'
+	 stop
+      end if
+      num_rnts(:) = -1
 
       end subroutine RXT_INI
 

@@ -49,6 +49,7 @@
 # endif
       real(r8), allocatable :: cph_enthalpy(:)
       integer,  allocatable :: cph_rid(:)
+      integer,  allocatable :: num_rnts(:)
 
       integer, allocatable :: rxt_tag_map(:)
       real(r8), allocatable :: pht_alias_mult(:,:)

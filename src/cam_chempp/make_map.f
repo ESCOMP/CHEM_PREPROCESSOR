@@ -40,7 +40,7 @@
                exit
             end if
          else
-            cls_rxt_map(kp3) = -99
+            cls_rxt_map(kp3) = -huge(0)
          end if
       end do
 

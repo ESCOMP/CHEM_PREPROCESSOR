@@ -32,6 +32,7 @@
                           prd_lim, rxtnt_lim
       use rxt_mod, only : has_cph => cph_flg, enthalpy
       use rxt_mod, only : frc_from_dataset
+      use rxt_mod, only : num_rnts
 
       implicit none
 
@@ -396,6 +397,7 @@ gas_phase_rxt_loop : &
                   if( nr < 0 ) then
                      call errmes ( 'there are no reactants@', lout, char, 1, buff )
                   end if
+                  num_rnts(rxno+1) = nr
 
                   call mapper( nq,       nfs,      npce,     nr,       np, &
                                rxtsym,   prdsym,   solsym,   fixsym,   pcesym, &

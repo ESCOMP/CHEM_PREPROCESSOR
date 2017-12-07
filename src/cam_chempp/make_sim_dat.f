@@ -14,7 +14,7 @@
       use rxt_mod, only : rxt_has_tag, rxt_tag
       use rxt_mod, only : phtcnt, pht_alias, pht_alias_mult
       use rxt_mod, only : usrcnt, usrmap, frc_from_dataset
-      use rxt_mod, only : cph_flg, enthalpy
+      use rxt_mod, only : cph_flg, enthalpy, num_rnts
 
       implicit none
 
@@ -44,6 +44,7 @@
       logical  ::  lexist
       integer  ::  numlen
       integer  ::  enthalpy_cnt
+      integer  ::  begcnt, endcnt
 
       inquire( file = trim( temp_path ) // 'mo_sim_dat.F', exist = lexist )
       if( lexist ) then
@@ -83,7 +84,7 @@
       write(30,100) trim(line)
       line(7:)   = 'use chem_mods,     only : extfrc_lst, inv_lst, slvd_lst'
       write(30,100) trim(line)
-      line(7:)   = 'use chem_mods,     only : enthalpy_cnt, cph_enthalpy, cph_rid'
+      line(7:)   = 'use chem_mods,     only : enthalpy_cnt, cph_enthalpy, cph_rid, num_rnts, rxntot'
       write(30,100) trim(line)
       line(7:)   = 'use cam_abortutils,only : endrun'
       write(30,100) trim(line)
@@ -566,30 +567,34 @@
          write(30,100) trim(line)
          line(7:) = 'end if'
          write(30,100) trim(line)
-         line = '      rxt_tag_lst(:rxt_tag_cnt) = (/ '
-         m1 = len_trim(line) + 2
-         do n = 1,i,2
-            n1 = min( n+1,i )
-            m = m1
-            do l = n,n1
-               rxt_string = rxt_tag(ndx(l))
-               lpos = index( rxt_string, ',cph' )
-               if( lpos > 0 ) then
-                  rxt_string = trim( rxt_string(:lpos-1) )
-               end if
-               if( l /= i ) then
-                  if( l /= n1 ) then
-                     write(line(m:),'("''",a32,"'',")') rxt_string
-                  else
-                     write(line(m:),'("''",a32,"'', &")') rxt_string
+
+         do begcnt = 1,i,200
+            endcnt = min(begcnt+199,i)
+            write(line,'(a,i6,a,i6,a)') '      rxt_tag_lst(',begcnt,':',endcnt,') = (/ '
+            m1 = len_trim(line) + 2
+            do n = begcnt,endcnt,2
+               n1 = min( n+1,endcnt )
+               m = m1
+               do l = n,n1
+                  rxt_string = rxt_tag(ndx(l))
+                  lpos = index( rxt_string, ',cph' )
+                  if( lpos > 0 ) then
+                     rxt_string = trim( rxt_string(:lpos-1) )
                   end if
-               else
-                  write(line(m:),'("''",a32,"'' /)")') rxt_string
-               end if
-               m = len_trim(line) + 2
+                  if( l /= endcnt ) then
+                     if( l /= n1 ) then
+                        write(line(m:),'("''",a32,"'',")') rxt_string
+                     else
+                        write(line(m:),'("''",a32,"'', &")') rxt_string
+                     end if
+                  else
+                     write(line(m:),'("''",a32,"'' /)")') rxt_string
+                  end if
+                  m = len_trim(line) + 2
+               end do
+               write(30,'(a)') trim(line)
+               line = ' '
             end do
-            write(30,'(a)') trim(line)
-            line = ' '
          end do
 
          line = '      rxt_tag_map(:rxt_tag_cnt) = (/'
@@ -805,7 +810,52 @@
             line = ' '
          end do
 
+         deallocate( ndx )
       endif has_cph
+
+!-------------------------------------------------------------------
+!	... List number of reactants
+!-------------------------------------------------------------------
+      
+
+      i = rxntot-phtcnt
+      numrnts: if (i>0) then
+
+          line = ' '
+
+         line(7:) = 'allocate( num_rnts(rxntot-phtcnt),stat=ios )'
+         write(30,100) trim(line)
+         line(7:) = 'if( ios /= 0 ) then'
+         write(30,100) trim(line)
+         line = ' '
+         line(10:) = 'write(iulog,*) ''set_sim_dat: failed to allocate num_rnts; error = '',ios'
+         write(30,100) trim(line)
+         line(10:) = 'call endrun'
+         write(30,100) trim(line)
+         line(7:) = 'end if'
+         write(30,100) trim(line)
+
+
+         line = '      num_rnts(:) = (/'
+         m = len_trim(line) + 2
+         do n = 1,i,10
+            n1 = min( n+9, i )
+            if( n1 /= i ) then
+               write(line(m:),'(10(i6,",")," &")') num_rnts(n+phtcnt:n1+phtcnt)
+            else
+               if( n1 > n ) then
+                  write(frmt,'("(",i2)') n1 - n
+                  frmt(len_trim(frmt)+1:) = '(i6,","),i6," /)")'
+               else
+                  frmt = '(i6," /)")'
+               end if
+               write(line(m:),trim(frmt)) num_rnts(n+phtcnt:n1+phtcnt)
+            end if
+            write(30,'(a)') trim(line)
+            line = ' '
+         end do
+
+      endif numrnts
 
       line = ' '
       write(30,100) trim(line)
