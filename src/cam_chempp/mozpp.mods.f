@@ -570,8 +570,8 @@
                    sym_rates(:,:), &
                    troe_sym_rates(:,:), &
                    pht_alias(:,:), &
-                   pht_alias_mult(:,:), &
-                   rxt_tag(:)
+                   pht_alias_mult(:,:)
+      character(len=32), allocatable :: rxt_tag(:)
       character(len=16), allocatable :: &
                    phtsym(:)
       logical, allocatable :: &
