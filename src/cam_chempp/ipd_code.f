@@ -57,7 +57,7 @@
       character(len=max_len) :: buff
       character(len=4) :: num_suffix 
       character(len=4) :: dec_suffix
-      character(len=3) ::  num
+      character(len=6) ::  num
       logical  ::  beg_line
       logical  ::  lexist, first, indprds
       logical  ::  first_class = .true.
@@ -228,7 +228,7 @@ Class_loop : &
 	    ku = MAX( cls_rxt_cnt(1,class),extcnt(class) )
 	    if( ku == 0 ) then
                do species = 1,clscnt(class)
-	          write(num,'(i3)') species
+	          write(num,'(i6)') species
 	          num =  adjustl( num )
 	          line = ' '
                   if( model /= 'CAM' ) then
@@ -252,7 +252,7 @@ Class_loop : &
 Species_loop : &
             do species = 1,clscnt(class)
                line = ' '
-	       write(num,'(i3)') permute(species,class)
+	       write(num,'(i6)') permute(species,class)
 	       num =  adjustl( num )
                if( model /= 'CAM' ) then
 	          line(10:) = 'prod(:,' // num(:len_trim(num)) // ') = '
@@ -336,7 +336,7 @@ Species_loop : &
                               call r2c( buff(len_trim(buff)+1:), rate, 'l' )
                               buff(len_trim( buff )+1:) = trim(num_suffix) // '*'
                            end if
-                           write(num,'(i3)') cls_rxt_map(k,1,class)
+                           write(num,'(i6)') cls_rxt_map(k,1,class)
 	                   num =  adjustl( num )
 		           if( model /= 'CAM' ) then
 		              buff(len_trim(buff)+1:) = 'rxt(:,' // num(:len_trim(num)) // ')'
@@ -349,7 +349,7 @@ Species_loop : &
 		           end if
 			   if( indexer(k) /= 0 ) then
                               if( abs( cls_rxt_map(k,indexer(k),class) ) /= 0 ) then
-                                 write(num,'(i3)') abs( cls_rxt_map(k,indexer(k),class) )
+                                 write(num,'(i6)') abs( cls_rxt_map(k,indexer(k),class) )
                                  num =  adjustl( num )
 		                 if( model /= 'CAM' ) then
                                     if( m > 1 ) then
@@ -395,7 +395,7 @@ Species_loop : &
 			   call put_in_line
 			   if( m == 1 ) then
 			      if( indexer(k) /= 0 ) then
-	                         write(num,'(i3)') max_loc(1)
+	                         write(num,'(i6)') max_loc(1)
 	                         num =  adjustl( num )
 		                 if( model /= 'CAM' ) then
 		                    buff = '*y(:,' // num(:len_trim(num)) // ')'
@@ -432,7 +432,7 @@ Species_loop : &
 	       if( count( match_mask(:extcnt(class),2) ) /= 0 ) then
 	          do k = base+1,base+extcnt(class)
 		     if( cls_rxt_map(k,2,class) == species ) then
-                        write(num,'(i3)') cls_rxt_map(k,1,class)
+                        write(num,'(i6)') cls_rxt_map(k,1,class)
 		        num = adjustl( num )
 		        n = len_trim( num )
 		        if( model /= 'CAM' ) then

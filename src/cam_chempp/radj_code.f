@@ -178,9 +178,9 @@
                end if
                if( trim(model) /= 'CAM' ) then
                   line(10:) = 'rate(:,'
-                  write(line(len_trim(line)+1:),'(i3)') rxno 
+                  write(line(len_trim(line)+1:),'(i6)') rxno 
                   line(len_trim(line)+1:) = ') = rate(:,'
-                  write(line(len_trim(line)+1:),'(i3)') rxno 
+                  write(line(len_trim(line)+1:),'(i6)') rxno 
                   line(len_trim(line)+1:) = ')'
                   do l = 2,j+1
                      line(strlen(line)+1:) = ' * inv(:,'
@@ -189,9 +189,9 @@
                   end do
                else
                   line(7:) = 'rate(:,:,'
-                  write(line(len_trim(line)+1:),'(i3)') rxno 
+                  write(line(len_trim(line)+1:),'(i6)') rxno 
                   line(len_trim(line)+1:) = ') = rate(:,:,'
-                  write(line(len_trim(line)+1:),'(i3)') rxno 
+                  write(line(len_trim(line)+1:),'(i6)') rxno 
                   line(len_trim(line)+1:) = ')'
                   do l = 2,j+1
                      line(strlen(line)+1:) = ' * inv(:,:,'
@@ -220,15 +220,15 @@
          line = ' '
          if( model /= 'CAM' ) then
             line(10:) = 'rate(:,'
-            write(line(len_trim(line)+1:),'(i3)') rxno 
+            write(line(len_trim(line)+1:),'(i6)') rxno 
             line(len_trim(line)+1:) = ') = rate(:,'
-            write(line(len_trim(line)+1:),'(i3)') rxno 
+            write(line(len_trim(line)+1:),'(i6)') rxno 
             line(len_trim(line)+1:) = ') * m(:)'
          else
             line(7:) = 'rate(:,:,'
-            write(line(len_trim(line)+1:),'(i3)') rxno 
+            write(line(len_trim(line)+1:),'(i6)') rxno 
             line(len_trim(line)+1:) = ') = rate(:,:,'
-            write(line(len_trim(line)+1:),'(i3)') rxno 
+            write(line(len_trim(line)+1:),'(i6)') rxno 
             line(len_trim(line)+1:) = ') * m(:,:)'
          end if
          write(30,100) trim(line)

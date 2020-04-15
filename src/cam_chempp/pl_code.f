@@ -68,7 +68,7 @@
       character(len= 6) :: sol_piece
       character(len=4)  :: num_suffix 
       character(len=4)  :: dec_suffix
-      character(len= 3) :: num
+      character(len=6)  :: num
       logical, allocatable :: match_mask(:,:)
       logical, allocatable :: pmask(:,:)
       logical  ::  beg_line
@@ -483,7 +483,7 @@ Class_loop : &
 Species_loop : &
             do species = 1,clscnt(class)
 	       if( class == ebi .or. class == hov ) then
-		  write(num,'(i3)') permute(species,2)
+		  write(num,'(i6)') permute(species,2)
 	          line = ' '
 	          line(13:) = 'case( ' // num(:len_trim(num)) // ' )'
 	          write(30,100) trim(line)
@@ -511,7 +511,7 @@ Species_loop : &
 	       if( class == ebi .or. class == hov ) then
 		  num = '1'
 	       else
-	          write(num,'(i3)') permute(species,class)
+	          write(num,'(i6)') permute(species,class)
 	          num =  adjustl( num )
 	       end if
 	       if( count( match_mask(kl:ku,1) ) == 0 ) then
@@ -597,7 +597,7 @@ Species_loop : &
 		     do k = kl,ku
 		        if( match_mask(k,2) ) then
 			   l = l + 1
-	                   write(num,'(i3)') cls_rxt_map(k,1,class)
+	                   write(num,'(i6)') cls_rxt_map(k,1,class)
 	                   num =  adjustl( num )
 			   if( model == 'CAM' .or. class == implicit .or. class == rodas ) then
 		              buff(len_trim(buff)+1:) = trim( rxt_piece ) // num(:len_trim(num)) // ') +'
@@ -611,7 +611,7 @@ Species_loop : &
 			         buff(len_trim(buff)-1:) = ' '
 			      end if
 			      call put_in_line
-			      write(num,'(i3)') m
+			      write(num,'(i6)') m
 	                      num =  adjustl( num )
 			      if( model == 'CAM' .or. class == implicit .or. class == rodas ) then
 		                 buff(len_trim(buff)+1:) = '* ' // trim( sol_piece ) // num(:len_trim(num)) // ')'
@@ -635,7 +635,7 @@ Species_loop : &
 	             do k = kl,ku
 		        if( match_mask(k,1) ) then
 		           cnt = cnt - 1
-	                   write(num,'(i3)') cls_rxt_map(k,1,class)
+	                   write(num,'(i6)') cls_rxt_map(k,1,class)
 	                   num =  adjustl( num )
 			   if( k <= sum(cls_rxt_cnt(1:3,class)) ) then
 			      if( model == 'CAM' .or. class == implicit .or. class == rodas ) then
@@ -661,7 +661,7 @@ Species_loop : &
 		     call put_in_line
 		  end if
 		  if( class == explicit .or. class >= implicit ) then
-	             write(num,'(i3)') target
+	             write(num,'(i6)') target
 	             num =  adjustl( num )
 		     if( model == 'CAM' .or. class == implicit .or. class == rodas ) then
 		        buff(len_trim(buff)+1:) = '* ' // trim( sol_piece ) // num(:len_trim(num)) // ')'
@@ -685,7 +685,7 @@ Species_loop : &
 	       if( class == ebi .or. class == hov ) then
 		  num = '1'
 	       else
-	          write(num,'(i3)') permute(species,class)
+	          write(num,'(i6)') permute(species,class)
 	          num =  adjustl( num )
 	       end if
 	       line = ' '
@@ -761,7 +761,7 @@ Species_loop : &
 			   call r2c( buff(len_trim(buff)+1:), rate, 'l' )
 			   buff(len_trim( buff )+1:) = trim(num_suffix) // '*'
 		        end if
-	                write(num,'(i3)') cls_rxt_map(k,1,class)
+	                write(num,'(i6)') cls_rxt_map(k,1,class)
 	                num =  adjustl( num )
 			if( model == 'CAM' .or. class == implicit .or. class == rodas ) then
 		           buff(len_trim(buff)+1:) = trim( rxt_piece ) // num(:len_trim(num)) // ')'
@@ -769,7 +769,7 @@ Species_loop : &
 		           buff(len_trim(buff)+1:) = 'rxt(:,' // num(:len_trim(num)) // ')'
 			end if
 			if( abs( cls_rxt_map(k,indexer(k),class) ) /= 0 ) then
-	                   write(num,'(i3)') abs( cls_rxt_map(k,indexer(k),class) )
+	                   write(num,'(i6)') abs( cls_rxt_map(k,indexer(k),class) )
 	                   num =  adjustl( num )
 			   if( model == 'CAM' .or. class == implicit .or. class == rodas ) then
 			      if( m > 1 ) then
@@ -797,7 +797,7 @@ Species_loop : &
 			end if
 			call put_in_line
 			if( m == 1 ) then
-	                   write(num,'(i3)') max_loc(1)
+	                   write(num,'(i6)') max_loc(1)
 	                   num =  adjustl( num )
 			   if( model == 'CAM' .or. class == implicit .or. class == rodas ) then
 		              buff = '*' // trim( sol_piece ) // num(:len_trim(num)) // ')'

@@ -46,8 +46,8 @@ contains
     character(len=16)   :: vec_dim
     character(len=4)   :: num_suffix 
     character(len=4)   :: dec_suffix
-    character(len=3)   :: num
-    character(len=3)   :: numa
+    character(len=6)   :: num
+    character(len=6)   :: numa
     logical  ::  lexist
     logical  ::  vftns
     logical  ::  do_tmp
@@ -384,7 +384,7 @@ contains
                       line(7:) = 'rate(:,:kbot,'
                    end if
                 end if
-                write(num,'(i3)') rxptab(i)
+                write(num,'(i6)') rxptab(i)
                 num = adjustl( num )
                 l   = len_trim( sym_rates(1,i) )
                 wrk = sym_rates(1,i)(:l)
@@ -552,7 +552,7 @@ contains
                             end if
                          end if
                          m1 = match_ind(m)
-                         write(num,'(i3)') rxptab(m1)
+                         write(num,'(i6)') rxptab(m1)
                          num = adjustl( num )
                          l = len_trim( sym_rates(1,m1) )
                          wrk = sym_rates(1,m1)(:l)
@@ -585,7 +585,7 @@ contains
                             line(7:) = 'rate(:,:kbot,'
                          end if
                       end if
-                      write(num,'(i3)') rxptab(i)
+                      write(num,'(i6)') rxptab(i)
                       num = adjustl( num )
                       l = len_trim( sym_rates(1,i) )
                       wrk  = sym_rates(1,i)(:l)
@@ -777,7 +777,8 @@ contains
                       line(7:) = 'call jpl( wrk'
                    end if
                 end if
-                write(numa,'(i3)') troetab(i)
+                write(numa,'(i6)') troetab(i)
+                numa = adjustl( numa )
                 if( subs == 1 ) then
                    num = numa
                 else

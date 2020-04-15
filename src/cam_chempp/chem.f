@@ -1265,12 +1265,18 @@ rxtnt_scan : &
 
       if( line_cnt <= 3 ) then
          if( sym_rate(1) /= ' ' ) then
-	    troe_rate = rate(1) /= 0. .and. rate(3) /= 0.
-	    if( line_cnt == 1 ) then
-	       if( rate(1) == 0. ) then
+            troe_rate = rate(1) /= 0. .and. rate(3) /= 0.
+            if( line_cnt == 1 ) then
+               if( rate(1) == 0. ) then
                   buff(69:) = ' rate = 0.'
-                  write(lout,100) loc_rxt_tag, irxn, buff, irxn+phtcnt
-	       else if( .not. troe_rate ) then
+                  if (irxn>999) then
+                     write(lout,102) loc_rxt_tag, irxn, buff, irxn+phtcnt
+                  else if (irxn+phtcnt>999) then
+                     write(lout,101) loc_rxt_tag, irxn, buff, irxn+phtcnt
+                  else
+                     write(lout,100) loc_rxt_tag, irxn, buff, irxn+phtcnt
+                  endif
+               else if( .not. troe_rate ) then
                   buff(69:) = ' rate = '
                   write(buff(77:),'(1pe8.2)') rate(1)
                   if( rate(2) /= 0. ) then
@@ -1278,11 +1284,17 @@ rxtnt_scan : &
                      write(buff(90:),'(f8.0)') rate(2)
                      buff(98:) = '/t)'
                   end if
-                  write(lout,100) loc_rxt_tag, irxn, buff, irxn+phtcnt
-	       else
+                  if (irxn>999) then
+                     write(lout,102) loc_rxt_tag, irxn, buff, irxn+phtcnt
+                  else if (irxn+phtcnt>999) then
+                     write(lout,101) loc_rxt_tag, irxn, buff, irxn+phtcnt
+                  else
+                     write(lout,100) loc_rxt_tag, irxn, buff, irxn+phtcnt
+                  endif
+               else
                   buff(69:) = ' troe : ko='
                   write(buff(80:),'(1pe8.2)') rate(1)
-	          if( rate(2) /= 0. ) then
+                  if( rate(2) /= 0. ) then
                      buff(88:) = '*(300/t)**'
                      if ( rate(2)>=0. ) then 
                         write(buff(98:),'(f4.2)') rate(2)
@@ -1290,36 +1302,48 @@ rxtnt_scan : &
                         write(buff(98:),'(f5.2)') rate(2)
                      endif
                   end if
-                  write(lout,110) loc_rxt_tag, irxn, buff, irxn+phtcnt
+                  if (irxn>999) then
+                     write(lout,112) loc_rxt_tag, irxn, buff, irxn+phtcnt
+                  else if (irxn+phtcnt>999) then
+                     write(lout,111) loc_rxt_tag, irxn, buff, irxn+phtcnt
+                  else
+                     write(lout,110) loc_rxt_tag, irxn, buff, irxn+phtcnt
+                  endif
                end if
-	    else if( troe_rate ) then
-	       if( line_cnt == 2 ) then
+            else if( troe_rate ) then
+               if( line_cnt == 2 ) then
                   buff(69:) = '        ki='
                   write(buff(80:),'(1pe8.2)') rate(3)
-	          if( rate(4) /= 0. ) then
-	             if( rate(4) /= 1. ) then
+                  if( rate(4) /= 0. ) then
+                     if( rate(4) /= 1. ) then
                         buff(88:) = '*(300/t)**'
                         if ( rate(4)>=0. ) then 
                            write(buff(98:),'(f4.2)') rate(4)
                         else
                            write(buff(98:),'(f5.2)') rate(4)
                         endif
-	             else
+                     else
                         buff(88:) = '*(300/t)'
-	             end if
+                     end if
                   end if
-	       else if( line_cnt == 3 ) then
+               else if( line_cnt == 3 ) then
                   buff(69:) = '         f='
                   write(buff(80:),'(f4.2)') rate(5)
-	       end if
+               end if
                write(lout,120) buff
-	    else if( buff /= ' ' ) then
+            else if( buff /= ' ' ) then
                write(lout,120) buff
             end if
          else
-	    if( line_cnt == 1 ) then
+            if( line_cnt == 1 ) then
                buff(69:) = ' rate = ** User defined **'
-               write(lout,100) loc_rxt_tag, irxn, buff, irxn+phtcnt
+               if (irxn>999) then
+                  write(lout,102) loc_rxt_tag, irxn, buff, irxn+phtcnt
+               else if (irxn+phtcnt>999) then
+                  write(lout,101) loc_rxt_tag, irxn, buff, irxn+phtcnt
+               else
+                  write(lout,100) loc_rxt_tag, irxn, buff, irxn+phtcnt
+               endif
             else if( buff /= ' ' ) then
                write(lout,120) buff
             end if
@@ -1333,7 +1357,13 @@ rxtnt_scan : &
 !        ... Formats
 !-----------------------------------------------------------------------
 100   format(2x,a16,1x,'(',i3,')',3x,a100,3x,'(',i3,')')
+101   format(2x,a16,1x,'(',i3,')',3x,a100,3x,'(',i4,')')
+102   format(2x,a16,1x,'(',i4,')',2x,a100,3x,'(',i4,')')
+
 110   format(2x,a16,1x,'(',i3,')',3x,a101,2x,'(',i3,')')
+111   format(2x,a16,1x,'(',i3,')',3x,a101,2x,'(',i4,')')
+112   format(2x,a16,1x,'(',i4,')',2x,a101,2x,'(',i4,')')
+
 120   format(27x,a103)
 
       end subroutine write_rxt
