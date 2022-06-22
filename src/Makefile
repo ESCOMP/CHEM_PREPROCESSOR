@@ -33,7 +33,7 @@ else
 dirs := ./ $(SRCDIRS)
 endif
 
-# Determine platform 
+# Determine platform
 UNAMES := $(shell uname -s)
 UNAMEM := $(shell uname -m)
 
@@ -42,8 +42,8 @@ cpp_dirs := $(dirs)
 cpp_path := $(foreach dir,$(cpp_dirs),-I$(dir)) # format for command line
 
 # Expand any tildes in directory names. Change spaces to colons.
-VPATH    := $(foreach dir,$(cpp_dirs),$(dir)) 
-VPATH    := $(subst $(space),:,$(VPATH))               
+VPATH    := $(foreach dir,$(cpp_dirs),$(dir))
+VPATH    := $(subst $(space),:,$(VPATH))
 
 # Get list of files and determine objects and dependency files
 base_srclist_f := $(shell cat $(SRCLIST))
@@ -55,14 +55,14 @@ all: $(MODEL_EXEDIR)/$(EXENAME)
 #------------------------------------------------------------------------
 #------------------------------------------------------------------------
 
-# guess default compiler 
+# guess default compiler
 ifeq ($(USER_FC),$(null))
 
 #------------------------------------------------------------------------
 # Linux -- including pleiades
 #------------------------------------------------------------------------
 ifeq ($(UNAMES),Linux)
-  USER_FC := pgf95
+  USER_FC := gfortran
 endif
 #------------------------------------------------------------------------
 # Altix (columbia)
