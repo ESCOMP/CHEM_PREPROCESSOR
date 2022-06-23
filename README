@@ -15,7 +15,7 @@ This will biuld $PROC_DIR/bin/campp executable.
 Edit or create a chemical mechanism file in the $PROC_DIR/inputs
 directory.  Example mechanisms files can be found in $PROC_DIR/inputs.
 More information the chemical mechanism inputs can be found at 
-http://gctm.acd.ucar.edu/mozart/documents/mozart2_preprocessor.pdf
+https://github.com/ESCOMP/CHEM_PREPROCESSOR/wiki
 
 To run:
 > cd $PROC_DIR/inputs
